@@ -6,7 +6,12 @@ pnpm install
 pnpm prisma generate
 pnpm run build
 
-echo "PM2 무중단 리로드 진행 중..."
+echo "PM2 프로세스 업데이트 중..."
+
+# 메인 앱은 무중단(Reload)으로 서비스 유지
 pm2 reload bono-open-class
 
-echo "무중단 배포(Reload)가 완료되었습니다!"
+# 스튜디오는 새로운 스키마 반영을 위해 재시작(Restart)
+pm2 restart prisma-studio
+
+echo "모든 서비스 업데이트가 완료되었습니다!"
