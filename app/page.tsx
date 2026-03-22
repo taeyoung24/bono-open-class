@@ -21,7 +21,7 @@ export default function Home() {
 
     // 1. 커스텀 유효성 검사 (브라우저 기본 알림 대체)
     if (!name.trim()) {
-      setErrorMessage('요원 이름을 입력해주세요.')
+      setErrorMessage('학생 이름을 입력해주세요.')
       return
     }
     if (secretCode.length < 4) {
@@ -108,9 +108,9 @@ export default function Home() {
       {showModal && (
         <div className="fixed inset-0 bg-black/20 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
           <div className="max-w-xs w-full bg-white border border-gray-100 rounded-3xl p-6 text-center animate-in zoom-in-95 duration-200">
-            <h3 className="text-lg font-bold mb-2 text-gray-900">새로운 요원 등록</h3>
+            <h3 className="text-lg font-bold mb-2 text-gray-900">새로운 학생 등록</h3>
             <p className="text-sm text-gray-500 mb-6 leading-relaxed break-keep">
-              <span className="font-bold text-blue-600">{name}</span> 요원의 데이터가 없습니다.<br/>
+              <span className="font-bold text-blue-600">{name}</span> 학생의 데이터가 없습니다.<br/>
               입력하신 정보로 새로 등록할까요?
             </p>
             <div className="flex gap-2">
