@@ -7,7 +7,7 @@ pnpm prisma generate
 pnpm run build
 
 echo "프로덕션 서버 실행 중..."
-pm2 start pnpm --name "bono-open-class" -- start
+pm2 start pnpm --name "bono-open-class" -- start -- -p 5033
 
 echo "Prisma Studio 실행 중 (백그라운드)..."
 # --host 0.0.0.0 옵션을 추가하여 Tailscale IP로 접속 가능하게 설정
