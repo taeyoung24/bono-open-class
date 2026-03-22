@@ -3,6 +3,7 @@ cd "$(dirname "$0")/.."
 
 echo "의존성 설치 및 Next.js 앱 빌드 시작..."
 pnpm install
+pnpm prisma generate
 pnpm run build
 
 echo "프로덕션 서버 실행 중..."
