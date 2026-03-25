@@ -1,0 +1,309 @@
+.pageWrapper {
+  min-height: 100vh;
+  background-color: var(--background);
+  display: flex;
+  justify-content: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pageWrapper {
+    background-color: #000000;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 960px;
+  background-color: var(--background);
+  min-height: 100%;
+  padding-bottom: 3rem;
+}
+
+/* 상단 배경 배너 */
+.banner {
+  width: 100%;
+  height: 240px; /* 기존 180px에서 240px로 확장 */
+  background: #f1f5f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  .banner {
+    background: #1e293b;
+  }
+}
+
+/* 프로필 영역 (왼쪽 정렬) */
+.profileSection {
+  padding: 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: -65px; /* 아바타 크기가 커졌으므로 더 많이 끌어올림 */
+  position: relative;
+  z-index: 10;
+}
+
+.avatarContainer {
+  width: 130px; /* 기존 90px에서 130px로 확대 */
+  height: 130px;
+  border-radius: 50%; /* 원형 마스크 */
+  background-color: var(--background);
+  padding: 4px; /* 테두리처럼 보이는 여백도 살짝 더 줌 */
+  box-sizing: border-box;
+}
+
+.avatarImage {
+  width: 100%;
+  height: 100%;
+  background-color: #e2e8f0; /* 플레이스홀더 색 */
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@media (prefers-color-scheme: dark) {
+  .avatarImage {
+    background-color: #334155;
+  }
+}
+
+.userInfo {
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.userName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.125rem;
+}
+
+.userEmail {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.userPoints {
+  font-size: 0.9rem;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+.userPoints strong {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+/* 로그아웃 버튼 (우측 정렬, 연하고 밑줄된 글씨) */
+.logoutBtn {
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  color: #9ca3af;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.35rem; /* 이름과 수직 줄맞춤을 위해 미세 조정 */
+}
+
+.logoutBtn:hover {
+  color: #6b7280;
+}
+
+/* 프로필 수정 / 학습하기 액션 버튼들 */
+.actionButtons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.btnPrimary, .btnSecondary {
+  flex: 1;
+  padding: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  text-align: center;
+}
+
+.btnPrimary {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btnSecondary {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  .btnSecondary {
+    background-color: #374151;
+    color: #f3f4f6;
+  }
+}
+
+.btnPrimary:hover, .btnSecondary:hover {
+  opacity: 0.85;
+}
+
+/* 모달창 디자인 (프로필 수정 등) */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 320px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.modalTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+.modalText {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.25rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modalBtn {
+  margin-top: 0;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  color: var(--foreground);
+  margin-bottom: 1.25rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+/* 완성작 갤러리 섹션 */
+.gallerySection {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+/* 인스타그램 스타일 3열 그리드 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px; /* 인스타처럼 이미지 간격을 아주 타이트하게(거의 붙임) */
+}
+
+.gridItem {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* 정사각형 비율 */
+  background-color: #f3f4f6;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .gridItem {
+    background-color: #1f2937;
+  }
+}
+
+.gridImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.2s ease;
+}
+
+/* 모바일 친화적인 터치/호버 효과 */
+.gridItem:hover .gridImage {
+  opacity: 0.8;
+}
+
+/* 호버 시 나타나는 오버레이 (텍스트) */
+.itemOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.gridItem:hover .itemOverlay {
+  opacity: 1;
+}
+
+.overlayLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 라벨 내용이 길면 2줄에서 말줄임 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.overlayDate {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.empty {
+  grid-column: span 3;
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

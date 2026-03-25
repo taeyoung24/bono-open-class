@@ -5,7 +5,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 // 로그인 체크 또는 계정 생성 통합 함수
-export async function handleAuth(name: string, secretCode: string, action: 'CHECK' | 'CREATE') {
+export async function handleAuth(name: string, secretCode: string, email: string, action: 'CHECK' | 'CREATE') {
   const cookieStore = await cookies()
 
   // 1. 기존 유저 확인 (동명이인이라도 이름+암호가 같으면 본인으로 취급)
@@ -27,12 +27,32 @@ export async function handleAuth(name: string, secretCode: string, action: 'CHEC
   // 2. 새 유저 생성 (모달에서 '네, 만들게요' 눌렀을 때 실행)
   if (action === 'CREATE') {
     const newStudent = await prisma.student.create({
-      data: { name, secretCode }
+      data: { name, secretCode, email: email || null }
     })
     
     cookieStore.set('studentId', newStudent.id.toString(), { httpOnly: true, path: '/' })
     return { success: true }
   }
+}
+
+import { revalidatePath } from 'next/cache'
+
+// 학생 이메일 정보 수정 함수
+export async function updateEmail(email: string) {
+  const cookieStore = await cookies()
+  const studentId = cookieStore.get('studentId')?.value
+
+  if (!studentId) return { success: false }
+
+  await prisma.student.update({
+    where: { id: parseInt(studentId) },
+    data: { email: email.trim() || null }
+  })
+  
+  // 데이터가 변경되었음을 알려 대시보드 화면을 갱신하도록 함
+  revalidatePath('/dashboard')
+  
+  return { success: true }
 }
 
 export async function logOut() {
