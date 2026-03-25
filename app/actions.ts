@@ -60,3 +60,50 @@ export async function logOut() {
   cookieStore.delete('studentId')
   redirect('/')
 }
+
+// 과제 상태 토글 액션 (WAITING <-> IN_PROGRESS 만 가능)
+export async function toggleTaskStatus(taskId: number) {
+  const cookieStore = await cookies()
+  const studentIdStr = cookieStore.get('studentId')?.value
+  if (!studentIdStr) return { success: false, error: 'Unauthorized' }
+
+  const studentId = parseInt(studentIdStr)
+
+  // 1. 현재 진도 상태 확인
+  const progress = await prisma.studentProgress.findUnique({
+    where: {
+      studentId_taskId: { studentId, taskId }
+    }
+  })
+
+  let nextStatus = 'IN_PROGRESS'
+  
+  if (progress) {
+    // 이미 있는 기록인 경우
+    if (progress.status === 'DONE') {
+      return { success: false, error: 'Already completed by admin' }
+    }
+    
+    // 토글 로직: IN_PROGRESS -> WAITING / WAITING -> IN_PROGRESS
+    nextStatus = progress.status === 'IN_PROGRESS' ? 'WAITING' : 'IN_PROGRESS'
+
+    await prisma.studentProgress.update({
+      where: { id: progress.id },
+      data: { status: nextStatus }
+    })
+  } else {
+    // 기록이 없으면 처음 클릭한 것이므로 IN_PROGRESS로 생성
+    await prisma.studentProgress.create({
+      data: {
+        studentId,
+        taskId,
+        status: 'IN_PROGRESS'
+      }
+    })
+  }
+
+  // 화면 갱신을 위해 해당 테마 페이지 재검증
+  revalidatePath('/learning/[themeId]', 'page')
+  
+  return { success: true, status: nextStatus }
+}

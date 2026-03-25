@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { updateEmail } from '../actions'
 import styles from './Dashboard.module.css'
+import { HiOutlineCog6Tooth } from 'react-icons/hi2'
 
 export default function EditProfileButton({ currentEmail }: { currentEmail: string }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -18,8 +19,12 @@ export default function EditProfileButton({ currentEmail }: { currentEmail: stri
 
   return (
     <>
-      <button className={styles.btnSecondary} onClick={() => setIsOpen(true)}>
-        프로필 수정
+      <button 
+        className={styles.btnIcon} 
+        onClick={() => setIsOpen(true)}
+        title="프로필 수정"
+      >
+        <HiOutlineCog6Tooth size={24} />
       </button>
 
       {isOpen && (

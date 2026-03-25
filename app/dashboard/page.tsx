@@ -1,9 +1,12 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import styles from './Dashboard.module.css'
 import { logOut } from '../actions'
 import EditProfileButton from './EditProfileButton'
+import ThemeImage from '../learning/ThemeImage'
+import { HiOutlineLogout } from 'react-icons/hi'
 
 export default async function DashboardPage() {
   const cookieStore = await cookies()
@@ -13,16 +16,18 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
-  const student = await prisma.student.findUnique({
-    where: { id: parseInt(studentId) },
-    include: {
-      artworks: {
-        orderBy: {
-          createdAt: 'desc',
-        },
+  // 로그인한 학생 정보 및 모든 학습 테마 데이터 검색
+  const [student, themes] = await Promise.all([
+    prisma.student.findUnique({
+      where: { id: parseInt(studentId) },
+      include: {
+        artworks: { orderBy: { createdAt: 'desc' } },
       },
-    },
-  })
+    }),
+    prisma.theme.findMany({
+      orderBy: { id: 'asc' },
+    })
+  ])
 
   if (!student) {
     redirect('/login')
@@ -31,41 +36,42 @@ export default async function DashboardPage() {
   return (
     <div className={styles.pageWrapper}>
       <main className={styles.container}>
-        {/* 1. 상단 가로 배너 영역 */}
-        <div className={styles.banner}></div>
+        {/* 상단 로그아웃 바 */}
+        <div className={styles.topBar}>
+          <form action={logOut}>
+            <button type="submit" className={styles.logoutBtnPill}>
+              <HiOutlineLogout size={18} />
+              <span>로그아웃</span>
+            </button>
+          </form>
+        </div>
 
-        {/* 2. 학생 정보 (왼쪽 정렬, 배너 겹침) */}
+        {/* 1. 학생 정보 섹션 */}
         <section className={styles.profileSection}>
-          <div className={styles.avatarContainer}>
-            <div className={styles.avatarImage} />
-          </div>
-          
           <div className={styles.userInfo}>
-            <div className={styles.infoRow}>
-              <div>
-                <h1 className={styles.userName}>{student.name}</h1>
-                {student.email && <p className={styles.userEmail}>{student.email}</p>}
-                <p className={styles.userPoints}>
-                  포인트: <strong>{student.points.toLocaleString()}P</strong>
-                </p>
-              </div>
-              
-              <form action={logOut}>
-                <button type="submit" className={styles.logoutBtn}>
-                  로그아웃
-                </button>
-              </form>
+            <div className={styles.nameRow}>
+              <h1 className={styles.userName}>{student.name}</h1>
+              <EditProfileButton currentEmail={student.email || ''} />
             </div>
-          </div>
-          
-          {/* 주요 액션 버튼 영역 */}
-          <div className={styles.actionButtons}>
-            <EditProfileButton currentEmail={student.email || ''} />
-            <button className={styles.btnPrimary}>학습하기</button>
+            {student.email && <p className={styles.userEmail}>{student.email}</p>}
+            <p className={styles.userPoints}>
+              포인트: <strong>{student.points.toLocaleString()}P</strong>
+            </p>
           </div>
         </section>
 
-        {/* 3. 완성작 포트폴리오 갤러리 (가로 폭 제한 유지, 타이트한 3열 그리드) */}
+        {/* 2. 학습 테마 선택 섹션 (대시보드 통합 타입) */}
+        <section className={styles.learningSection}>
+          <div className={styles.themeList}>
+            {themes.map((theme) => (
+              <Link key={theme.id} href={`/learning/${theme.id}`} className={styles.themeCard}>
+                <ThemeImage id={theme.id} name={theme.name} className={styles.coverImage} />
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* 3. 완성작 포트폴리오 갤러리 */}
         <section className={styles.gallerySection}>
           <div className={styles.grid}>
             {student.artworks && student.artworks.length > 0 ? (

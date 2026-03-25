@@ -23,6 +23,7 @@ model Task {
   id          Int     @id @default(autoincrement())
   title       String
   description String?
+  url         String? // 과제 수행을 위한 외부 링크 (있는 경우)
   themeId     Int
 
   prevId      Int?    // 이전 과제 ID (첫 번째 과제는 null)
