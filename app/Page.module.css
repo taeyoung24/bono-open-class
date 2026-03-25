@@ -1,0 +1,178 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  padding: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .container {
+    background-color: #111827;
+  }
+}
+
+.card {
+  width: 100%;
+  max-width: 400px;
+  background-color: var(--background);
+  padding: 2.5rem 2rem;
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  position: relative;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin-bottom: 0.25rem;
+  text-align: center;
+  letter-spacing: -0.5px;
+}
+
+.subtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 400;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background-color: transparent;
+  border: var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  color: var(--foreground);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+/* 포커스시 기본 번들 효과 대신 깔끔한 선 변경으로 처리 */
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.input::placeholder {
+  color: #9ca3af;
+}
+
+.errorContainer {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.errorMessage {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #ef4444;
+}
+
+.button {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: opacity 0.2s ease;
+}
+
+.button:hover:not(:disabled) {
+  opacity: 0.9; /* 호버시 살짝 투명도 조절로만 플랫하게 피드백 */
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.buttonSecondary {
+  background-color: transparent;
+  color: var(--foreground);
+  border: var(--border);
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .buttonSecondary:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 340px;
+  background-color: var(--background);
+  border: var(--border);
+  padding: 2rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+.modalText {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.modalText strong {
+  color: var(--foreground);
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modalActions .button {
+  margin-top: 0;
+}

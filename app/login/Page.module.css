@@ -1,0 +1,181 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background); /* 순백색 컨벤션 일치 */
+  padding: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .container {
+    background-color: #000000;
+  }
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  background-color: var(--background);
+  padding: 2rem;
+  border: none; /* 투박한 테두리 완전 제거 */
+  border-radius: 0;
+}
+
+.title {
+  font-size: 2rem; /* 굵고 시원하게 */
+  font-weight: 800;
+  color: var(--foreground);
+  margin-bottom: 0.5rem;
+  text-align: left; /* 좌측 정렬이 더욱 모던함 */
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  margin-bottom: 3rem;
+  text-align: left;
+  font-weight: 500;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 2rem;
+}
+
+.label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.input {
+  width: 100%;
+  padding: 1rem 0; /* 좌우 여백을 없애 라인에 떠 있는 텍스트 연출 */
+  background-color: transparent;
+  border: none;
+  border-bottom: var(--border); /* 수정: 하단 라인 하나로 세련되게 */
+  border-radius: 0;
+  font-size: 1.1rem;
+  color: var(--foreground);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-bottom-color: var(--primary); /* 포커스 시 하단 생명선 발광 */
+}
+
+.input::placeholder {
+  color: #cbd5e1;
+}
+
+.errorContainer {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 1rem;
+}
+
+.errorMessage {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ef4444;
+}
+
+.button {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: 99px; /* 트렌디한 알약(Pill) 형태 버튼 */
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.button:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px); /* 미세하게 뜨는 효과 */
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.buttonSecondary {
+  background-color: transparent;
+  color: var(--foreground);
+  border: var(--border);
+}
+
+.buttonSecondary:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+  opacity: 1;
+}
+
+@media (prefers-color-scheme: dark) {
+  .buttonSecondary:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 340px;
+  background-color: var(--background);
+  border: var(--border);
+  padding: 2rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.modalTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+.modalText {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.modalText strong {
+  color: var(--foreground);
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modalActions .button {
+  margin-top: 0;
+}

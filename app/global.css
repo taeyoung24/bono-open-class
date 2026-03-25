@@ -1,19 +1,33 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  
+  /* 테두리 글로벌 설정 */
+  --border-color: #e5e7eb;
+  --border: 1px solid var(--border-color);
+  
+  /* 둥글기(Radius) 글로벌 설정 */
+  --radius-sm: 10px;   /* 인풋, 버튼 등 작은 요소 */
+  --radius-md: 16px;   /* 모달, 중간 크기 요소 */
+  --radius-lg: 24px;   /* 폼 카드 등 큰 요소 */
+  
+  --input: #f9fafb;
+  --primary: #2563eb;
+  --primary-foreground: #ffffff;
+}
 
-@layer base {
+@media (prefers-color-scheme: dark) {
   :root {
-    --background: #ffffff;
-    --foreground: #111827;
-    --border: #e5e7eb;
-    --input: #f9fafb;
-    --primary: #2563eb;
-    --primary-foreground: #ffffff;
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --border-color: #333333;
+    --input: #171717;
   }
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
 }

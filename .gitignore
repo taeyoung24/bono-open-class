@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# database (SQLite)
+*.db
+*.db-journal
+
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -41,3 +45,4 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+/docs/reports

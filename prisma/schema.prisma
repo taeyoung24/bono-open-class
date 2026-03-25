@@ -7,35 +7,70 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 1. 학생 테이블
+// ─────────────────────────────────────────────
+// 테마 (기초편 / 활용편 / 실전편 등)
+// ─────────────────────────────────────────────
+model Theme {
+  id    Int    @id @default(autoincrement())
+  name  String // 예: "기초편: 디지털 세상"
+  tasks Task[]
+}
+
+// ─────────────────────────────────────────────
+// 과제 (학습 절차 / 진도 단위)
+// ─────────────────────────────────────────────
+model Task {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+  url         String? // 과제 수행을 위한 외부 링크 (있는 경우)
+  themeId     Int
+
+  prevId      Int?    // 이전 과제 ID (첫 번째 과제는 null)
+  nextId      Int?    // 다음 과제 ID (마지막 과제는 null)
+
+  theme    Theme             @relation(fields: [themeId], references: [id])
+  progress StudentProgress[]
+}
+
+// ─────────────────────────────────────────────
+// 학생
+// ─────────────────────────────────────────────
 model Student {
-  id         Int            @id @default(autoincrement())
-  name       String         // 이름 (예: 김철수)
-  secretCode String         // 아이들용 암호 (예: "피카츄", "1234" 등)
-  badges     StudentBadge[]
+  id         Int               @id @default(autoincrement())
+  name       String
+  email      String?
+  secretCode String
+  points     Int               @default(0) // 재화 (포인트, 음수 불가 정수)
+  progress   StudentProgress[]
+  artworks   Artwork[]
 }
 
-// 2. 뱃지 메타데이터 테이블
-model Badge {
-  id          Int            @id @default(autoincrement())
-  name        String         // 뱃지 이름 (예: "첫 타자왕")
-  description String?        // 뱃지 설명
-  imagePath   String         // 이미지 경로 (예: "/badges/type-master.svg")
-  grade       Int            @default(1) // 1~5 자연수 등급 (1이 가장 낮고 5가 가장 높음)
-  students    StudentBadge[]
-}
-
-// 3. 학생-뱃지 발급 기록 (N:M 매핑)
-model StudentBadge {
-  id        String   @id @default(uuid()) // 아이들이 열광할 고유 해커 식별자!
+// ─────────────────────────────────────────────
+// 학생별 과제 진도
+// ─────────────────────────────────────────────
+model StudentProgress {
+  id        String         @id @default(uuid())
   studentId Int
-  badgeId   Int
-  earnedAt  DateTime @default(now())      // 획득 시간 자동 기록
-  issuer    String   @default("정태영")    // 발급자 기본값 세팅
+  taskId    Int
+  status    String         @default("WAITING") // WAITING | IN_PROGRESS | DONE
 
+  student   Student @relation(fields: [studentId], references: [id])
+  task      Task    @relation(fields: [taskId], references: [id])
+
+  @@unique([studentId, taskId])
+}
+
+// ─────────────────────────────────────────────
+// 완성작 (포트폴리오, 학생과 N:1 관계)
+// ─────────────────────────────────────────────
+model Artwork {
+  id        Int      @id @default(autoincrement())
+  imageUrl  String   // 대표이미지 (상대 경로 혹은 URL)
+  date      String   // 제작날짜 (예: "2026-03-26")
+  label     String?  // 이미지를 나타내는 짧은 문자열
+  createdAt DateTime @default(now()) // 최신순 정렬용 백업 타임스탬프
+
+  studentId Int
   student   Student  @relation(fields: [studentId], references: [id])
-  badge     Badge    @relation(fields: [badgeId], references: [id])
-
-  // 한 학생이 똑같은 뱃지를 두 번 받지 않도록 방지 (원치 않으시면 지워도 됩니다)
-  @@unique([studentId, badgeId]) 
 }

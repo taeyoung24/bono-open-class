@@ -1,0 +1,343 @@
+.pageWrapper {
+  min-height: 100vh;
+  background-color: var(--background);
+  display: flex;
+  justify-content: center;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pageWrapper {
+    background-color: #000000;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 960px;
+  background-color: var(--background);
+  min-height: 100%;
+  padding-bottom: 3rem;
+}
+
+/* 상단 메타 바 (로그아웃 등) */
+.topBar {
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.logoutBtnPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  color: #64748b;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logoutBtnPill:hover {
+  background-color: #e5e7eb;
+  color: var(--foreground);
+}
+
+@media (prefers-color-scheme: dark) {
+  .logoutBtnPill {
+    background-color: #1e293b;
+    color: #94a3b8;
+  }
+  .logoutBtnPill:hover {
+    background-color: #334155;
+    color: #f8fafc;
+  }
+}
+
+/* 프로필 영역 */
+.profileSection {
+  padding: 1rem 1.25rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.userInfo {
+  width: 100%;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.userName {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+}
+
+.btnIcon {
+  background: transparent;
+  border: none;
+  color: #94a3b8; /* 너무 튀지 않게 연한 회색 */
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+}
+
+.btnIcon:hover {
+  color: var(--foreground);
+  background-color: #f1f5f9;
+}
+
+@media (prefers-color-scheme: dark) {
+  .btnIcon:hover {
+    background-color: #1e293b;
+  }
+}
+
+.userEmail {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.userPoints {
+  font-size: 0.9rem;
+  color: #4b5563;
+  margin-top: 0.25rem;
+}
+
+.userPoints strong {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.btnPrimary, .btnSecondary {
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  min-width: 100px;
+}
+
+/* 대시보드 통합 학습 테마 섹션 */
+.learningSection {
+  padding: 2.5rem 1.25rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f8fafc; /* 아주 연한 타일 느낌의 배경 */
+  border-radius: var(--radius-lg);
+  margin-left: 1rem;
+  margin-right: 1rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .learningSection {
+    background-color: #0f172a;
+  }
+}
+
+.themeList {
+  display: flex;
+  flex-direction: row; 
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.themeCard {
+  width: 200px; /* 대시보드 내에서는 약간 더 작게 유지 */
+  aspect-ratio: 1 / 1.4142; /* A4 비율 */
+  background-color: #f3f4f6;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent; /* 다른 폼처럼 얇게 통일 */
+  overflow: hidden;
+  display: block;
+  opacity: 0.9;
+  transition: all 0.2s ease;
+}
+
+@media (prefers-color-scheme: dark) {
+  .themeCard {
+    background-color: #1f2937;
+  }
+}
+
+.themeCard:hover {
+  border-color: var(--primary);
+  opacity: 1;
+  transform: translateY(-4px);
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* 모달창 디자인 (프로필 수정 등) */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 320px;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.modalTitle {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+}
+
+.modalText {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1.25rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.modalBtn {
+  margin-top: 0;
+}
+
+.input {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  color: var(--foreground);
+  margin-bottom: 1.25rem;
+  box-sizing: border-box;
+  font-family: inherit;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+/* 완성작 갤러리 섹션 */
+.gallerySection {
+  margin-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+/* 인스타그램 스타일 3열 그리드 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px; /* 인스타처럼 이미지 간격을 아주 타이트하게(거의 붙임) */
+}
+
+.gridItem {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1; /* 정사각형 비율 */
+  background-color: #f3f4f6;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+@media (prefers-color-scheme: dark) {
+  .gridItem {
+    background-color: #1f2937;
+  }
+}
+
+.gridImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.2s ease;
+}
+
+/* 모바일 친화적인 터치/호버 효과 */
+.gridItem:hover .gridImage {
+  opacity: 0.8;
+}
+
+/* 호버 시 나타나는 오버레이 (텍스트) */
+.itemOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.gridItem:hover .itemOverlay {
+  opacity: 1;
+}
+
+.overlayLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* 라벨 내용이 길면 2줄에서 말줄임 */
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.overlayDate {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.empty {
+  grid-column: span 3;
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
