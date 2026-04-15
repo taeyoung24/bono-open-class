@@ -1,11 +1,12 @@
 'use client';
 
 import styles from 'app/components/AuthFormLayout.module.css';
-import TextButton from 'app/components/TextButton';
+import { DefaultButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
-import WideButton from 'app/components/WideButton';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { FaAsterisk } from 'react-icons/fa';
+import { IoAlertCircleOutline } from 'react-icons/io5';
 
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
@@ -63,26 +64,46 @@ export default function LoginPage() {
         </div>
 
         <form onSubmit={handleLogin} className={styles.form} noValidate>
-          <TextInput
-            label="아이디"
-            value={userId}
-            onChange={setUserId}
-            placeholder="아이디를 입력해주세요"
-            required={true}
-            error={errorStatus?.field === 'userId' ? errorStatus.message : ''}
-          />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              아이디
+              <FaAsterisk className={styles.requiredIcon} size={8} />
+            </label>
+            <TextInput
+              value={userId}
+              onChange={setUserId}
+              placeholder="아이디를 입력해주세요"
+              required={true}
+            />
+            {errorStatus?.field === 'userId' && (
+              <span className={styles.errorText}>
+                <IoAlertCircleOutline size={16} />
+                {errorStatus.message}
+              </span>
+            )}
+          </div>
 
-          <TextInput
-            label="비밀번호"
-            type="password"
-            value={password}
-            onChange={setPassword}
-            placeholder="비밀번호를 입력해주세요"
-            required={true}
-            error={errorStatus?.field === 'password' ? errorStatus.message : ''}
-          />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              비밀번호
+              <FaAsterisk className={styles.requiredIcon} size={8} />
+            </label>
+            <TextInput
+              type="password"
+              value={password}
+              onChange={setPassword}
+              placeholder="비밀번호를 입력해주세요"
+              required={true}
+            />
+            {errorStatus?.field === 'password' && (
+              <span className={styles.errorText}>
+                <IoAlertCircleOutline size={16} />
+                {errorStatus.message}
+              </span>
+            )}
+          </div>
 
-          <WideButton type="submit" text="로그인" />
+          <DefaultButton type="submit" text="로그인" />
         </form>
 
         <div className={styles.helperActions}>
@@ -98,3 +119,5 @@ export default function LoginPage() {
     </main>
   );
 }
+
+

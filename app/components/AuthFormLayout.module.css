@@ -42,6 +42,61 @@
   gap: 20px;
 }
 
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-sb);
+  color: var(--text-main);
+  margin-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.requiredIcon {
+  color: var(--accent-primary);
+  margin-bottom: 4px;
+}
+
+.inputWithAction {
+  display: flex;
+  align-items: center; /* 버튼 높이가 고정이므로 중앙 정렬이 더 안정적 */
+  gap: 12px;
+}
+
+.inputWithAction > div {
+  flex: 1;
+}
+
+.errorText {
+  font-size: 13px;
+  font-weight: var(--font-weight-sb);
+  color: var(--status-failure);
+  margin-top: 4px;
+  padding-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.successText {
+  font-size: 13px;
+  font-weight: var(--font-weight-sb);
+  color: var(--status-success);
+  margin-top: 4px;
+  padding-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+
+
 .helperActions {
   display: flex;
   justify-content: center;
@@ -58,7 +113,9 @@
 
 .footer {
   margin-top: 32px;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .bottomFooter {

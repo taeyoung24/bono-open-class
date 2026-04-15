@@ -1,11 +1,12 @@
 'use client';
 
-import WideButton from 'app/components/WideButton';
-import TextInput from 'app/components/TextInput';
-import TextButton from 'app/components/TextButton';
-import { useState } from 'react';
 import styles from 'app/components/AuthFormLayout.module.css';
+import { DefaultButton, FieldButton, TextButton } from 'app/components/Button';
+import TextInput from 'app/components/TextInput';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { FaAsterisk } from 'react-icons/fa';
+import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,23 +14,62 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
+  const [errorStatus, setErrorStatus] = useState<{ field: string; message: string; success?: boolean } | null>(null);
+  const [isIdChecked, setIsIdChecked] = useState(false);
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const checkIdDuplication = async () => {
     if (!userId) {
       setErrorStatus({ field: 'userId', message: '아이디를 입력해주세요!' });
       return;
     }
+
+    try {
+      const response = await fetch('/api/auth/check-id', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await response.json();
+
+      if (data.available) {
+        setIsIdChecked(true);
+        setErrorStatus({ field: 'userId', message: data.message, success: true });
+      } else {
+        setIsIdChecked(false);
+        setErrorStatus({ field: 'userId', message: data.message });
+      }
+    } catch (error) {
+      alert('서버와 통신 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // 아이디 유효성 검사 (4자 이상 영문/숫자)
+    const userIdRegex = /^[a-zA-Z0-9]{4,}$/;
+    if (!userId || !userIdRegex.test(userId)) {
+      setErrorStatus({ field: 'userId', message: '아이디는 4자 이상의 영문 또는 숫자여야 합니다.' });
+      return;
+    }
+
+    if (!isIdChecked) {
+      setErrorStatus({ field: 'userId', message: '아이디 중복 확인이 필요합니다.' });
+      return;
+    }
+
     if (!name) {
       setErrorStatus({ field: 'name', message: '이름을 입력해주세요!' });
       return;
     }
-    if (!password) {
-      setErrorStatus({ field: 'password', message: '비밀번호를 입력해주세요!' });
+
+    // 비밀번호 유효성 검사 (8자 이상, 영문+숫자+특수문자 포함)
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    if (!password || !passwordRegex.test(password)) {
+      setErrorStatus({ field: 'password', message: '비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.' });
       return;
     }
+
     if (password !== confirmPassword) {
       setErrorStatus({ field: 'confirmPassword', message: '비밀번호가 일치하지 않습니다.' });
       return;
@@ -67,46 +107,96 @@ export default function RegisterPage() {
         </div>
 
         <form onSubmit={handleRegister} className={styles.form} noValidate>
-          <TextInput
-            label="사용할 아이디"
-            value={userId}
-            onChange={setUserId}
-            placeholder="아이디를 입력해주세요"
-            required={true}
-            error={errorStatus?.field === 'userId' ? errorStatus.message : ''}
-          />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              사용할 아이디
+              <FaAsterisk className={styles.requiredIcon} size={8} />
+            </label>
+            <div className={styles.inputWithAction}>
+              <TextInput
+                value={userId}
+                onChange={(val) => {
+                  setUserId(val);
+                  setIsIdChecked(false); 
+                }}
+                placeholder="4자 이상의 영문 또는 숫자"
+                required={true}
+              />
+              <FieldButton 
+                text="중복 확인" 
+                type="button" 
+                onClick={checkIdDuplication} 
+              />
+            </div>
+            {errorStatus?.field === 'userId' && (
+              <span className={errorStatus.success ? styles.successText : styles.errorText}>
+                {errorStatus.success ? <IoCheckmarkCircleOutline size={16} /> : <IoAlertCircleOutline size={16} />}
+                {errorStatus.message}
+              </span>
+            )}
+          </div>
 
-          <TextInput
-            label="이름"
-            value={name}
-            onChange={setName}
-            placeholder="본명을 입력해주세요"
-            required={true}
-            error={errorStatus?.field === 'name' ? errorStatus.message : ''}
-          />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              이름
+              <FaAsterisk className={styles.requiredIcon} size={8} />
+            </label>
+            <TextInput
+              value={name}
+              onChange={setName}
+              placeholder="본명을 입력해주세요"
+              required={true}
+            />
+            {errorStatus?.field === 'name' && (
+              <span className={styles.errorText}>
+                <IoAlertCircleOutline size={16} />
+                {errorStatus.message}
+              </span>
+            )}
+          </div>
 
-          <TextInput
-            label="비밀번호"
-            type="password"
-            value={password}
-            onChange={setPassword}
-            placeholder="비밀번호를 입력해주세요"
-            required={true}
-            error={errorStatus?.field === 'password' ? errorStatus.message : ''}
-          />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              비밀번호
+              <FaAsterisk className={styles.requiredIcon} size={8} />
+            </label>
+            <TextInput
+              type="password"
+              value={password}
+              onChange={setPassword}
+              placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+              required={true}
+            />
+            {errorStatus?.field === 'password' && (
+              <span className={styles.errorText}>
+                <IoAlertCircleOutline size={16} />
+                {errorStatus.message}
+              </span>
+            )}
+          </div>
 
-          <TextInput
-            label="비밀번호 확인"
-            type="password"
-            value={confirmPassword}
-            onChange={setConfirmPassword}
-            placeholder="비밀번호를 다시 입력해주세요"
-            required={true}
-            error={errorStatus?.field === 'confirmPassword' ? errorStatus.message : ''}
-          />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              비밀번호 확인
+              <FaAsterisk className={styles.requiredIcon} size={8} />
+            </label>
+            <TextInput
+              type="password"
+              value={confirmPassword}
+              onChange={setConfirmPassword}
+              placeholder="비밀번호를 다시 한번 입력해주세요"
+              required={true}
+            />
+            {errorStatus?.field === 'confirmPassword' && (
+              <span className={styles.errorText}>
+                <IoAlertCircleOutline size={16} />
+                {errorStatus.message}
+              </span>
+            )}
+          </div>
 
           <div style={{ marginTop: '10px' }}>
-            <WideButton type="submit" text="가입 완료" />
+            <DefaultButton type="submit" text="가입 완료" />
           </div>
         </form>
 
@@ -121,3 +211,5 @@ export default function RegisterPage() {
     </main>
   );
 }
+
+
