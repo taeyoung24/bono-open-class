@@ -133,7 +133,7 @@ export default function LoginPage() {
         </form>
 
         <div className={styles.helperActions}>
-          <TextButton text="비밀번호 찾기" onClick={() => console.log('Find Password')} />
+          <TextButton text="비밀번호 찾기" onClick={() => router.push('/reset-password')} />
           <div className={styles.divider} />
           <TextButton text="새로 가입하기" onClick={() => router.push('/register')} />
         </div>

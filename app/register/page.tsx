@@ -3,11 +3,11 @@
 import styles from 'app/components/AuthFormLayout.module.css';
 import { DefaultButton, FieldButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
+import AlertModal from 'app/modals/AlertModal';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
-import AlertModal from 'app/modals/AlertModal';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function RegisterPage() {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {}
+    onConfirm: () => { }
   });
 
   const showModal = (title: string, message: string, onConfirm?: () => void) => {
@@ -109,9 +109,9 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrorStatus({ 
-          field: data.field || 'userId', 
-          message: data.message || '가입 중 오류가 발생했습니다.' 
+        setErrorStatus({
+          field: data.field || 'userId',
+          message: data.message || '가입 중 오류가 발생했습니다.'
         });
         return;
       }
@@ -144,15 +144,15 @@ export default function RegisterPage() {
                 value={userId}
                 onChange={(val) => {
                   setUserId(val);
-                  setIsIdChecked(false); 
+                  setIsIdChecked(false);
                 }}
                 placeholder="4자 이상의 영문 또는 숫자"
                 required={true}
               />
-              <FieldButton 
-                text="중복 확인" 
-                type="button" 
-                onClick={checkIdDuplication} 
+              <FieldButton
+                text="중복 확인"
+                type="button"
+                onClick={checkIdDuplication}
               />
             </div>
             {errorStatus?.field === 'userId' && (
@@ -239,7 +239,7 @@ export default function RegisterPage() {
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
 
-      <AlertModal 
+      <AlertModal
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}

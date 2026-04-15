@@ -1,0 +1,270 @@
+'use client';
+
+import styles from 'app/components/AuthFormLayout.module.css';
+import { DefaultButton, TextButton } from 'app/components/Button';
+import TextInput from 'app/components/TextInput';
+import AlertModal from 'app/modals/AlertModal';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { FaAsterisk } from 'react-icons/fa';
+import { IoAlertCircleOutline } from 'react-icons/io5';
+
+type Step = 'request' | 'verify' | 'reset';
+
+export default function ResetPasswordPage() {
+  const router = useRouter();
+
+  const [step, setStep] = useState<Step>('request');
+  const [userId, setUserId] = useState('');
+  const [code, setCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [modal, setModal] = useState({ isOpen: false, title: '', message: '', onConfirm: () => { } });
+
+  const showModal = (title: string, message: string, onConfirm?: () => void) => {
+    setModal({
+      isOpen: true, title, message,
+      onConfirm: onConfirm || (() => setModal(prev => ({ ...prev, isOpen: false })))
+    });
+  };
+
+  // STEP 1: 아이디 입력 → 관리자에게 코드 전송
+  const handleRequestCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorStatus(null);
+
+    if (!userId) {
+      setErrorStatus({ field: 'userId', message: '아이디를 입력해주세요.' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/auth/reset-password/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorStatus({ field: 'userId', message: data.message });
+        return;
+      }
+
+      setStep('verify');
+    } catch {
+      showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // STEP 2: 인증코드 입력 → 검증
+  const handleVerifyCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorStatus(null);
+
+    if (!code || code.length !== 4) {
+      setErrorStatus({ field: 'code', message: '4자리 인증코드를 입력해주세요.' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/auth/reset-password/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, code }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorStatus({ field: 'code', message: data.message });
+        return;
+      }
+
+      setStep('reset');
+    } catch {
+      showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // STEP 3: 새 비밀번호 설정
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorStatus(null);
+
+    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    if (!newPassword || !passwordRegex.test(newPassword)) {
+      setErrorStatus({ field: 'newPassword', message: '영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setErrorStatus({ field: 'confirmPassword', message: '비밀번호가 일치하지 않습니다.' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/auth/reset-password/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, code, newPassword }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showModal('오류', data.message);
+        return;
+      }
+
+      showModal('완료', '비밀번호가 성공적으로 변경되었습니다.', () => {
+        setModal(prev => ({ ...prev, isOpen: false }));
+        router.push('/login');
+      });
+    } catch {
+      showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const stepTitles: Record<Step, string> = {
+    request: '비밀번호 재설정',
+    verify: '인증코드 입력',
+    reset: '새 비밀번호 설정',
+  };
+
+  const stepDescriptions: Record<Step, string> = {
+    request: '아이디를 입력하면 관리자에게 인증코드가 전달됩니다.',
+    verify: `관리자에게 받은 4자리 인증코드를 입력해주세요.\n코드는 5분간 유효합니다.`,
+    reset: '새로 사용할 비밀번호를 입력해주세요.',
+  };
+
+  return (
+    <main className={styles.container}>
+      <div className={styles.authCard}>
+        <div className={styles.header}>
+          <h3 className={styles.title}>{stepTitles[step]}</h3>
+          <p className={styles.subtitle}>{stepDescriptions[step]}</p>
+        </div>
+
+        {/* STEP 1: 아이디 입력 */}
+        {step === 'request' && (
+          <form onSubmit={handleRequestCode} className={styles.form} noValidate>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>
+                아이디
+                <FaAsterisk className={styles.requiredIcon} size={8} />
+              </label>
+              <TextInput
+                value={userId}
+                onChange={setUserId}
+                placeholder="로그인에 사용하는 아이디"
+                required={true}
+              />
+              {errorStatus?.field === 'userId' && (
+                <span className={styles.errorText}>
+                  <IoAlertCircleOutline size={16} />
+                  {errorStatus.message}
+                </span>
+              )}
+            </div>
+            <DefaultButton type="submit" text={isLoading ? '요청 중...' : '인증코드 요청'} disabled={isLoading} />
+          </form>
+        )}
+
+        {/* STEP 2: 인증코드 입력 */}
+        {step === 'verify' && (
+          <form onSubmit={handleVerifyCode} className={styles.form} noValidate>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>
+                인증코드
+                <FaAsterisk className={styles.requiredIcon} size={8} />
+              </label>
+              <TextInput
+                value={code}
+                onChange={setCode}
+                placeholder="4자리 숫자 코드"
+                required={true}
+              />
+              {errorStatus?.field === 'code' && (
+                <span className={styles.errorText}>
+                  <IoAlertCircleOutline size={16} />
+                  {errorStatus.message}
+                </span>
+              )}
+            </div>
+            <DefaultButton type="submit" text={isLoading ? '확인 중...' : '코드 확인'} disabled={isLoading} />
+          </form>
+        )}
+
+        {/* STEP 3: 새 비밀번호 */}
+        {step === 'reset' && (
+          <form onSubmit={handleResetPassword} className={styles.form} noValidate>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>
+                새 비밀번호
+                <FaAsterisk className={styles.requiredIcon} size={8} />
+              </label>
+              <TextInput
+                type="password"
+                value={newPassword}
+                onChange={setNewPassword}
+                placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                required={true}
+              />
+              {errorStatus?.field === 'newPassword' && (
+                <span className={styles.errorText}>
+                  <IoAlertCircleOutline size={16} />
+                  {errorStatus.message}
+                </span>
+              )}
+            </div>
+            <div className={styles.fieldGroup}>
+              <label className={styles.label}>
+                비밀번호 확인
+                <FaAsterisk className={styles.requiredIcon} size={8} />
+              </label>
+              <TextInput
+                type="password"
+                value={confirmPassword}
+                onChange={setConfirmPassword}
+                placeholder="비밀번호를 다시 입력해주세요"
+                required={true}
+              />
+              {errorStatus?.field === 'confirmPassword' && (
+                <span className={styles.errorText}>
+                  <IoAlertCircleOutline size={16} />
+                  {errorStatus.message}
+                </span>
+              )}
+            </div>
+            <DefaultButton type="submit" text={isLoading ? '변경 중...' : '비밀번호 변경'} disabled={isLoading} />
+          </form>
+        )}
+
+        <div className={styles.footer}>
+          <TextButton text="로그인으로 돌아가기" onClick={() => router.push('/login')} />
+        </div>
+      </div>
+
+      <div className={styles.bottomFooter}>
+        <p>© 2026 Bono Open Class. All rights reserved.</p>
+      </div>
+
+      <AlertModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+      />
+    </main>
+  );
+}

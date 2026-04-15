@@ -25,3 +25,16 @@ model User {
 
   @@map("users") // 테이블 이름을 명확하게 지정
 }
+
+// ─────────────────────────────────────────────
+// 비밀번호 재설정 인증코드 (임시 저장, 10분 유효)
+// ─────────────────────────────────────────────
+model PasswordResetCode {
+  id        Int      @id @default(autoincrement())
+  userId    String   @unique // 한 아이디에 하나의 코드만 유효
+  code      String   // 4자리 숫자 코드
+  expiresAt DateTime // 만료 시각 (발급 후 10분)
+  createdAt DateTime @default(now())
+
+  @@map("password_reset_codes")
+}

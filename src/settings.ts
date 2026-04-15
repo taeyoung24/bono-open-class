@@ -22,5 +22,6 @@ if (NODE_ENV !== 'production') {
 export const GLOBAL_CONFIG = {
   isProd: isProd,
   discordManagerUserId: "334298300364619776",
+  passwordResetExpiryMinutes: 5,
 };
 
