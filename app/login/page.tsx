@@ -69,10 +69,7 @@ export default function LoginPage() {
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user_info', JSON.stringify(data.user));
 
-      showModal('로그인 성공', '환영합니다! 메인 페이지로 이동합니다.', () => {
-        setModal(prev => ({ ...prev, isOpen: false }));
-        router.push('/');
-      });
+      router.push('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
       showModal('오류', '서버와 통신 중 오류가 발생했습니다.');

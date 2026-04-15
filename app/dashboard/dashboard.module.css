@@ -1,0 +1,38 @@
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 0 -40px; /* 카드의 패딩(40px) 밖으로 확장되도록 설정 */
+  border-top: var(--border-width-thin) solid var(--border-main);
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 40px; /* 카드의 패딩값을 대체 */
+  background-color: var(--bg-card);
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.2s ease;
+  border-bottom: var(--border-width-thin) solid var(--border-main);
+}
+
+.listItem:last-child {
+  border-bottom: none;
+}
+
+.listItem:hover {
+  background-color: var(--bg-hover);
+}
+
+.itemLabel {
+  font-size: 16px;
+  font-weight: var(--font-weight-m);
+  color: var(--text-main);
+}
+
+.itemIcon {
+  color: var(--text-sub);
+  font-size: 20px;
+}
