@@ -13,6 +13,7 @@ datasource db {
 model User {
   id           Int      @id @default(autoincrement())
   userId       String   @unique // 로그인 시 사용하는 아이디
+  email        String   @unique // 사용자 이메일 (아이디@도메인)
   password     String   // 해싱된 비밀번호
   refreshToken String?  // JWT Refresh Token 보관용 (선택 사항)
   

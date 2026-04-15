@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
+import { GLOBAL_CONFIG } from 'src/settings';
 
 export async function POST(request: Request) {
   try {
@@ -17,10 +18,10 @@ export async function POST(request: Request) {
     }
 
     // 비밀번호 유효성 재확인
-    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    const passwordRegex = GLOBAL_CONFIG.authRegex.password;
     if (!passwordRegex.test(newPassword)) {
       return NextResponse.json(
-        { message: '비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.' },
+        { message: '비밀번호 형식이 올바르지 않습니다. (영문, 숫자, 특수문자 포함 8자 이상)' },
         { status: 400 }
       );
     }

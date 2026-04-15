@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline } from 'react-icons/io5';
+import { GLOBAL_CONFIG } from 'src/settings';
 
 type Step = 'request' | 'verify' | 'reset';
 
@@ -100,7 +101,7 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setErrorStatus(null);
 
-    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    const passwordRegex = GLOBAL_CONFIG.authRegex.password;
     if (!newPassword || !passwordRegex.test(newPassword)) {
       setErrorStatus({ field: 'newPassword', message: '영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.' });
       return;

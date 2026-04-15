@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { GLOBAL_CONFIG } from 'src/settings';
 
 export async function POST(request: Request) {
   try {
@@ -9,6 +10,22 @@ export async function POST(request: Request) {
     if (!userId || !password) {
       return NextResponse.json(
         { message: '아이디와 비밀번호를 입력해주세요.' },
+        { status: 400 }
+      );
+    }
+
+    // 아이디 형식 검사
+    if (!GLOBAL_CONFIG.authRegex.userId.test(userId)) {
+      return NextResponse.json(
+        { field: 'userId', message: '아이디 형식이 올바르지 않습니다. (4자 이상의 영문 또는 숫자)' },
+        { status: 400 }
+      );
+    }
+
+    // 비밀번호 형식 검사
+    if (!GLOBAL_CONFIG.authRegex.password.test(password)) {
+      return NextResponse.json(
+        { field: 'password', message: '비밀번호 형식이 올바르지 않습니다. (영문, 숫자, 특수문자 포함 8자 이상)' },
         { status: 400 }
       );
     }
@@ -28,10 +45,14 @@ export async function POST(request: Request) {
     // 비밀번호 해싱
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // 가성 이메일 자동 생성 (아이디@도메인)
+    const email = `${userId}@${GLOBAL_CONFIG.emailDomain}`;
+
     // 사용자 생성
     const user = await prisma.user.create({
       data: {
         userId,
+        email,
         password: hashedPassword,
         name: name || userId,
         role: 'STUDENT',

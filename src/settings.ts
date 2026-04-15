@@ -23,5 +23,10 @@ export const GLOBAL_CONFIG = {
   isProd: isProd,
   discordManagerUserId: "334298300364619776",
   passwordResetExpiryMinutes: 5,
+  authRegex: {
+    userId: /^[a-zA-Z0-9]{4,}$/, // 4자 이상의 영문 또는 숫자
+    password: /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/, // 영문, 숫자, 특수문자 포함 8자 이상
+  },
+  emailDomain: 'bono.com',
 };
 

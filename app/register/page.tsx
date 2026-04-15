@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline, IoCheckmarkCircleOutline } from 'react-icons/io5';
+import { GLOBAL_CONFIG } from 'src/settings';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -67,7 +68,7 @@ export default function RegisterPage() {
     setErrorStatus(null);
 
     // 2. 아이디 유효성 검사
-    const userIdRegex = /^[a-zA-Z0-9]{4,}$/;
+    const userIdRegex = GLOBAL_CONFIG.authRegex.userId;
     if (!userId || !userIdRegex.test(userId)) {
       setErrorStatus({ field: 'userId', message: '아이디는 4자 이상의 영문 또는 숫자여야 합니다.' });
       return;
@@ -86,7 +87,7 @@ export default function RegisterPage() {
     }
 
     // 5. 비밀번호 유효성 검사
-    const passwordRegex = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/;
+    const passwordRegex = GLOBAL_CONFIG.authRegex.password;
     if (!password || !passwordRegex.test(password)) {
       setErrorStatus({ field: 'password', message: '비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.' });
       return;
