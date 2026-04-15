@@ -27,9 +27,9 @@
   --accent-primary: #4852db;
   --accent-hover: #3a44c9;
 
-  --accent-secondary: #fce045;
-  --accent-secondary-hover: #ECEFF3;
-  --accent-secondary-active: #E2E6EC;
+  --accent-secondary: #ffc445;
+  --accent-secondary-hover: #f0b331;
+  --accent-secondary-active: #f0b331;
 
   --accent-glow: rgba(59, 130, 246, 0.15);
   /* 포인트 요소 주위의 광원 효과용 */

@@ -7,11 +7,29 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline } from 'react-icons/io5';
+import AlertModal from 'app/modals/AlertModal';
 
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
+  
+  // 모달 상태
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
+
+  const showModal = (title: string, message: string, onConfirm?: () => void) => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: onConfirm || (() => setModal(prev => ({ ...prev, isOpen: false })))
+    });
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +56,12 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setErrorStatus({ field: 'userId', message: data.message || '로그인 중 오류가 발생했습니다.' });
+        // 비밀번호 관련 에러인 경우 password 필드 아래에 표시
+        const isPasswordError = data.message?.includes('비밀번호');
+        setErrorStatus({ 
+          field: isPasswordError ? 'password' : 'userId', 
+          message: data.message || '로그인 중 오류가 발생했습니다.' 
+        });
         return;
       }
 
@@ -46,11 +69,13 @@ export default function LoginPage() {
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user_info', JSON.stringify(data.user));
 
-      alert('로그인 성공!');
-      router.push('/'); // 메인 페이지로 이동
+      showModal('로그인 성공', '환영합니다! 메인 페이지로 이동합니다.', () => {
+        setModal(prev => ({ ...prev, isOpen: false }));
+        router.push('/');
+      });
     } catch (error) {
       console.error('Login error:', error);
-      alert('서버와 통신 중 오류가 발생했습니다.');
+      showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
     }
   };
 
@@ -59,6 +84,7 @@ export default function LoginPage() {
   return (
     <main className={styles.container}>
       <div className={styles.authCard}>
+
         <div className={styles.header}>
           <h3 className={styles.title}>로그인으로 시작</h3>
         </div>
@@ -116,8 +142,16 @@ export default function LoginPage() {
       <div className={styles.bottomFooter}>
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
+
+      <AlertModal 
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+      />
     </main>
   );
 }
+
 
 
