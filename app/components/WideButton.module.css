@@ -1,0 +1,38 @@
+.button {
+  width: 100%;
+  padding: 16px 24px;
+  background-color: var(--accent-primary);
+  color: white;
+  border: var(--border-width) solid var(--border-main);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-sb);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.1s ease;
+  
+  /* 글로벌 변수 shadow-depth-md, shadow-inset 적용 (하단 입체감) */
+  box-shadow: inset 0 calc(var(--shadow-depth-md) * -1) 0 var(--shadow-inset);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+.button:hover {
+  background-color: var(--accent-hover);
+  /* 게이미피케이션 느낌의 미세한 눌림 효과 준비 */
+}
+
+.button:active {
+  /* 클릭 시 실제로 버튼이 눌리는 듯한 인터랙션 */
+  transform: translateY(2px);
+  box-shadow: inset 0 calc(var(--shadow-depth) * -0.5) 0 var(--shadow-inset);
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
