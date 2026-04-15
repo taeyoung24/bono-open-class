@@ -8,69 +8,20 @@ datasource db {
 }
 
 // ─────────────────────────────────────────────
-// 테마 (기초편 / 활용편 / 실전편 등)
+// 사용자 계정 (인증 및 권한 관리)
 // ─────────────────────────────────────────────
-model Theme {
-  id    Int    @id @default(autoincrement())
-  name  String // 예: "기초편: 디지털 세상"
-  tasks Task[]
-}
+model User {
+  id           Int      @id @default(autoincrement())
+  userId       String   @unique // 로그인 시 사용하는 아이디
+  password     String   // 해싱된 비밀번호
+  refreshToken String?  // JWT Refresh Token 보관용 (선택 사항)
+  
+  // 기본 프로필 정보
+  name         String?  // 사용자 이름
+  role         String   @default("STUDENT") // ADMIN | STUDENT | TEACHER
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-// ─────────────────────────────────────────────
-// 과제 (학습 절차 / 진도 단위)
-// ─────────────────────────────────────────────
-model Task {
-  id          Int     @id @default(autoincrement())
-  title       String
-  description String?
-  url         String? // 과제 수행을 위한 외부 링크 (있는 경우)
-  themeId     Int
-
-  prevId      Int?    // 이전 과제 ID (첫 번째 과제는 null)
-  nextId      Int?    // 다음 과제 ID (마지막 과제는 null)
-
-  theme    Theme             @relation(fields: [themeId], references: [id])
-  progress StudentProgress[]
-}
-
-// ─────────────────────────────────────────────
-// 학생
-// ─────────────────────────────────────────────
-model Student {
-  id         Int               @id @default(autoincrement())
-  name       String
-  email      String?
-  secretCode String
-  points     Int               @default(0) // 재화 (포인트, 음수 불가 정수)
-  progress   StudentProgress[]
-  artworks   Artwork[]
-}
-
-// ─────────────────────────────────────────────
-// 학생별 과제 진도
-// ─────────────────────────────────────────────
-model StudentProgress {
-  id        String         @id @default(uuid())
-  studentId Int
-  taskId    Int
-  status    String         @default("WAITING") // WAITING | IN_PROGRESS | DONE
-
-  student   Student @relation(fields: [studentId], references: [id])
-  task      Task    @relation(fields: [taskId], references: [id])
-
-  @@unique([studentId, taskId])
-}
-
-// ─────────────────────────────────────────────
-// 완성작 (포트폴리오, 학생과 N:1 관계)
-// ─────────────────────────────────────────────
-model Artwork {
-  id        Int      @id @default(autoincrement())
-  imageUrl  String   // 대표이미지 (상대 경로 혹은 URL)
-  date      String   // 제작날짜 (예: "2026-03-26")
-  label     String?  // 이미지를 나타내는 짧은 문자열
-  createdAt DateTime @default(now()) // 최신순 정렬용 백업 타임스탬프
-
-  studentId Int
-  student   Student  @relation(fields: [studentId], references: [id])
+  @@map("users") // 테이블 이름을 명확하게 지정
 }

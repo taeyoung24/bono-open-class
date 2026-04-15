@@ -31,3 +31,10 @@ pnpm prisma generate
 pnpm dev
 ```
 이제 브라우저에서 `http://localhost:3000`으로 접속하여 앱을 확인할 수 있습니다.
+
+### 5. 데이터베이스 확인 (Prisma Studio)
+브라우저를 통해 데이터베이스 내용을 확인하고 직접 수정하려면 다음 명령어를 실행하세요.
+```bash
+npx prisma studio --env-file .env.development
+```
+기본적으로 `http://localhost:5555`에서 확인 가능합니다.

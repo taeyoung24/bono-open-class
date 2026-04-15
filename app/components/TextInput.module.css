@@ -1,7 +1,7 @@
 .inputGroup {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 0px;
   width: 100%;
 }
 
@@ -10,6 +10,14 @@
   font-weight: var(--font-weight-sb);
   color: var(--text-main);
   margin-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.requiredIcon {
+  color: var(--accent-primary);
+  margin-bottom: 4px;
 }
 
 .input {
@@ -33,13 +41,13 @@
 }
 
 .inputError {
-  border-bottom-color: #ff4d4d;
+  border-bottom-color: var(--status-failure);
 }
 
 .errorMessage {
   font-size: 14px;
   font-weight: var(--font-weight-sb);
-  color: #ff4d4d;
+  color: var(--status-failure);
   margin-top: 4px;
   padding-left: 4px;
   display: flex;
@@ -47,9 +55,7 @@
   gap: 4px;
 }
 
-.errorMessage::before {
-  content: "?";
-}
+
 
 .input::placeholder {
   color: var(--text-muted);

@@ -22,7 +22,7 @@
   
   /* Status Colors */
   --status-success: #22c55e;
-  --status-error: #ef4444;
+  --status-failure: #ef4444;
   --status-neutral: #64748b;
 
   /* 테두리 및 둥글기 */
@@ -35,6 +35,12 @@
   --radius-sm: 14px;
   --radius-md: 18px;
   --radius-lg: 20px;
+
+  /* Form Widths */
+  --form-width-base: 400px;
+  --form-width-wide: 520px;
+  --form-width-extra: 640px;
+
 
   /* Typography - Fixed Scale */
   --font-size-h1: 2.5rem;    /* 40px */

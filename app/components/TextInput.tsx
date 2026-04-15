@@ -1,6 +1,9 @@
 import React from 'react';
 import styles from './TextInput.module.css';
 
+import { IoAlertCircleOutline } from 'react-icons/io5';
+import { FaAsterisk } from 'react-icons/fa';
+
 interface TextInputProps {
   label: string;
   type?: 'text' | 'password' | 'email' | 'number';
@@ -24,7 +27,10 @@ export default function TextInput({
 }: TextInputProps) {
   return (
     <div className={styles.inputGroup}>
-      <label className={styles.label}>{label}</label>
+      <label className={styles.label}>
+        {label}
+        {required && <FaAsterisk className={styles.requiredIcon} size={8} />}
+      </label>
       <input
         type={type}
         value={value}
@@ -34,7 +40,12 @@ export default function TextInput({
         required={required}
         name={name}
       />
-      {error && <span className={styles.errorMessage}>{error}</span>}
+      {error && (
+        <span className={styles.errorMessage}>
+          <IoAlertCircleOutline size={16} />
+          {error}
+        </span>
+      )}
     </div>
   );
 }

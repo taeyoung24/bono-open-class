@@ -1,19 +1,20 @@
 'use client';
 
-import WideButton from 'app/components/WideButton';
-import TextInput from 'app/components/TextInput';
+import styles from 'app/components/AuthFormLayout.module.css';
 import TextButton from 'app/components/TextButton';
+import TextInput from 'app/components/TextInput';
+import WideButton from 'app/components/WideButton';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import styles from './Login.module.css';
 
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // 브라우저 기본 validation 대신 커스텀 체크
     if (!userId) {
       setErrorStatus({ field: 'userId', message: '아이디를 입력해주세요!' });
@@ -25,15 +26,40 @@ export default function LoginPage() {
     }
 
     setErrorStatus(null);
-    console.log('Login attempt:', { userId, password });
+
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErrorStatus({ field: 'userId', message: data.message || '로그인 중 오류가 발생했습니다.' });
+        return;
+      }
+
+      // JWT 토큰 저장
+      localStorage.setItem('auth_token', data.token);
+      localStorage.setItem('user_info', JSON.stringify(data.user));
+
+      alert('로그인 성공!');
+      router.push('/'); // 메인 페이지로 이동
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('서버와 통신 중 오류가 발생했습니다.');
+    }
   };
+
+  const router = useRouter();
 
   return (
     <main className={styles.container}>
-      <div className={styles.loginCard}>
+      <div className={styles.authCard}>
         <div className={styles.header}>
-          <h1 className={styles.title}>로그인</h1>
-          <p className={styles.subtitle}>본오동 열린 교실 컴퓨터 교육용 앱</p>
+          <h3 className={styles.title}>로그인으로 시작</h3>
         </div>
 
         <form onSubmit={handleLogin} className={styles.form} noValidate>
@@ -42,7 +68,8 @@ export default function LoginPage() {
             value={userId}
             onChange={setUserId}
             placeholder="아이디를 입력해주세요"
-            error={errorStatus?.field === '아이디' ? errorStatus.message : ''}
+            required={true}
+            error={errorStatus?.field === 'userId' ? errorStatus.message : ''}
           />
 
           <TextInput
@@ -51,7 +78,8 @@ export default function LoginPage() {
             value={password}
             onChange={setPassword}
             placeholder="비밀번호를 입력해주세요"
-            error={errorStatus?.field === '비밀번호' ? errorStatus.message : ''}
+            required={true}
+            error={errorStatus?.field === 'password' ? errorStatus.message : ''}
           />
 
           <WideButton type="submit" text="로그인" />
@@ -60,11 +88,11 @@ export default function LoginPage() {
         <div className={styles.helperActions}>
           <TextButton text="비밀번호 찾기" onClick={() => console.log('Find Password')} />
           <div className={styles.divider} />
-          <TextButton text="새로 가입하기" onClick={() => console.log('Sign Up')} />
+          <TextButton text="새로 가입하기" onClick={() => router.push('/register')} />
         </div>
       </div>
 
-      <div className={styles.footer}>
+      <div className={styles.bottomFooter}>
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
     </main>
