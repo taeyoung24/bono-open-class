@@ -58,6 +58,94 @@
 .mailList {
   display: flex;
   flex-direction: column;
+  gap: 8px;
+}
+
+.mailItem {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  border: var(--border-width-thin) solid var(--border-main);
+  background-color: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.mailItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.mailItem.unread {
+  background-color: #fff9e6; /* 읽지 않은 메일은 연한 노란색 배경 */
+}
+
+.itemTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.senderName {
+  font-size: 14px;
+  font-weight: var(--font-weight-sb);
+  color: var(--text-main);
+}
+
+.dateText {
+  font-size: 12px;
+  color: var(--text-sub);
+}
+
+.mailTitle {
+  font-size: 16px;
+  font-weight: var(--font-weight-sb);
+  color: var(--text-main);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mailSnippet {
+  font-size: 14px;
+  color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mail View Styles */
+.viewContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.viewHeader {
+  padding-bottom: 24px;
+  border-bottom: var(--border-width-thin) solid var(--bg-input);
+  margin-bottom: 24px;
+}
+
+.senderInfo {
+  font-size: 14px;
+  color: var(--text-sub);
+  margin-top: 8px;
+}
+
+.mailContentBody {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-main);
+  white-space: pre-wrap;
+  min-height: 300px;
+}
+
+.viewActions {
+  margin-top: 40px;
 }
 
 .emptyState {

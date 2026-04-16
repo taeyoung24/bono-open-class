@@ -26,6 +26,11 @@ export default function MailboxPage() {
   const [isSending, setIsSending] = useState(false);
   const [isSentSuccess, setIsSentSuccess] = useState(false);
 
+  // 리스트 상태
+  const [mails, setMails] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedMail, setSelectedMail] = useState<any | null>(null);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user_info');
     if (storedUser) {
@@ -37,6 +42,56 @@ export default function MailboxPage() {
       router.push('/login');
     }
   }, [router]);
+
+  // 메일 목록 가져오기 함수
+  const fetchMails = async (view: MailView) => {
+    if (view !== 'inbox' && view !== 'sent') return;
+    
+    setIsLoading(true);
+    try {
+      const endpoint = `/api/mailbox/${view}?userId=${userId}`;
+      const response = await fetch(endpoint);
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMails(view === 'inbox' ? data.inbox : data.sent);
+      }
+    } catch (error) {
+      console.error('Failed to fetch mails:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (userId && (currentView === 'inbox' || currentView === 'sent')) {
+      fetchMails(currentView);
+      setSelectedMail(null); // 뷰 전환 시 선택된 메일 초기화
+    }
+  }, [userId, currentView]);
+
+  const handleSelectMail = async (mail: any) => {
+    setSelectedMail(mail);
+    setCurrentView('view');
+
+    // 읽지 않은 받은 메일인 경우 읽음 처리
+    if (currentView === 'inbox' && !mail.isRead) {
+      try {
+        await fetch('/api/mailbox/read', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mailId: mail.id }),
+        });
+        
+        // 로컬 상태 업데이트
+        setMails(prev => prev.map(m => 
+          m.id === mail.id ? { ...m, isRead: true } : m
+        ));
+      } catch (e) {
+        console.error('Failed to mark as read');
+      }
+    }
+  };
 
   const handleSendMail = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +130,7 @@ export default function MailboxPage() {
       onClick: () => {
         setCurrentView('inbox');
         setIsSentSuccess(false);
+        setSelectedMail(null);
       }
     },
     { 
@@ -82,9 +138,20 @@ export default function MailboxPage() {
       onClick: () => {
         setCurrentView('sent');
         setIsSentSuccess(false);
+        setSelectedMail(null);
       }
     }
   ];
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleString('ko-KR', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
     <main className={layoutStyles.container}>
@@ -130,8 +197,60 @@ export default function MailboxPage() {
 
           <div className={styles.mainContent}>
             {(currentView === 'inbox' || currentView === 'sent') && (
-              <div className={styles.emptyState}>
-                <p>표시할 메일이 없습니다.</p>
+              <>
+                {isLoading ? (
+                  <div className={styles.emptyState}><p>로딩 중...</p></div>
+                ) : mails.length > 0 ? (
+                  <div className={styles.mailList}>
+                    {mails.map((mail) => (
+                      <div 
+                        key={mail.id} 
+                        className={`${styles.mailItem} ${currentView === 'inbox' && !mail.isRead ? styles.unread : ''}`}
+                        onClick={() => handleSelectMail(mail)}
+                      >
+                        <div className={styles.itemTop}>
+                          <span className={styles.senderName}>
+                            {currentView === 'inbox' ? mail.sender?.name || mail.senderId : `To: ${mail.receiver?.name || mail.receiverId}`}
+                          </span>
+                          <span className={styles.dateText}>{formatDate(mail.createdAt)}</span>
+                        </div>
+                        <h4 className={styles.mailTitle}>{mail.title}</h4>
+                        <p className={styles.mailSnippet}>{mail.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={styles.emptyState}>
+                    <p>표시할 메일이 없습니다.</p>
+                  </div>
+                )}
+              </>
+            )}
+
+            {currentView === 'view' && selectedMail && (
+              <div className={styles.viewContainer}>
+                <div className={styles.viewHeader}>
+                  <h3 className={styles.viewTitle}>{selectedMail.title}</h3>
+                  <div className={styles.senderInfo}>
+                    {selectedMail.senderId === userId ? (
+                      <span>수신: {selectedMail.receiver?.name || selectedMail.receiverId} ({selectedMail.receiverId})</span>
+                    ) : (
+                      <span>발신: {selectedMail.sender?.name || selectedMail.senderId} ({selectedMail.senderId})</span>
+                    )}
+                    <span style={{ marginLeft: '12px' }}>| {formatDate(selectedMail.createdAt)}</span>
+                  </div>
+                </div>
+                <div className={styles.mailContentBody}>
+                  {selectedMail.content}
+                </div>
+                <div className={styles.viewActions}>
+                  <DefaultButton 
+                    text="목록으로" 
+                    onClick={() => setCurrentView(selectedMail.receiverId === userId ? 'inbox' : 'sent')} 
+                    variant="none"
+                    width="hug" 
+                  />
+                </div>
               </div>
             )}
             
