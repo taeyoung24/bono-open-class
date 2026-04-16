@@ -1,6 +1,10 @@
 function requireEnv(key: string, defaultValue?: string): string {
   const value = process.env[key];
   if (value === undefined) {
+    // 클라이언트 브라우저 환경에서는 환경 변수에 접근할 수 없으므로 에러를 던지지 않고 기본값이나 빈 문자열을 반환합니다.
+    if (typeof window !== 'undefined') {
+      return defaultValue || '';
+    }
     if (defaultValue) {
       console.log(`The environment variable '${key}' is not defined. Using default value '${defaultValue}'.`);
       return defaultValue;
@@ -15,7 +19,7 @@ export const DISCORD_WEBHOOK_URL = requireEnv('DISCORD_WEBHOOK_URL');
 
 const isProd = NODE_ENV === 'production';
 
-if (NODE_ENV !== 'production') {
+if (typeof window === 'undefined' && NODE_ENV !== 'production') {
   console.log(`[Config] Loaded environment variables from: .env.${NODE_ENV}`);
 }
 
