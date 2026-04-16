@@ -36,7 +36,9 @@
 
   /* Status Colors */
   --status-success: #2DC275;
+  --status-success-hover: #26a362;
   --status-failure: #ef4444;
+  --status-failure-hover: #d73a3a;
   --status-neutral: #64748b;
 
   /* 테두리 및 둥글기 */

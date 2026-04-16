@@ -40,6 +40,12 @@
   border-bottom-color: var(--accent-primary);
 }
 
+.input:disabled {
+  color: var(--text-sub);
+  cursor: not-allowed;
+  border-bottom-style: dashed;
+}
+
 .inputError {
   border-bottom-color: var(--status-failure);
 }

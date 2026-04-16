@@ -8,6 +8,7 @@ interface TextInputProps {
   value: string;
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean;
   onChange: (value: string) => void;
   name?: string;
 }
@@ -17,6 +18,7 @@ export default function TextInput({
   value,
   placeholder,
   required = false,
+  disabled = false,
   onChange,
   name
 }: TextInputProps) {
@@ -35,6 +37,7 @@ export default function TextInput({
           className={styles.input}
           placeholder={placeholder}
           required={required}
+          disabled={disabled}
           name={name}
           style={type === 'password' ? { paddingRight: '40px' } : {}}
         />
