@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './TextInput.module.css';
 
-import { IoAlertCircleOutline } from 'react-icons/io5';
-import { FaAsterisk } from 'react-icons/fa';
+import { IoEyeOffOutline, IoEyeOutline } from 'react-icons/io5';
 
 interface TextInputProps {
   type?: 'text' | 'password' | 'email' | 'number';
@@ -21,17 +20,39 @@ export default function TextInput({
   onChange,
   name
 }: TextInputProps) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  // 비밀번호 표시 여부에 따라 타입 전환 (password -> text)
+  const inputType = type === 'password' && showPassword ? 'text' : type;
+
   return (
     <div className={styles.inputGroup}>
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className={styles.input}
-        placeholder={placeholder}
-        required={required}
-        name={name}
-      />
+      <div className={styles.inputWrapper}>
+        <input
+          type={inputType}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={styles.input}
+          placeholder={placeholder}
+          required={required}
+          name={name}
+          style={type === 'password' ? { paddingRight: '40px' } : {}}
+        />
+        {type === 'password' && (
+          <button
+            type="button"
+            className={styles.eyeButton}
+            onMouseDown={() => setShowPassword(true)}
+            onMouseUp={() => setShowPassword(false)}
+            onMouseLeave={() => setShowPassword(false)}
+            onTouchStart={() => setShowPassword(true)}
+            onTouchEnd={() => setShowPassword(false)}
+            tabIndex={-1}
+          >
+            {showPassword ? <IoEyeOutline size={20} /> : <IoEyeOffOutline size={20} />}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
