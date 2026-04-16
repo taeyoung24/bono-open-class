@@ -89,10 +89,18 @@
   padding: 0;
 }
 
+body,
+button,
+input,
+select,
+textarea,
+span {
+  font-family: var(--font-atoz), -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
 body {
   background-color: var(--bg-main);
   color: var(--text-main);
-  font-family: var(--font-atoz), -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   line-height: 1.5;
 }

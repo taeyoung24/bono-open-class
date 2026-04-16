@@ -1,0 +1,89 @@
+.mailboxContainer {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+  max-width: calc(var(--form-width-base) + var(--form-width-extra) + 24px);
+  width: 100%;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: var(--form-width-base);
+  max-width: var(--form-width-base); /* 가급적 명시적으로 고정 */
+  flex-shrink: 0;
+}
+
+.actionButtonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.navSection {
+  /* ActionList 내부에서 이미 -40px 처리가 되어 있으므로 여기서는 제거 */
+}
+
+/* Main Content Styles */
+.contentArea {
+  width: var(--form-width-extra);
+  max-width: var(--form-width-extra) !important;
+  flex-grow: 1;
+  min-height: 540px;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.viewTitle {
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-eb);
+  color: var(--text-main);
+}
+
+.mainContent {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* 세로 중앙 정렬 */
+}
+
+.mailList {
+  display: flex;
+  flex-direction: column;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sub);
+  gap: 16px;
+  padding-bottom: 60px; /* 헤더 공간을 고려하여 시각적으로 정중앙에 가까워 보이도록 약간의 보정 */
+}
+
+.emptyIcon {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1100px) {
+  .mailboxContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .sidebar, .contentArea {
+    width: 100%;
+    max-width: var(--form-width-base);
+  }
+}

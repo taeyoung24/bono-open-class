@@ -24,7 +24,35 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  // 메일 관련 관계
+  sentMails     Mail[] @relation("SentMails")
+  receivedMails Mail[] @relation("ReceivedMails")
+
   @@map("users") // 테이블 이름을 명확하게 지정
+}
+
+// ─────────────────────────────────────────────
+// 메일(쪽지) 시스템
+// ─────────────────────────────────────────────
+model Mail {
+  id          Int      @id @default(autoincrement())
+  
+  // 발신자 정보
+  sender      User     @relation("SentMails", fields: [senderId], references: [userId])
+  senderId    String
+  
+  // 수신자 정보
+  receiver    User     @relation("ReceivedMails", fields: [receiverId], references: [userId])
+  receiverId  String
+  
+  title       String   // 제목
+  content     String   // 내용
+  
+  isRead      Boolean  @default(false) // 읽음 여부
+  
+  createdAt   DateTime @default(now())   // 보낸 시간
+
+  @@map("mails")
 }
 
 // ─────────────────────────────────────────────
