@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import authStyles from 'app/components/AuthFormLayout.module.css';
 import styles from './dashboard.module.css';
 import { IoChevronForward } from 'react-icons/io5';
 
@@ -29,10 +28,10 @@ export default function DashboardPage() {
   ];
 
   return (
-    <main className={authStyles.container}>
-      <div className={authStyles.authCard}>
-        <div className={authStyles.header}>
-          <h3 className={authStyles.title}>{userName}의 작업공간</h3>
+    <main className={styles.container}>
+      <div className={styles.authCard}>
+        <div className={styles.header}>
+          <h3 className={styles.title}>{userName}의 작업공간</h3>
         </div>
 
         <nav className={styles.listContainer}>
