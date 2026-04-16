@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './dashboard.module.css';
+import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton } from 'app/components/Button';
 import ActionList from 'app/components/ActionList';
 
@@ -35,10 +36,10 @@ export default function DashboardPage() {
   ];
 
   return (
-    <main className={styles.container}>
-      <div className={styles.authCard}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>{userName}의 작업공간</h3>
+    <main className={layoutStyles.container}>
+      <div className={layoutStyles.formCard}>
+        <div className={layoutStyles.header}>
+          <h3 className={layoutStyles.title}>{userName}의 작업공간</h3>
         </div>
 
         <ActionList items={menuItems} />

@@ -1,6 +1,7 @@
 'use client';
 
 import styles from 'app/components/AuthFormLayout.module.css';
+import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
 import { useRouter } from 'next/navigation';
@@ -79,11 +80,11 @@ export default function LoginPage() {
   const router = useRouter();
 
   return (
-    <main className={styles.container}>
-      <div className={styles.authCard}>
+    <main className={layoutStyles.container}>
+      <div className={layoutStyles.formCard}>
 
-        <div className={styles.header}>
-          <h3 className={styles.title}>로그인으로 시작</h3>
+        <div className={layoutStyles.header}>
+          <h3 className={layoutStyles.title}>로그인으로 시작</h3>
         </div>
 
         <form onSubmit={handleLogin} className={styles.form} noValidate>
@@ -136,7 +137,7 @@ export default function LoginPage() {
         </div>
       </div>
 
-      <div className={styles.bottomFooter}>
+      <div className={layoutStyles.bottomFooter}>
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
 

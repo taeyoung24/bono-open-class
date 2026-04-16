@@ -1,8 +1,9 @@
 'use client';
 
-import styles from 'app/components/AuthFormLayout.module.css';
 import { DefaultButton, FieldButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
+import styles from 'app/components/AuthFormLayout.module.css';
+import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -127,10 +128,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className={styles.container}>
-      <div className={styles.authCard}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>회원가입 정보 입력</h3>
+    <main className={layoutStyles.container}>
+      <div className={layoutStyles.formCard}>
+        <div className={layoutStyles.header}>
+          <h3 className={layoutStyles.title}>회원가입 정보 입력</h3>
         </div>
 
         <form onSubmit={handleRegister} className={styles.form} noValidate>
@@ -236,7 +237,7 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      <div className={styles.bottomFooter}>
+      <div className={layoutStyles.bottomFooter}>
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
 

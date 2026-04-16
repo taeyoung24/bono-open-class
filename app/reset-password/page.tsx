@@ -1,8 +1,9 @@
 'use client';
 
-import styles from 'app/components/AuthFormLayout.module.css';
 import { DefaultButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
+import styles from 'app/components/AuthFormLayout.module.css';
+import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -149,11 +150,11 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <main className={styles.container}>
-      <div className={styles.authCard}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>{stepTitles[step]}</h3>
-          <p className={styles.subtitle}>{stepDescriptions[step]}</p>
+    <main className={layoutStyles.container}>
+      <div className={layoutStyles.formCard}>
+        <div className={layoutStyles.header}>
+          <h3 className={layoutStyles.title}>{stepTitles[step]}</h3>
+          <p className={layoutStyles.subtitle}>{stepDescriptions[step]}</p>
         </div>
 
         {/* STEP 1: 아이디 입력 */}
@@ -256,7 +257,7 @@ export default function ResetPasswordPage() {
         </div>
       </div>
 
-      <div className={styles.bottomFooter}>
+      <div className={layoutStyles.bottomFooter}>
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
 
