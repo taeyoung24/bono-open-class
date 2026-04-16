@@ -12,10 +12,10 @@ interface DefaultButtonProps extends ButtonProps {
   width?: 'fill' | 'hug' | string;
 }
 
-export function DefaultButton({ 
-  text, 
-  onClick, 
-  type = 'button', 
+export function DefaultButton({
+  text,
+  onClick,
+  type = 'button',
   disabled = false,
   width = 'fill'
 }: DefaultButtonProps) {
@@ -41,11 +41,11 @@ export function DefaultButton({
   );
 }
 
-export function TextButton({ 
-  text, 
-  onClick, 
-  type = 'button', 
-  disabled = false 
+export function TextButton({
+  text,
+  onClick,
+  type = 'button',
+  disabled = false
 }: ButtonProps) {
   return (
     <button
@@ -59,10 +59,10 @@ export function TextButton({
   );
 }
 
-export function FieldButton({ 
-  text, 
-  onClick, 
-  type = 'button', 
+export function FieldButton({
+  text,
+  onClick,
+  type = 'button',
   disabled = false,
   width = 'hug'
 }: DefaultButtonProps) {

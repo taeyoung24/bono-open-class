@@ -4,10 +4,17 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './dashboard.module.css';
 import { IoChevronForward } from 'react-icons/io5';
+import { DefaultButton } from 'app/components/Button';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [userName, setUserName] = useState('사용자');
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_info');
+    router.push('/login');
+  };
 
   useEffect(() => {
     // 로컬 스토리지에서 사용자 정보 가져오기
@@ -46,6 +53,10 @@ export default function DashboardPage() {
             </button>
           ))}
         </nav>
+
+        <div className={styles.logoutSection}>
+          <DefaultButton text="로그아웃" onClick={handleLogout} width='fill' />
+        </div>
       </div>
     </main>
   );
