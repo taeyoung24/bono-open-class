@@ -146,7 +146,7 @@ export default function ResetPasswordPage() {
 
   const stepDescriptions: Record<Step, string> = {
     request: '아이디를 입력하면 관리자에게 인증코드가 전달됩니다.',
-    verify: `관리자에게 받은 4자리 인증코드를 입력해주세요.\n코드는 5분간 유효합니다.`,
+    verify: `관리자에게 받은 4자리 인증코드를 입력해주세요.\n코드는 10분간 유효합니다.`,
     reset: '새로 사용할 비밀번호를 입력해주세요.',
   };
 

@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from './CodeInput.module.css';
+import Tooltip from 'app/overlays/Tooltip';
 
 interface CodeInputProps {
   length: number;
@@ -17,6 +18,7 @@ export default function CodeInput({
   disabled = false
 }: CodeInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const [isFocused, setIsFocused] = useState(false);
 
   // value가 변경될 때 각 인덱스에 맞는 글자를 채워줌
   const values = value.split('').slice(0, length);
@@ -74,41 +76,52 @@ export default function CodeInput({
     const pasteData = e.clipboardData.getData('text').slice(0, length);
     const filteredData = pasteData.split('').filter(char => pattern.test(char)).join('');
     onChange(filteredData);
-    
+
     // 붙여넣기 후 마지막 포커스 이동
     const nextIndex = Math.min(filteredData.length, length - 1);
     inputRefs.current[nextIndex]?.focus();
   };
 
   const handleFocus = (index: number) => {
-    // 사용자가 클릭한 인덱스보다 앞에 빈 칸이 있는지 확인
+    setIsFocused(true);
+  };
+
+  const handleManualClick = (index: number) => {
+    // 사용자가 직접 클릭했을 때만 맨 앞의 빈 칸으로 강제 이동
     const firstEmptyIndex = value.split('').concat(Array(length).fill('')).findIndex(v => v === '' || v === undefined);
-    
-    // 앞에 빈 칸이 있고 그게 현재 인덱스보다 앞이라면 강제로 거기로 보냄
+
     if (firstEmptyIndex !== -1 && firstEmptyIndex < index) {
       inputRefs.current[firstEmptyIndex]?.focus();
     }
   };
 
   return (
-    <div className={styles.codeInputContainer}>
-      {values.map((val, idx) => (
-        <input
-          key={idx}
-          ref={el => { inputRefs.current[idx] = el; }}
-          type="text"
-          inputMode="numeric"
-          className={styles.codeSlot}
-          value={val}
-          maxLength={1}
-          disabled={disabled}
-          onChange={(e) => handleInputChange(idx, e.target.value.slice(-1))}
-          onKeyDown={(e) => handleKeyDown(idx, e)}
-          onClick={() => handleFocus(idx)}
-          onPaste={handlePaste}
-          autoComplete="one-time-code"
-        />
-      ))}
-    </div>
+    <Tooltip
+      content="숫자만 입력하세요"
+      position="left"
+      show={isFocused}
+    >
+      <div className={styles.codeInputContainer}>
+        {values.map((val, idx) => (
+          <input
+            key={idx}
+            ref={el => { inputRefs.current[idx] = el; }}
+            type="text"
+            inputMode="numeric"
+            className={styles.codeSlot}
+            value={val}
+            maxLength={1}
+            disabled={disabled}
+            onChange={(e) => handleInputChange(idx, e.target.value.slice(-1))}
+            onKeyDown={(e) => handleKeyDown(idx, e)}
+            onClick={() => handleManualClick(idx)}
+            onFocus={() => handleFocus(idx)}
+            onBlur={() => setIsFocused(false)}
+            onPaste={handlePaste}
+            autoComplete="one-time-code"
+          />
+        ))}
+      </div>
+    </Tooltip>
   );
 }

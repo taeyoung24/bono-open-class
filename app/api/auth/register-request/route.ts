@@ -26,7 +26,7 @@ export async function POST(request: Request) {
 
     // 4자리 인증코드 생성
     const code = String(Math.floor(1000 + Math.random() * 9000));
-    const expiryMinutes = 30; // 가입은 좀 더 여유 있게 30분
+    const expiryMinutes = GLOBAL_CONFIG.registrationExpiryMinutes;
     const expiresAt = new Date(Date.now() + expiryMinutes * 60 * 1000);
 
     // DB 저장 (VerificationCode 모델 사용)
@@ -37,8 +37,9 @@ export async function POST(request: Request) {
     });
 
     // 관리자 알림
-    await logger.ac(
-      `**[신규 가입 요청]**\n\`아이디\`: \`${userId}\`\n\`인증코드\`: **${code}** (30분 유효)\n\n학생에게 이 코드를 알려주세요.`
+    await logger.reportAsync(
+      `**[신규 가입 요청]**\n\`아이디\`: \`${userId}\`\n\`인증코드\`: **${code}** (${expiryMinutes}분 유효)\n\n학생에게 이 코드를 알려주세요.`,
+      true
     );
 
     return NextResponse.json({ message: '가입 인증코드가 관리자에게 요청되었습니다.' }, { status: 200 });
