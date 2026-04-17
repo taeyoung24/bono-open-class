@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import layoutStyles from 'app/Layout.module.css';
-import styles from './mailbox.module.css';
-import { DefaultButton, TextButton } from 'app/components/Button';
 import ActionList from 'app/components/ActionList';
-import TextInput from 'app/components/TextInput';
-import TextArea from 'app/components/TextArea';
 import formStyles from 'app/components/AuthFormLayout.module.css';
+import { DefaultButton, FieldButton } from 'app/components/Button';
+import SelectInput from 'app/components/SelectInput';
+import TextArea from 'app/components/TextArea';
+import TextInput from 'app/components/TextInput';
+import layoutStyles from 'app/Layout.module.css';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import styles from './mailbox.module.css';
 
 type MailView = 'inbox' | 'sent' | 'compose' | 'view';
 
@@ -31,6 +32,11 @@ export default function MailboxPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMail, setSelectedMail] = useState<any | null>(null);
 
+  // 툴바 및 필터 상태
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+
   useEffect(() => {
     const storedUser = localStorage.getItem('user_info');
     if (storedUser) {
@@ -46,13 +52,13 @@ export default function MailboxPage() {
   // 메일 목록 가져오기 함수
   const fetchMails = async (view: MailView) => {
     if (view !== 'inbox' && view !== 'sent') return;
-    
+
     setIsLoading(true);
     try {
       const endpoint = `/api/mailbox/${view}?userId=${userId}`;
       const response = await fetch(endpoint);
       const data = await response.json();
-      
+
       if (response.ok) {
         setMails(view === 'inbox' ? data.inbox : data.sent);
       }
@@ -82,9 +88,9 @@ export default function MailboxPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ mailId: mail.id }),
         });
-        
+
         // 로컬 상태 업데이트
-        setMails(prev => prev.map(m => 
+        setMails(prev => prev.map(m =>
           m.id === mail.id ? { ...m, isRead: true } : m
         ));
       } catch (e) {
@@ -125,23 +131,60 @@ export default function MailboxPage() {
   };
 
   const navItems = [
-    { 
-      label: '받은메일함', 
+    {
+      label: '받은메일함',
       onClick: () => {
         setCurrentView('inbox');
         setIsSentSuccess(false);
         setSelectedMail(null);
+        setSelectedIds([]);
+        setSearchQuery('');
       }
     },
-    { 
-      label: '보낸메일함', 
+    {
+      label: '보낸메일함',
       onClick: () => {
         setCurrentView('sent');
         setIsSentSuccess(false);
         setSelectedMail(null);
+        setSelectedIds([]);
+        setSearchQuery('');
       }
     }
   ];
+
+  const filteredMails = mails
+    .filter(mail => {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      const targetName = currentView === 'inbox' 
+        ? (mail.sender?.name || mail.senderId)
+        : (mail.receiver?.name || mail.receiverId);
+      return (
+        mail.title.toLowerCase().includes(q) ||
+        mail.content.toLowerCase().includes(q) ||
+        targetName?.toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+
+  const handleToggleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectedIds(filteredMails.map(m => m.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (!confirm('선택한 메일을 삭제하시겠습니까? (현재 데모이므로 화면에서만 임시 삭제됩니다)')) return;
+    setMails(prev => prev.filter(m => !selectedIds.includes(m.id)));
+    setSelectedIds([]);
+  };
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -156,12 +199,12 @@ export default function MailboxPage() {
   return (
     <main className={layoutStyles.container}>
       <div className={styles.mailboxContainer}>
-        
+
         {/* 왼쪽 사이드바 */}
         <aside className={`${layoutStyles.formCard} ${styles.sidebar}`}>
           <div className={styles.actionButtonGroup}>
-            <DefaultButton 
-              text="메일 작성하기" 
+            <DefaultButton
+              text="메일 작성하기"
               onClick={() => {
                 setCurrentView('compose');
                 setIsSentSuccess(false);
@@ -175,8 +218,8 @@ export default function MailboxPage() {
           </div>
 
           <div style={{ marginTop: '32px' }}>
-            <DefaultButton 
-              text="대쉬보드로 돌아가기" 
+            <DefaultButton
+              text="대쉬보드로 돌아가기"
               onClick={() => router.push('/dashboard')}
               variant="none"
               width="fill"
@@ -191,7 +234,7 @@ export default function MailboxPage() {
               {currentView === 'inbox' && '받은메일함'}
               {currentView === 'sent' && '보낸메일함'}
               {currentView === 'compose' && '새 메일 작성'}
-              {currentView === 'view' && '메일 읽기'}
+              {currentView === 'view' && (selectedMail?.title || '메일 읽기')}
             </h3>
           </div>
 
@@ -201,24 +244,77 @@ export default function MailboxPage() {
                 {isLoading ? (
                   <div className={styles.emptyState}><p>로딩 중...</p></div>
                 ) : mails.length > 0 ? (
-                  <div className={styles.mailList}>
-                    {mails.map((mail) => (
-                      <div 
-                        key={mail.id} 
-                        className={`${styles.mailItem} ${currentView === 'inbox' && !mail.isRead ? styles.unread : ''}`}
-                        onClick={() => handleSelectMail(mail)}
-                      >
-                        <div className={styles.itemTop}>
-                          <span className={styles.senderName}>
-                            {currentView === 'inbox' ? mail.sender?.name || mail.senderId : `To: ${mail.receiver?.name || mail.receiverId}`}
-                          </span>
-                          <span className={styles.dateText}>{formatDate(mail.createdAt)}</span>
-                        </div>
-                        <h4 className={styles.mailTitle}>{mail.title}</h4>
-                        <p className={styles.mailSnippet}>{mail.content}</p>
+                  <>
+                    <div className={styles.toolbar}>
+                      <div className={styles.colCheckbox}>
+                        <input 
+                          type="checkbox" 
+                          className={styles.checkbox}
+                          checked={filteredMails.length > 0 && selectedIds.length === filteredMails.length}
+                          onChange={handleToggleSelectAll} 
+                        />
                       </div>
-                    ))}
-                  </div>
+                      <div className={styles.toolbarActions}>
+                        {selectedIds.length > 0 ? (
+                          <div style={{ marginLeft: 'auto' }}>
+                            <FieldButton text="선택한 메일 삭제하기" type="button" onClick={handleDeleteSelected} />
+                          </div>
+                        ) : (
+                          <div className={styles.filterGroup}>
+                            <div style={{ width: '120px' }}>
+                              <SelectInput 
+                                value={sortOrder} 
+                                onChange={(val: string) => setSortOrder(val as 'desc' | 'asc')}
+                                options={[
+                                  { value: 'desc', label: '최신순' },
+                                  { value: 'asc', label: '오래된순' }
+                                ]}
+                              />
+                            </div>
+                            <div style={{ width: '200px' }}>
+                              <TextInput 
+                                type="search"
+                                value={searchQuery}
+                                onChange={setSearchQuery}
+                                placeholder="검색어를 입력하세요"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className={styles.mailList}>
+                      {filteredMails.map((mail) => (
+                        <div
+                          key={mail.id}
+                          className={`${styles.mailListItem} ${currentView === 'inbox' && !mail.isRead ? styles.unread : ''}`}
+                          onClick={() => handleSelectMail(mail)}
+                        >
+                          <div className={styles.colCheckbox} onClick={(e) => e.stopPropagation()}>
+                            <input 
+                              type="checkbox" 
+                              className={styles.checkbox}
+                              checked={selectedIds.includes(mail.id)}
+                              onChange={(e) => {
+                                if (e.target.checked) setSelectedIds(p => [...p, mail.id]);
+                                else setSelectedIds(p => p.filter(id => id !== mail.id));
+                              }} 
+                            />
+                          </div>
+                          <div className={styles.colName}>
+                            {currentView === 'inbox' ? mail.sender?.name || mail.senderId : mail.receiver?.name || mail.receiverId}
+                          </div>
+                          <div className={styles.colTitleContent}>
+                            <span className={styles.listMailTitle}>{mail.title}</span>
+                          </div>
+                          <div className={styles.colDate}>
+                            {formatDate(mail.createdAt)}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 ) : (
                   <div className={styles.emptyState}>
                     <p>표시할 메일이 없습니다.</p>
@@ -230,12 +326,11 @@ export default function MailboxPage() {
             {currentView === 'view' && selectedMail && (
               <div className={styles.viewContainer}>
                 <div className={styles.viewHeader}>
-                  <h3 className={styles.viewTitle}>{selectedMail.title}</h3>
                   <div className={styles.senderInfo}>
                     {selectedMail.senderId === userId ? (
-                      <span>수신: {selectedMail.receiver?.name || selectedMail.receiverId} ({selectedMail.receiverId})</span>
+                      <span>수신: {selectedMail.receiver?.name || selectedMail.receiverId} ({selectedMail.receiver?.email || selectedMail.receiverId})</span>
                     ) : (
-                      <span>발신: {selectedMail.sender?.name || selectedMail.senderId} ({selectedMail.senderId})</span>
+                      <span>발신: {selectedMail.sender?.name || selectedMail.senderId} ({selectedMail.sender?.email || selectedMail.senderId})</span>
                     )}
                     <span style={{ marginLeft: '12px' }}>| {formatDate(selectedMail.createdAt)}</span>
                   </div>
@@ -244,63 +339,72 @@ export default function MailboxPage() {
                   {selectedMail.content}
                 </div>
                 <div className={styles.viewActions}>
-                  <DefaultButton 
-                    text="목록으로" 
-                    onClick={() => setCurrentView(selectedMail.receiverId === userId ? 'inbox' : 'sent')} 
+                  <DefaultButton
+                    text="목록으로"
+                    onClick={() => setCurrentView(selectedMail.receiverId === userId ? 'inbox' : 'sent')}
                     variant="none"
-                    width="hug" 
+                    width="hug"
                   />
                 </div>
               </div>
             )}
-            
+
             {currentView === 'compose' && !isSentSuccess && (
-              <form onSubmit={handleSendMail} className={formStyles.form}>
+              <div className={styles.composeContainer}>
+                <form onSubmit={handleSendMail} className={formStyles.form}>
                 <div className={formStyles.fieldGroup}>
                   <label className={formStyles.label}>받는 사람 이메일</label>
-                  <TextInput 
-                    value={receiverEmail} 
-                    onChange={setReceiverEmail} 
-                    placeholder="상대방의 이메일 주소를 입력하세요" 
-                    required 
-                  />
+                  <div className={formStyles.inputWithAction}>
+                    <TextInput
+                      value={receiverEmail}
+                      onChange={setReceiverEmail}
+                      placeholder="상대방의 이메일 주소를 입력하세요"
+                      required
+                    />
+                    <FieldButton
+                      text="나에게 보내기"
+                      type="button"
+                      onClick={() => setReceiverEmail(userEmail)}
+                    />
+                  </div>
                 </div>
-                
+
                 <div className={formStyles.fieldGroup}>
                   <label className={formStyles.label}>제목</label>
-                  <TextInput 
-                    value={title} 
-                    onChange={setTitle} 
-                    placeholder="제목을 입력하세요" 
-                    required 
+                  <TextInput
+                    value={title}
+                    onChange={setTitle}
+                    placeholder="제목을 입력하세요"
+                    required
                   />
                 </div>
 
                 <div className={formStyles.fieldGroup}>
                   <label className={formStyles.label}>내용</label>
-                  <TextArea 
-                    value={content} 
-                    onChange={setContent} 
-                    placeholder="내용을 입력하세요" 
-                    rows={10}
-                    required 
+                  <TextArea
+                    value={content}
+                    onChange={setContent}
+                    placeholder="내용을 입력하세요"
+                    rows={8}
+                    required
                   />
                 </div>
 
                 <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
-                  <DefaultButton 
-                    text={isSending ? '보내는 중...' : '보내기'} 
-                    type="submit" 
-                    variant="primary" 
+                  <DefaultButton
+                    text={isSending ? '보내는 중...' : '보내기'}
+                    type="submit"
+                    variant="primary"
                     disabled={isSending}
                   />
-                  <DefaultButton 
-                    text="취소" 
-                    onClick={() => setCurrentView('inbox')} 
-                    variant="none" 
+                  <DefaultButton
+                    text="취소"
+                    onClick={() => setCurrentView('inbox')}
+                    variant="none"
                   />
                 </div>
-              </form>
+                </form>
+              </div>
             )}
 
             {currentView === 'compose' && isSentSuccess && (
@@ -308,12 +412,12 @@ export default function MailboxPage() {
                 <p style={{ fontSize: '18px', fontWeight: 'bold', color: 'var(--text-main)', marginBottom: '16px' }}>
                   메일을 성공적으로 보냈습니다!
                 </p>
-                <DefaultButton 
-                  text="확인" 
+                <DefaultButton
+                  text="확인"
                   onClick={() => {
                     setIsSentSuccess(false);
                     setCurrentView('sent');
-                  }} 
+                  }}
                   variant="correct"
                   width="hug"
                 />
