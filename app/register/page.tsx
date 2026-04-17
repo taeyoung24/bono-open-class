@@ -4,6 +4,7 @@ import { DefaultButton, FieldButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
 import styles from 'app/components/AuthFormLayout.module.css';
 import layoutStyles from 'app/Layout.module.css';
+import Tooltip from 'app/overlays/Tooltip';
 import AlertModal from 'app/modals/AlertModal';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -19,6 +20,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string; success?: boolean } | null>(null);
   const [isIdChecked, setIsIdChecked] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const [modal, setModal] = useState({
     isOpen: false,
@@ -191,13 +193,21 @@ export default function RegisterPage() {
               비밀번호
               <FaAsterisk className={styles.requiredIcon} size={8} />
             </label>
-            <TextInput
-              type="password"
-              value={password}
-              onChange={setPassword}
-              placeholder="영문, 숫자, 특수문자 포함 8자 이상"
-              required={true}
-            />
+            <Tooltip 
+              content="이 항목은 선생님도 알아낼 수 없도록 저장되므로 꼭 잘 기억해야 한다" 
+              position="left" 
+              show={isPasswordFocused}
+            >
+              <TextInput
+                type="password"
+                value={password}
+                onChange={setPassword}
+                onFocus={() => setIsPasswordFocused(true)}
+                onBlur={() => setIsPasswordFocused(false)}
+                placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                required={true}
+              />
+            </Tooltip>
             {errorStatus?.field === 'password' && (
               <span className={styles.errorText}>
                 <IoAlertCircleOutline size={16} />

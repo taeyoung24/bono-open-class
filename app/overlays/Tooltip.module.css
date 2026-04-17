@@ -1,0 +1,108 @@
+.tooltipWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: #111111; /* 깊은 검정 */
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10000;
+  
+  /* 등장 애니메이션 초기 상태 */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 뾰족한 꼬리(화살표) 공통 */
+.tooltip::after {
+  content: "";
+  position: absolute;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+/* 위치별 스타일 및 애니메이션 방향 */
+
+/* TOP */
+.top {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0px);
+  margin-bottom: 10px;
+}
+.top.visible {
+  transform: translateX(-50%) translateY(-6px);
+}
+.top::after {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #111111;
+}
+
+/* BOTTOM */
+.bottom {
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(0px);
+  margin-top: 10px;
+}
+.bottom.visible {
+  transform: translateX(-50%) translateY(6px);
+}
+.bottom::after {
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #111111;
+}
+
+/* LEFT */
+.left {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(0px);
+  margin-right: 10px;
+}
+.left.visible {
+  transform: translateY(-50%) translateX(-6px);
+}
+.left::after {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-left-color: #111111;
+}
+
+/* RIGHT */
+.right {
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(0px);
+  margin-left: 10px;
+}
+.right.visible {
+  transform: translateY(-50%) translateX(6px);
+}
+.right::after {
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border-right-color: #111111;
+}

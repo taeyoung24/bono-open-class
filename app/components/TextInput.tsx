@@ -10,6 +10,8 @@ interface TextInputProps {
   required?: boolean;
   disabled?: boolean;
   onChange: (value: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
   name?: string;
 }
 
@@ -20,6 +22,8 @@ export default function TextInput({
   required = false,
   disabled = false,
   onChange,
+  onFocus,
+  onBlur,
   name
 }: TextInputProps) {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,6 +43,8 @@ export default function TextInput({
           required={required}
           disabled={disabled}
           name={name}
+          onFocus={onFocus}
+          onBlur={onBlur}
           style={(type === 'password' || type === 'search') ? { paddingRight: '40px' } : {}}
         />
         {type === 'password' && (
