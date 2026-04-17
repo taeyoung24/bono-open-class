@@ -25,15 +25,15 @@ export async function POST(request: Request) {
     const expiresAt = new Date(Date.now() + expiryMinutes * 60 * 1000);
 
     // DB에 upsert (이미 있으면 덮어씀)
-    await prisma.passwordResetCode.upsert({
-      where: { userId },
+    await prisma.verificationCode.upsert({
+      where: { target_type: { target: userId, type: 'PASSWORD_RESET' } },
       update: { code, expiresAt },
-      create: { userId, code, expiresAt },
+      create: { target: userId, type: 'PASSWORD_RESET', code, expiresAt },
     });
 
-    // logger.ac() → CRITICAL 레벨 → 자동으로 관리자 멘션 포함하여 디스코드 전송
-    await logger.ac(
-      `**비밀번호 재설정 요청**\n\`아이디\`: \`${userId}\`\n\`이름\`: ${user.name}\n\`인증코드\`: **${code}** (${expiryMinutes}분 유효)\n\n사용자에게 이 코드를 전달해주세요.`
+    await logger.reportAsync(
+      `**비밀번호 재설정 요청**\n\`아이디\`: \`${userId}\`\n\`이름\`: ${user.name}\n\`인증코드\`: **${code}** (${expiryMinutes}분 유효)\n\n사용자에게 이 코드를 전달해주세요.`,
+      true
     );
 
     return NextResponse.json({ message: '인증코드가 관리자에게 전송되었습니다.' }, { status: 200 });

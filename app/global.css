@@ -36,7 +36,9 @@
 
   /* Status Colors */
   --status-success: #2DC275;
+  --status-success-hover: #26a362;
   --status-failure: #ef4444;
+  --status-failure-hover: #d73a3a;
   --status-neutral: #64748b;
 
   /* 테두리 및 둥글기 */
@@ -87,10 +89,18 @@
   padding: 0;
 }
 
+body,
+button,
+input,
+select,
+textarea,
+span {
+  font-family: var(--font-atoz), -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+}
+
 body {
   background-color: var(--bg-main);
   color: var(--text-main);
-  font-family: var(--font-atoz), -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   line-height: 1.5;
 }

@@ -1,8 +1,10 @@
 'use client';
 
-import styles from 'app/components/AuthFormLayout.module.css';
 import { DefaultButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
+import CodeInput from 'app/components/CodeInput';
+import styles from 'app/components/AuthFormLayout.module.css';
+import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -144,16 +146,16 @@ export default function ResetPasswordPage() {
 
   const stepDescriptions: Record<Step, string> = {
     request: '아이디를 입력하면 관리자에게 인증코드가 전달됩니다.',
-    verify: `관리자에게 받은 4자리 인증코드를 입력해주세요.\n코드는 5분간 유효합니다.`,
+    verify: `관리자에게 받은 4자리 인증코드를 입력해주세요.\n코드는 10분간 유효합니다.`,
     reset: '새로 사용할 비밀번호를 입력해주세요.',
   };
 
   return (
-    <main className={styles.container}>
-      <div className={styles.authCard}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>{stepTitles[step]}</h3>
-          <p className={styles.subtitle}>{stepDescriptions[step]}</p>
+    <main className={layoutStyles.container}>
+      <div className={layoutStyles.formCard}>
+        <div className={layoutStyles.header}>
+          <h3 className={layoutStyles.title}>{stepTitles[step]}</h3>
+          <p className={layoutStyles.subtitle}>{stepDescriptions[step]}</p>
         </div>
 
         {/* STEP 1: 아이디 입력 */}
@@ -189,11 +191,11 @@ export default function ResetPasswordPage() {
                 인증코드
                 <FaAsterisk className={styles.requiredIcon} size={8} />
               </label>
-              <TextInput
+              <CodeInput
+                length={4}
                 value={code}
                 onChange={setCode}
-                placeholder="4자리 숫자 코드"
-                required={true}
+                disabled={isLoading}
               />
               {errorStatus?.field === 'code' && (
                 <span className={styles.errorText}>
@@ -256,7 +258,7 @@ export default function ResetPasswordPage() {
         </div>
       </div>
 
-      <div className={styles.bottomFooter}>
+      <div className={layoutStyles.bottomFooter}>
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
 

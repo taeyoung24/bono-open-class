@@ -1,0 +1,51 @@
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  width: 100%;
+}
+
+.inputWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.select {
+  width: 100%;
+  padding: 12px 28px 12px 4px; /* 아이콘 공간 확보 */
+  background-color: var(--bg-card);
+  border: none;
+  border-bottom: var(--border-width) solid var(--text-muted);
+  border-radius: 0;
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-r);
+  color: var(--text-main);
+  transition: border-color 0.1s ease;
+  box-shadow: none;
+  outline: none;
+  appearance: none; /* 기본 화살표 제거 */
+  cursor: pointer;
+}
+
+.select:focus {
+  border-bottom-color: var(--accent-primary);
+}
+
+.select:disabled {
+  color: var(--text-sub);
+  cursor: not-allowed;
+  border-bottom-style: dashed;
+}
+
+.icon {
+  position: absolute;
+  right: 4px;
+  pointer-events: none; /* 클릭 이벤트 통과 (select 요소 클릭되도록 함) */
+  color: var(--text-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

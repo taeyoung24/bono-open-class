@@ -40,6 +40,20 @@
   border-bottom-color: var(--accent-primary);
 }
 
+/* type="search"의 기본 X 아이콘 제거 */
+.input::-webkit-search-decoration,
+.input::-webkit-search-cancel-button,
+.input::-webkit-search-results-button,
+.input::-webkit-search-results-decoration {
+  display: none;
+}
+
+.input:disabled {
+  color: var(--text-sub);
+  cursor: not-allowed;
+  border-bottom-style: dashed;
+}
+
 .inputError {
   border-bottom-color: var(--status-failure);
 }
@@ -86,4 +100,14 @@
 .eyeButton:hover {
   background-color: var(--bg-hover);
   color: var(--text-main);
+}
+
+.searchIcon {
+  position: absolute;
+  right: 4px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
 }

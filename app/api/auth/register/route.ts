@@ -5,11 +5,11 @@ import { GLOBAL_CONFIG } from 'src/settings';
 
 export async function POST(request: Request) {
   try {
-    const { userId, password, name } = await request.json();
+    const { userId, password, name, verificationCode } = await request.json();
 
-    if (!userId || !password) {
+    if (!userId || !password || !verificationCode) {
       return NextResponse.json(
-        { message: '아이디와 비밀번호를 입력해주세요.' },
+        { field: 'userId', message: '아이디, 비밀번호, 그리고 인증코드를 모두 입력해주세요.' },
         { status: 400 }
       );
     }
@@ -37,8 +37,20 @@ export async function POST(request: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { message: '이미 존재하는 아이디입니다.' },
+        { field: 'userId', message: '이미 존재하는 아이디입니다.' },
         { status: 409 }
+      );
+    }
+
+    // 인증코드 확인
+    const record = await prisma.verificationCode.findUnique({
+      where: { target_type: { target: userId, type: 'REGISTER' } }
+    });
+
+    if (!record || record.code !== verificationCode || new Date() > record.expiresAt) {
+      return NextResponse.json(
+        { field: 'verificationCode', message: '인증코드가 유효하지 않거나 만료되었습니다. 관리자에게 다시 요청해주세요.' },
+        { status: 401 }
       );
     }
 
@@ -57,6 +69,11 @@ export async function POST(request: Request) {
         name: name || userId,
         role: 'STUDENT',
       },
+    });
+
+    // 사용한 인증코드 삭제
+    await prisma.verificationCode.delete({
+      where: { target_type: { target: userId, type: 'REGISTER' } }
     });
 
     return NextResponse.json(

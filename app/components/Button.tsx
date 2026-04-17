@@ -10,6 +10,12 @@ interface ButtonProps {
 
 interface DefaultButtonProps extends ButtonProps {
   width?: 'fill' | 'hug' | string;
+  variant?: 'primary' | 'danger' | 'none' | 'correct';
+}
+
+interface FieldButtonProps extends ButtonProps {
+  width?: 'fill' | 'hug' | string;
+  variant?: 'default' | 'correct' | 'danger' | 'primary' | 'none';
 }
 
 export function DefaultButton({
@@ -17,7 +23,8 @@ export function DefaultButton({
   onClick,
   type = 'button',
   disabled = false,
-  width = 'fill'
+  width = 'fill',
+  variant = 'primary'
 }: DefaultButtonProps) {
   // width 값에 따른 실제 스타일 결정
   const getWidthStyle = () => {
@@ -31,7 +38,7 @@ export function DefaultButton({
   return (
     <button
       type={type}
-      className={`${styles.button} ${styles.wide}`}
+      className={`${styles.button} ${styles.wide} ${styles[variant]}`}
       onClick={onClick}
       disabled={disabled}
       style={{ width: getWidthStyle() }}
@@ -64,8 +71,9 @@ export function FieldButton({
   onClick,
   type = 'button',
   disabled = false,
-  width = 'hug'
-}: DefaultButtonProps) {
+  width = 'hug',
+  variant = 'default'
+}: FieldButtonProps) {
   const getWidthStyle = () => {
     switch (width) {
       case 'fill': return '100%';
@@ -77,7 +85,7 @@ export function FieldButton({
   return (
     <button
       type={type}
-      className={`${styles.button} ${styles.field}`}
+      className={`${styles.button} ${styles.field} ${styles[variant]}`}
       onClick={onClick}
       disabled={disabled}
       style={{ width: getWidthStyle() }}

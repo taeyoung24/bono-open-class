@@ -1,0 +1,276 @@
+.mailboxContainer {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+  max-width: calc(var(--form-width-base) + var(--form-width-extra) + 24px);
+  width: 100%;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: var(--form-width-base);
+  max-width: var(--form-width-base); /* 가급적 명시적으로 고정 */
+  flex-shrink: 0;
+}
+
+.actionButtonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.navSection {
+  /* ActionList 내부에서 이미 -40px 처리가 되어 있으므로 여기서는 제거 */
+}
+
+/* Main Content Styles */
+.contentArea {
+  width: var(--form-width-extra);
+  max-width: var(--form-width-extra) !important;
+  flex-grow: 1;
+  min-height: 540px;
+  max-height: 680px; /* 최대 높이 설정 */
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.contentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* viewTitle 제거됨 */
+
+.mainContent {
+  flex: 1 1 auto; /* 남은 공간을 확실히 채움 */
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0; /* Flex 자식의 높이 계산 오류 방지 */
+}
+
+.centeredContent {
+  justify-content: center !important;
+}
+
+/* mailListWrapper 제거됨 */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  min-height: 56px;
+}
+
+.toolbarActions {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filterGroup {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* sortSelect 제거됨 */
+
+/* searchInput 제거됨 */
+
+.mailList {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 4px; /* 스크롤바 공간 */
+}
+
+/* 스크롤바 커스텀 스타일 */
+.mailList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.mailList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.mailList::-webkit-scrollbar-thumb {
+  background: var(--border-main);
+  border-radius: 10px;
+}
+
+.mailList::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+.mailListItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--bg-input);
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.mailListItem:last-child {
+  border-bottom: none;
+}
+
+.mailListItem:hover {
+  background-color: var(--bg-input-hover);
+}
+
+.mailListItem.unread {
+  /* 배경 구분을 제거함 */
+}
+
+.mailListItem.unread .colName,
+.mailListItem.unread .listMailTitle {
+  color: var(--text-main);
+}
+
+.colCheckbox {
+  width: 36px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--accent-primary);
+}
+
+.colName {
+  width: 110px;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: var(--font-weight-sb);
+  color: var(--text-sub); /* 읽은 메일 기본색 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 12px;
+}
+
+.colTitleContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-right: 16px;
+}
+
+.listMailTitle {
+  font-size: 15px;
+  color: var(--text-sub); /* 읽은 메일 기본색 */
+  font-weight: var(--font-weight-sb);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.listMailSnippet {
+  font-size: 14px;
+  color: var(--text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-left: 8px;
+  font-weight: var(--font-weight-r);
+}
+
+.colDate {
+  width: 120px; /* 고정너비 늘림 */
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-sub);
+  text-align: right;
+  white-space: nowrap;
+  padding-right: 4px;
+}
+
+/* Mail View Styles */
+.viewContainer,
+.composeContainer {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 8px; /* 스크롤바 배려 */
+}
+
+/* 스크롤바 스타일 통일 */
+.viewContainer::-webkit-scrollbar,
+.composeContainer::-webkit-scrollbar {
+  width: 6px;
+}
+
+.viewContainer::-webkit-scrollbar-thumb,
+.composeContainer::-webkit-scrollbar-thumb {
+  background: var(--border-main);
+  border-radius: 10px;
+}
+
+.viewHeader {
+  padding-bottom: 24px;
+  border-bottom: var(--border-width-thin) solid var(--bg-input);
+  margin-bottom: 24px;
+}
+
+.senderInfo {
+  font-size: 14px;
+  color: var(--text-sub);
+  margin-top: 8px;
+}
+
+.mailContentBody {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-main);
+  white-space: pre-wrap;
+  min-height: 300px;
+}
+
+.viewActions {
+  margin-top: 40px;
+}
+
+.emptyState {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 100%; /* 부모의 전체 높이를 점유 */
+  width: 100%;
+  color: var(--text-sub);
+  gap: 16px;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  opacity: 0.3;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1100px) {
+  .mailboxContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .sidebar, .contentArea {
+    width: 100%;
+    max-width: var(--form-width-base);
+  }
+}

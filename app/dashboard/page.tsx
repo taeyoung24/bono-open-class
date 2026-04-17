@@ -3,12 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './dashboard.module.css';
+import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton } from 'app/components/Button';
 import ActionList from 'app/components/ActionList';
+import ConfirmModal from 'app/modals/ConfirmModal';
 
 export default function DashboardPage() {
   const router = useRouter();
   const [userName, setUserName] = useState('사용자');
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
@@ -35,18 +38,34 @@ export default function DashboardPage() {
   ];
 
   return (
-    <main className={styles.container}>
-      <div className={styles.authCard}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>{userName}의 작업공간</h3>
+    <main className={layoutStyles.container}>
+      <div className={layoutStyles.formCard}>
+        <div className={layoutStyles.header}>
+          <h3 className={layoutStyles.title}>{userName}의 작업공간</h3>
         </div>
 
         <ActionList items={menuItems} />
 
         <div className={styles.logoutSection}>
-          <DefaultButton text="로그아웃" onClick={handleLogout} width='fill' />
+          <DefaultButton 
+            text="로그아웃" 
+            onClick={() => setIsLogoutModalOpen(true)} 
+            width='fill' 
+            variant="none"
+          />
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={isLogoutModalOpen}
+        title="로그아웃"
+        message="정말로 로그아웃 하시겠습니까?"
+        confirmText="로그아웃"
+        cancelText="취소"
+        onConfirm={handleLogout}
+        onCancel={() => setIsLogoutModalOpen(false)}
+        variant="danger"
+      />
     </main>
   );
 }

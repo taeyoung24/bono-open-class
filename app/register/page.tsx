@@ -1,8 +1,11 @@
 'use client';
 
-import styles from 'app/components/AuthFormLayout.module.css';
 import { DefaultButton, FieldButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
+import CodeInput from 'app/components/CodeInput';
+import styles from 'app/components/AuthFormLayout.module.css';
+import layoutStyles from 'app/Layout.module.css';
+import Tooltip from 'app/overlays/Tooltip';
 import AlertModal from 'app/modals/AlertModal';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -16,8 +19,12 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string; success?: boolean } | null>(null);
   const [isIdChecked, setIsIdChecked] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isRequestingCode, setIsRequestingCode] = useState(false);
+  const [hasRequestedCode, setHasRequestedCode] = useState(false);
 
   const [modal, setModal] = useState({
     isOpen: false,
@@ -61,6 +68,39 @@ export default function RegisterPage() {
     }
   };
 
+  const requestRegisterCode = async () => {
+    if (!userId) {
+      setErrorStatus({ field: 'userId', message: '아이디를 먼저 입력해주세요.' });
+      return;
+    }
+
+    if (!isIdChecked) {
+      setErrorStatus({ field: 'userId', message: '먼저 아이디 중복 확인을 완료해주세요.' });
+      return;
+    }
+
+    setIsRequestingCode(true);
+    try {
+      const response = await fetch('/api/auth/register-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await response.json();
+
+      if (response.ok) {
+        showModal('인증 요청 완료', '선생님께 가입 승인 코드가 전송되었습니다. 코드를 받아 입력해주세요.');
+        setHasRequestedCode(true); // 성공적으로 요청되면 상태 업데이트
+      } else {
+        showModal('요청 실패', data.message || '인증 코드 요청 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
+    } finally {
+      setIsRequestingCode(false);
+    }
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -93,18 +133,23 @@ export default function RegisterPage() {
       return;
     }
 
-    // 6. 비밀번호 일치 확인 (가장 중요한 부분)
     if (password !== confirmPassword) {
       setErrorStatus({ field: 'confirmPassword', message: '비밀번호가 일치하지 않습니다.' });
       return;
     }
 
-    // 7. 서버 전송
+    // 7. 인증코드 확인
+    if (!verificationCode) {
+      setErrorStatus({ field: 'verificationCode', message: '인증코드를 입력해주세요.' });
+      return;
+    }
+
+    // 8. 서버 전송
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, password, name }),
+        body: JSON.stringify({ userId, password, name, verificationCode }),
       });
 
       const data = await response.json();
@@ -127,10 +172,10 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className={styles.container}>
-      <div className={styles.authCard}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>회원가입 정보 입력</h3>
+    <main className={layoutStyles.container}>
+      <div className={layoutStyles.formCard}>
+        <div className={layoutStyles.header}>
+          <h3 className={layoutStyles.title}>회원가입 정보 입력</h3>
         </div>
 
         <form onSubmit={handleRegister} className={styles.form} noValidate>
@@ -151,9 +196,10 @@ export default function RegisterPage() {
                 required={true}
               />
               <FieldButton
-                text="중복 확인"
+                text={isIdChecked ? "확인 완료" : "중복 확인"}
                 type="button"
                 onClick={checkIdDuplication}
+                variant={isIdChecked ? "correct" : "default"}
               />
             </div>
             {errorStatus?.field === 'userId' && (
@@ -190,13 +236,21 @@ export default function RegisterPage() {
               비밀번호
               <FaAsterisk className={styles.requiredIcon} size={8} />
             </label>
-            <TextInput
-              type="password"
-              value={password}
-              onChange={setPassword}
-              placeholder="영문, 숫자, 특수문자 포함 8자 이상"
-              required={true}
-            />
+            <Tooltip
+              content="이 항목은 선생님도 알아낼 수 없도록 저장되므로 꼭 잘 기억해야 한다"
+              position="left"
+              show={isPasswordFocused}
+            >
+              <TextInput
+                type="password"
+                value={password}
+                onChange={setPassword}
+                onFocus={() => setIsPasswordFocused(true)}
+                onBlur={() => setIsPasswordFocused(false)}
+                placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                required={true}
+              />
+            </Tooltip>
             {errorStatus?.field === 'password' && (
               <span className={styles.errorText}>
                 <IoAlertCircleOutline size={16} />
@@ -215,10 +269,39 @@ export default function RegisterPage() {
               type="password"
               value={confirmPassword}
               onChange={setConfirmPassword}
-              placeholder="비밀번호를 다시 한번 입력해주세요"
+              placeholder="비밀번호를 다시 한 번 입력해주세요"
               required={true}
             />
             {errorStatus?.field === 'confirmPassword' && (
+              <span className={styles.errorText}>
+                <IoAlertCircleOutline size={16} />
+                {errorStatus.message}
+              </span>
+            )}
+          </div>
+
+          {/* 가입 인증코드 필드 */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              가입 인증코드
+              <FaAsterisk className={styles.requiredIcon} size={8} />
+            </label>
+            <div className={styles.inputWithAction}>
+              <CodeInput
+                length={4}
+                value={verificationCode}
+                onChange={setVerificationCode}
+                disabled={isRequestingCode}
+              />
+              <FieldButton
+                text={isRequestingCode ? "요청 중..." : (hasRequestedCode ? "다시 요청" : "코드 요청")}
+                type="button"
+                onClick={requestRegisterCode}
+                disabled={isRequestingCode}
+                variant={hasRequestedCode ? "none" : "default"}
+              />
+            </div>
+            {errorStatus?.field === 'verificationCode' && (
               <span className={styles.errorText}>
                 <IoAlertCircleOutline size={16} />
                 {errorStatus.message}
@@ -236,7 +319,7 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      <div className={styles.bottomFooter}>
+      <div className={layoutStyles.bottomFooter}>
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
 

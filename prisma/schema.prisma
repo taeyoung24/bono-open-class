@@ -24,18 +24,52 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
+  // 메일 관련 관계
+  sentMails     Mail[] @relation("SentMails")
+  receivedMails Mail[] @relation("ReceivedMails")
+
   @@map("users") // 테이블 이름을 명확하게 지정
 }
 
 // ─────────────────────────────────────────────
-// 비밀번호 재설정 인증코드 (임시 저장, 10분 유효)
+// 메일(쪽지) 시스템
 // ─────────────────────────────────────────────
-model PasswordResetCode {
+model Mail {
+  id          Int      @id @default(autoincrement())
+  
+  // 발신자 정보
+  sender      User     @relation("SentMails", fields: [senderId], references: [userId])
+  senderId    String
+  
+  // 수신자 정보
+  receiver    User     @relation("ReceivedMails", fields: [receiverId], references: [userId])
+  receiverId  String
+  
+  title       String   // 제목
+  content     String   // 내용
+  
+  isRead      Boolean  @default(false) // 읽음 여부
+  
+  // 삭제 여부 플래그
+  deletedBySender   Boolean  @default(false)
+  deletedByReceiver Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())   // 보낸 시간
+
+  @@map("mails")
+}
+
+// ─────────────────────────────────────────────
+// 범용 관리자 승인 인증코드 (회원가입, 비밀번호 재설정 등)
+// ─────────────────────────────────────────────
+model VerificationCode {
   id        Int      @id @default(autoincrement())
-  userId    String   @unique // 한 아이디에 하나의 코드만 유효
-  code      String   // 4자리 숫자 코드
-  expiresAt DateTime // 만료 시각 (발급 후 10분)
+  target    String   // 식별자 (userId, email, phone 등)
+  type      String   // 용도 (REGISTER, PASSWORD_RESET, REWARD_CLAIM 등)
+  code      String   // 발급된 인증코드
+  expiresAt DateTime // 만료 시각
   createdAt DateTime @default(now())
 
-  @@map("password_reset_codes")
+  @@unique([target, type]) // 특정 대상이 특정 용도로는 하나의 코드만 가지게 함
+  @@map("verification_codes")
 }

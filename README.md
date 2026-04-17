@@ -15,14 +15,30 @@ pnpm install
 
 ### 2. 환경 변수 세팅
 프로젝트 루트 디렉토리에 `.env` 파일을 생성하고 아래와 같이 작성합니다. (SQLite를 사용하므로 파일 경로를 지정해 줍니다)
-```env
-DATABASE_URL="file:./dev.db"
+```bash
+NODE_ENV="production" # 또는 "development"
+DATABASE_URL="file:./main.db" # 또는 "file:./local.db"
+DISCORD_WEBHOOK_URL="DISCORD_WEBHOOK_URL"
+JWT_SECRET="JWT_SECRET"
 ```
 
 ### 3. 데이터베이스 초기화 및 Prisma 세팅
-Prisma 마이그레이션을 적용하여 SQLite 데이터베이스 파일을 생성하고, Prisma 클라이언트를 생성합니다.
+Prisma 마이그레이션을 적용하여 데이터베이스 구조를 동기화하고 Prisma 클라이언트를 생성합니다.
+> [!IMPORTANT]
+> 마이그레이션 실행 전 최상단 루트 디렉토리에 **`.env` 파일이 올바르게 세팅되어 있어야 합니다.** Prisma는 기본적으로 `.env` 파일을 참조합니다. 만약 `.env.development`와 같은 파일만 있다면, 잠시 `.env`로 이름을 변경하거나 복사본을 만든 후 진행하세요.
+
+**개발 환경 (새로운 변경사항 적용 시)**
 ```bash
-pnpm prisma migrate dev
+pnpm prisma migrate dev --name init
+```
+
+**운영/배포 환경 (기존 마이그레이션 파일 배포)**
+```bash
+pnpm prisma migrate deploy
+```
+
+**Prisma Client 수동 생성 (필요 시)**
+```bash
 pnpm prisma generate
 ```
 
@@ -33,8 +49,8 @@ pnpm dev
 이제 브라우저에서 `http://localhost:3000`으로 접속하여 앱을 확인할 수 있습니다.
 
 ### 5. 데이터베이스 확인 (Prisma Studio)
-브라우저를 통해 데이터베이스 내용을 확인하고 직접 수정하려면 다음 명령어를 실행하세요.
+브라우저를 통해 GUI 환경에서 데이터베이스 내용을 확인하고 직접 수정하려면 다음 명령어를 실행하세요.
 ```bash
-npx prisma studio --env-file .env.development
+pnpm prisma studio
 ```
-기본적으로 `http://localhost:5555`에서 확인 가능합니다.
+기본적으로 `http://localhost:5555`에서 확인 가능합니다.

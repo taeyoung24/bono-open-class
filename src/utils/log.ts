@@ -50,9 +50,9 @@ export class Logger {
     const config = LOG_LEVEL_MAP[validLogType];
     const padType = validLogType.padStart(8, ' ');
     const formattedContent = util.format(content);
-    
+
     const terminalContent = `${BOLD}${config.color}${padType}:   ${RESET} ${dateStr}   ${convertMarkdownBold(formattedContent)}`;
-    
+
     if (!hidePrompt) {
       if (validLogType === 'ERROR' || validLogType === 'CRITICAL' || validLogType === 'WARNING') {
         console.error(terminalContent);
@@ -68,13 +68,13 @@ export class Logger {
       this.log(`유효하지 않은 로그 타입 사용: ${logType}`, 'WARNING');
       logType = 'INFO';
     }
-    
+
     const validLogType = logType as LogType;
     this.log(content, validLogType, dateStr, hidePrompt);
-    
+
     const config = LOG_LEVEL_MAP[validLogType];
     const formattedContent = util.format(content);
-    
+
     let discordContent = '';
     if (this.name === null) {
       discordContent = `${config.emoji}\`[${dateStr}]\` ${formattedContent}`;
@@ -108,9 +108,8 @@ export class Logger {
 
     let content = message;
     if (important) {
-      // settings.ts의 설정에 맞추어 멘션 방식 동적 적용 (기존 로직 유지)
-      const roleId = (GLOBAL_CONFIG as any)?.discordAlertRoleIds?.operator || (GLOBAL_CONFIG as any)?.discordManagerUserId;
-      if (roleId) content = `<@&${roleId}>\n${content}`;
+      const roleId = GLOBAL_CONFIG.discordManagerUserId;
+      if (roleId) content = `<@${roleId}>\n${content}`;
     }
 
     try {
@@ -121,14 +120,13 @@ export class Logger {
   }
 
   private async _sendDiscordReport(message: string, important = false) {
-    // Report 웹훅 URL이 별도로 없다면 기본 웹훅 URL 사용
-    const reportUrl = (GLOBAL_CONFIG as any)?.DISCORD_REPORT_WH_URL || DISCORD_WEBHOOK_URL;
+    const reportUrl = DISCORD_WEBHOOK_URL;
     if (!reportUrl) return;
 
     let content = message;
     if (important) {
-      const roleId = (GLOBAL_CONFIG as any)?.discordAlertRoleIds?.ceo || (GLOBAL_CONFIG as any)?.discordManagerUserId;
-      if (roleId) content = `<@&${roleId}>\n${content}`;
+      const roleId = GLOBAL_CONFIG.discordManagerUserId;
+      if (roleId) content = `<@${roleId}>\n${content}`;
     }
 
     try {
