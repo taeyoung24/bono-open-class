@@ -12,7 +12,9 @@ export async function POST(request: Request) {
     }
 
     // 코드 재검증 (직접 confirm URL 호출하는 경우 방지)
-    const record = await prisma.passwordResetCode.findUnique({ where: { userId } });
+    const record = await prisma.verificationCode.findUnique({ 
+      where: { target_type: { target: userId, type: 'PASSWORD_RESET' } } 
+    });
     if (!record || record.code !== code || new Date() > record.expiresAt) {
       return NextResponse.json({ message: '유효하지 않은 인증 정보입니다.' }, { status: 401 });
     }
@@ -34,7 +36,9 @@ export async function POST(request: Request) {
     });
 
     // 사용한 인증코드 삭제
-    await prisma.passwordResetCode.delete({ where: { userId } });
+    await prisma.verificationCode.delete({ 
+      where: { target_type: { target: userId, type: 'PASSWORD_RESET' } } 
+    });
 
     return NextResponse.json({ message: '비밀번호가 성공적으로 변경되었습니다.' }, { status: 200 });
   } catch (error) {

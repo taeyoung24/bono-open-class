@@ -25,10 +25,10 @@ export async function POST(request: Request) {
     const expiresAt = new Date(Date.now() + expiryMinutes * 60 * 1000);
 
     // DB에 upsert (이미 있으면 덮어씀)
-    await prisma.passwordResetCode.upsert({
-      where: { userId },
+    await prisma.verificationCode.upsert({
+      where: { target_type: { target: userId, type: 'PASSWORD_RESET' } },
       update: { code, expiresAt },
-      create: { userId, code, expiresAt },
+      create: { target: userId, type: 'PASSWORD_RESET', code, expiresAt },
     });
 
     // logger.ac() → CRITICAL 레벨 → 자동으로 관리자 멘션 포함하여 디스코드 전송

@@ -18,9 +18,11 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string; success?: boolean } | null>(null);
   const [isIdChecked, setIsIdChecked] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isRequestingCode, setIsRequestingCode] = useState(false);
 
   const [modal, setModal] = useState({
     isOpen: false,
@@ -64,6 +66,33 @@ export default function RegisterPage() {
     }
   };
 
+  const requestRegisterCode = async () => {
+    if (!userId) {
+      setErrorStatus({ field: 'userId', message: '아이디를 먼저 입력해주세요.' });
+      return;
+    }
+    
+    setIsRequestingCode(true);
+    try {
+      const response = await fetch('/api/auth/register-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        showModal('인증 요청 완료', '관리자(디스코드)에게 가입 승인 코드가 전송되었습니다. 관리자에게 문의하여 코드를 받아 입력해주세요.');
+      } else {
+        showModal('요청 실패', data.message || '인증 코드 요청 중 오류가 발생했습니다.');
+      }
+    } catch (error) {
+      showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
+    } finally {
+      setIsRequestingCode(false);
+    }
+  };
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -96,18 +125,23 @@ export default function RegisterPage() {
       return;
     }
 
-    // 6. 비밀번호 일치 확인 (가장 중요한 부분)
     if (password !== confirmPassword) {
       setErrorStatus({ field: 'confirmPassword', message: '비밀번호가 일치하지 않습니다.' });
       return;
     }
 
-    // 7. 서버 전송
+    // 7. 인증코드 확인
+    if (!verificationCode) {
+      setErrorStatus({ field: 'verificationCode', message: '인증코드를 입력해주세요.' });
+      return;
+    }
+
+    // 8. 서버 전송
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, password, name }),
+        body: JSON.stringify({ userId, password, name, verificationCode }),
       });
 
       const data = await response.json();
@@ -230,6 +264,34 @@ export default function RegisterPage() {
               required={true}
             />
             {errorStatus?.field === 'confirmPassword' && (
+              <span className={styles.errorText}>
+                <IoAlertCircleOutline size={16} />
+                {errorStatus.message}
+              </span>
+            )}
+          </div>
+
+          {/* 가입 인증코드 필드 */}
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              가입 인증코드
+              <FaAsterisk className={styles.requiredIcon} size={8} />
+            </label>
+            <div className={styles.inputWithAction}>
+              <TextInput
+                value={verificationCode}
+                onChange={setVerificationCode}
+                placeholder="관리자에게 전달받은 4자리 코드"
+                required={true}
+              />
+              <FieldButton
+                text={isRequestingCode ? "요청 중..." : "코드 요청"}
+                type="button"
+                onClick={requestRegisterCode}
+                disabled={isRequestingCode}
+              />
+            </div>
+            {errorStatus?.field === 'verificationCode' && (
               <span className={styles.errorText}>
                 <IoAlertCircleOutline size={16} />
                 {errorStatus.message}

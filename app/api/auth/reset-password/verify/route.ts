@@ -9,14 +9,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: '아이디와 인증코드를 입력해주세요.' }, { status: 400 });
     }
 
-    const record = await prisma.passwordResetCode.findUnique({ where: { userId } });
+    const record = await prisma.verificationCode.findUnique({ 
+      where: { target_type: { target: userId, type: 'PASSWORD_RESET' } } 
+    });
 
     if (!record) {
       return NextResponse.json({ message: '인증코드 요청 내역이 없습니다.' }, { status: 404 });
     }
 
     if (new Date() > record.expiresAt) {
-      await prisma.passwordResetCode.delete({ where: { userId } });
+      await prisma.verificationCode.delete({ 
+        where: { target_type: { target: userId, type: 'PASSWORD_RESET' } } 
+      });
       return NextResponse.json({ message: '인증코드가 만료되었습니다. 다시 요청해주세요.' }, { status: 410 });
     }
 
