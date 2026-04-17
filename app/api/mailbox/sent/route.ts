@@ -17,6 +17,7 @@ export async function GET(request: Request) {
     const sent = await prisma.mail.findMany({
       where: {
         senderId: userId,
+        deletedBySender: false,
       },
       include: {
         receiver: {

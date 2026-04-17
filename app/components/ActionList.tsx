@@ -3,7 +3,7 @@ import styles from './ActionList.module.css';
 import { HiChevronRight } from 'react-icons/hi';
 
 export interface ActionListItem {
-  label: string;
+  label: React.ReactNode;
   onClick: () => void;
 }
 

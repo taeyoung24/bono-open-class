@@ -50,6 +50,10 @@ model Mail {
   
   isRead      Boolean  @default(false) // 읽음 여부
   
+  // 삭제 여부 플래그
+  deletedBySender   Boolean  @default(false)
+  deletedByReceiver Boolean  @default(false)
+  
   createdAt   DateTime @default(now())   // 보낸 시간
 
   @@map("mails")

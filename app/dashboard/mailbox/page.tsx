@@ -7,6 +7,7 @@ import SelectInput from 'app/components/SelectInput';
 import TextArea from 'app/components/TextArea';
 import TextInput from 'app/components/TextInput';
 import layoutStyles from 'app/Layout.module.css';
+import ConfirmModal from 'app/modals/ConfirmModal';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styles from './mailbox.module.css';
@@ -26,6 +27,7 @@ export default function MailboxPage() {
   const [content, setContent] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isSentSuccess, setIsSentSuccess] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // 리스트 상태
   const [mails, setMails] = useState<any[]>([]);
@@ -36,6 +38,12 @@ export default function MailboxPage() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
+  const [inboxCount, setInboxCount] = useState(0);
+  const [sentCount, setSentCount] = useState(0);
+
+  const formatCount = (count: number) => {
+    return count >= 1000 ? '999+' : count.toString();
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user_info');
@@ -48,6 +56,29 @@ export default function MailboxPage() {
       router.push('/login');
     }
   }, [router]);
+
+  // 메일 개수(Count) 가져오기
+  const fetchCounts = async () => {
+    if (!userId) return;
+    try {
+      const [inboxRes, sentRes] = await Promise.all([
+        fetch(`/api/mailbox/inbox?userId=${userId}`),
+        fetch(`/api/mailbox/sent?userId=${userId}`)
+      ]);
+      const [inboxData, sentData] = await Promise.all([inboxRes.json(), sentRes.json()]);
+      
+      if (inboxRes.ok) setInboxCount(inboxData.inbox.length);
+      if (sentRes.ok) setSentCount(sentData.sent.length);
+    } catch (e) {
+      console.error('Failed to fetch counts:', e);
+    }
+  };
+
+  useEffect(() => {
+    if (userId) {
+      fetchCounts();
+    }
+  }, [userId]);
 
   // 메일 목록 가져오기 함수
   const fetchMails = async (view: MailView) => {
@@ -73,6 +104,7 @@ export default function MailboxPage() {
     if (userId && (currentView === 'inbox' || currentView === 'sent')) {
       fetchMails(currentView);
       setSelectedMail(null); // 뷰 전환 시 선택된 메일 초기화
+      fetchCounts(); // 뷰 전환시마다도 최신화
     }
   }, [userId, currentView]);
 
@@ -132,7 +164,11 @@ export default function MailboxPage() {
 
   const navItems = [
     {
-      label: '받은메일함',
+      label: (
+        <span>
+          받은메일함 <span style={{ color: 'var(--text-muted)', marginLeft: '2px', fontSize: '13px' }}>({formatCount(inboxCount)})</span>
+        </span>
+      ),
       onClick: () => {
         setCurrentView('inbox');
         setIsSentSuccess(false);
@@ -142,7 +178,11 @@ export default function MailboxPage() {
       }
     },
     {
-      label: '보낸메일함',
+      label: (
+        <span>
+          보낸메일함 <span style={{ color: 'var(--text-muted)', marginLeft: '2px', fontSize: '13px' }}>({formatCount(sentCount)})</span>
+        </span>
+      ),
       onClick: () => {
         setCurrentView('sent');
         setIsSentSuccess(false);
@@ -180,10 +220,38 @@ export default function MailboxPage() {
     }
   };
 
-  const handleDeleteSelected = async () => {
-    if (!confirm('선택한 메일을 삭제하시겠습니까? (현재 데모이므로 화면에서만 임시 삭제됩니다)')) return;
-    setMails(prev => prev.filter(m => !selectedIds.includes(m.id)));
-    setSelectedIds([]);
+  const handleDeleteSelected = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const executeBulkDelete = async () => {
+    setIsDeleteModalOpen(false);
+    try {
+      const res = await fetch('/api/mailbox/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mailIds: selectedIds, userId }),
+      });
+
+      if (res.ok) {
+        // UI 로컬 업데이트
+        setMails(prev => {
+          const newList = prev.filter(m => !selectedIds.includes(m.id));
+          if (currentView === 'inbox') setInboxCount(newList.length);
+          else setSentCount(newList.length);
+          return newList;
+        });
+        setSelectedIds([]);
+      } else {
+        const data = await res.json();
+        alert(data.message || '삭제 중 오류가 발생했습니다.');
+      }
+    } catch (e) {
+      console.error(e);
+      alert('서버 요청 중 오류가 발생했습니다.');
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -427,6 +495,17 @@ export default function MailboxPage() {
         </section>
 
       </div>
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title="선택 삭제"
+        message="선택한 메일을 삭제하시겠습니까?"
+        confirmText="삭제"
+        cancelText="취소"
+        variant="danger"
+        onConfirm={executeBulkDelete}
+        onCancel={() => setIsDeleteModalOpen(false)}
+      />
     </main>
   );
 }
