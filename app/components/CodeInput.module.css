@@ -1,0 +1,42 @@
+.codeInputContainer {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 2%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.codeSlot {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 0;
+  text-align: center;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-sb);
+  color: var(--text-main);
+  background-color: var(--bg-card);
+  border: none;
+  border-bottom: var(--border-width) solid var(--text-muted);
+  border-radius: 0;
+  outline: none;
+  transition: border-bottom-color 0.1s ease, background-color 0.1s ease;
+}
+
+.codeSlot:focus {
+  border-bottom-color: var(--accent-primary);
+  background-color: var(--bg-hover);
+}
+
+.codeSlot:disabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+  border-bottom-style: dashed;
+}
+
+/* Chrome, Safari, Edge, Opera - 화살표 제거 */
+.codeSlot::-webkit-outer-spin-button,
+.codeSlot::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

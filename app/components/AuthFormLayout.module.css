@@ -44,8 +44,13 @@
   margin-top: 4px;
   padding-left: 4px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
+}
+
+.errorText svg, .successText svg {
+  margin-top: 1px;
+  flex-shrink: 0;
 }
 
 .successText {
@@ -55,7 +60,7 @@
   margin-top: 4px;
   padding-left: 4px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 4px;
 }
 

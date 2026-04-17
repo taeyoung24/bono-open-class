@@ -2,6 +2,7 @@
 
 import { DefaultButton, FieldButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
+import CodeInput from 'app/components/CodeInput';
 import styles from 'app/components/AuthFormLayout.module.css';
 import layoutStyles from 'app/Layout.module.css';
 import Tooltip from 'app/overlays/Tooltip';
@@ -23,6 +24,7 @@ export default function RegisterPage() {
   const [isIdChecked, setIsIdChecked] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isRequestingCode, setIsRequestingCode] = useState(false);
+  const [hasRequestedCode, setHasRequestedCode] = useState(false);
 
   const [modal, setModal] = useState({
     isOpen: false,
@@ -71,7 +73,12 @@ export default function RegisterPage() {
       setErrorStatus({ field: 'userId', message: '아이디를 먼저 입력해주세요.' });
       return;
     }
-    
+
+    if (!isIdChecked) {
+      setErrorStatus({ field: 'userId', message: '먼저 아이디 중복 확인을 완료해주세요.' });
+      return;
+    }
+
     setIsRequestingCode(true);
     try {
       const response = await fetch('/api/auth/register-request', {
@@ -80,9 +87,10 @@ export default function RegisterPage() {
         body: JSON.stringify({ userId }),
       });
       const data = await response.json();
-      
+
       if (response.ok) {
-        showModal('인증 요청 완료', '관리자(디스코드)에게 가입 승인 코드가 전송되었습니다. 관리자에게 문의하여 코드를 받아 입력해주세요.');
+        showModal('인증 요청 완료', '선생님께 가입 승인 코드가 전송되었습니다. 코드를 받아 입력해주세요.');
+        setHasRequestedCode(true); // 성공적으로 요청되면 상태 업데이트
       } else {
         showModal('요청 실패', data.message || '인증 코드 요청 중 오류가 발생했습니다.');
       }
@@ -188,9 +196,10 @@ export default function RegisterPage() {
                 required={true}
               />
               <FieldButton
-                text="중복 확인"
+                text={isIdChecked ? "확인 완료" : "중복 확인"}
                 type="button"
                 onClick={checkIdDuplication}
+                variant={isIdChecked ? "correct" : "default"}
               />
             </div>
             {errorStatus?.field === 'userId' && (
@@ -227,9 +236,9 @@ export default function RegisterPage() {
               비밀번호
               <FaAsterisk className={styles.requiredIcon} size={8} />
             </label>
-            <Tooltip 
-              content="이 항목은 선생님도 알아낼 수 없도록 저장되므로 꼭 잘 기억해야 한다" 
-              position="left" 
+            <Tooltip
+              content="이 항목은 선생님도 알아낼 수 없도록 저장되므로 꼭 잘 기억해야 한다"
+              position="left"
               show={isPasswordFocused}
             >
               <TextInput
@@ -260,7 +269,7 @@ export default function RegisterPage() {
               type="password"
               value={confirmPassword}
               onChange={setConfirmPassword}
-              placeholder="비밀번호를 다시 한번 입력해주세요"
+              placeholder="비밀번호를 다시 한 번 입력해주세요"
               required={true}
             />
             {errorStatus?.field === 'confirmPassword' && (
@@ -278,17 +287,18 @@ export default function RegisterPage() {
               <FaAsterisk className={styles.requiredIcon} size={8} />
             </label>
             <div className={styles.inputWithAction}>
-              <TextInput
+              <CodeInput
+                length={4}
                 value={verificationCode}
                 onChange={setVerificationCode}
-                placeholder="관리자에게 전달받은 4자리 코드"
-                required={true}
+                disabled={isRequestingCode}
               />
               <FieldButton
-                text={isRequestingCode ? "요청 중..." : "코드 요청"}
+                text={isRequestingCode ? "요청 중..." : (hasRequestedCode ? "다시 요청" : "코드 요청")}
                 type="button"
                 onClick={requestRegisterCode}
                 disabled={isRequestingCode}
+                variant={hasRequestedCode ? "none" : "default"}
               />
             </div>
             {errorStatus?.field === 'verificationCode' && (

@@ -9,7 +9,7 @@ export async function POST(request: Request) {
 
     if (!userId || !password || !verificationCode) {
       return NextResponse.json(
-        { message: '아이디, 비밀번호, 그리고 인증코드를 모두 입력해주세요.' },
+        { field: 'userId', message: '아이디, 비밀번호, 그리고 인증코드를 모두 입력해주세요.' },
         { status: 400 }
       );
     }
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { message: '이미 존재하는 아이디입니다.' },
+        { field: 'userId', message: '이미 존재하는 아이디입니다.' },
         { status: 409 }
       );
     }
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
 
     if (!record || record.code !== verificationCode || new Date() > record.expiresAt) {
       return NextResponse.json(
-        { message: '인증코드가 유효하지 않거나 만료되었습니다. 관리자에게 다시 요청해주세요.' },
+        { field: 'verificationCode', message: '인증코드가 유효하지 않거나 만료되었습니다. 관리자에게 다시 요청해주세요.' },
         { status: 401 }
       );
     }

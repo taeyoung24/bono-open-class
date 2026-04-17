@@ -2,6 +2,7 @@
 
 import { DefaultButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
+import CodeInput from 'app/components/CodeInput';
 import styles from 'app/components/AuthFormLayout.module.css';
 import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
@@ -190,11 +191,11 @@ export default function ResetPasswordPage() {
                 인증코드
                 <FaAsterisk className={styles.requiredIcon} size={8} />
               </label>
-              <TextInput
+              <CodeInput
+                length={4}
                 value={code}
                 onChange={setCode}
-                placeholder="4자리 숫자 코드"
-                required={true}
+                disabled={isLoading}
               />
               {errorStatus?.field === 'code' && (
                 <span className={styles.errorText}>

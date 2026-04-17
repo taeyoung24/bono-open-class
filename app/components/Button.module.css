@@ -95,23 +95,30 @@
 
 /* Field Variant */
 .field {
+  flex-shrink: 0; /* 버튼이 찌그러지지 않도록 고정 */
   height: 44px;
   /* 입력 필드와 시각적으로 정렬되도록 조정 */
   padding: 0 16px;
-  background-color: var(--accent-secondary);
   border: var(--border-width) solid var(--border-main);
   border-radius: var(--radius-sm);
   font-size: 14px;
-  color: var(--text-main);
   box-shadow: inset 0 calc(var(--shadow-depth-sm) * -1) 0 var(--shadow-inset);
 }
 
-.field:hover {
+.field:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.default {
+  background-color: var(--accent-secondary);
+  color: var(--text-main);
+}
+
+.default:hover {
   background-color: var(--accent-secondary-hover);
 }
 
-.field:active {
+.default:active {
   background-color: var(--accent-secondary-active);
-  transform: translateY(1px);
-  box-shadow: none;
 }
