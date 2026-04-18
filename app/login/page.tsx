@@ -1,26 +1,26 @@
 'use client';
 
 import styles from 'app/components/AuthFormLayout.module.css';
-import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
+import layoutStyles from 'app/Layout.module.css';
+import AlertModal from 'app/modals/AlertModal';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline } from 'react-icons/io5';
-import AlertModal from 'app/modals/AlertModal';
 
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
-  
+
   // 모달 상태
   const [modal, setModal] = useState({
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {}
+    onConfirm: () => { }
   });
 
   const showModal = (title: string, message: string, onConfirm?: () => void) => {
@@ -59,9 +59,9 @@ export default function LoginPage() {
       if (!response.ok) {
         // 비밀번호 관련 에러인 경우 password 필드 아래에 표시
         const isPasswordError = data.message?.includes('비밀번호');
-        setErrorStatus({ 
-          field: isPasswordError ? 'password' : 'userId', 
-          message: data.message || '로그인 중 오류가 발생했습니다.' 
+        setErrorStatus({
+          field: isPasswordError ? 'password' : 'userId',
+          message: data.message || '로그인 중 오류가 발생했습니다.'
         });
         return;
       }
@@ -85,6 +85,7 @@ export default function LoginPage() {
 
         <div className={layoutStyles.header}>
           <h3 className={layoutStyles.title}>로그인으로 시작</h3>
+          <p className={layoutStyles.subtitle}>이 앱은 교육용으로 제작되었습니다.<br></br>자세한 사항은 하단 앱 정보를 확인해주세요.</p>
         </div>
 
         <form onSubmit={handleLogin} className={layoutStyles.form} noValidate>
@@ -134,6 +135,8 @@ export default function LoginPage() {
           <TextButton text="비밀번호 찾기" onClick={() => router.push('/reset-password')} />
           <div className={styles.divider} />
           <TextButton text="새로 가입하기" onClick={() => router.push('/register')} />
+          <div className={styles.divider} />
+          <TextButton text="앱 정보" onClick={() => router.push('/about')} />
         </div>
       </div>
 
@@ -141,7 +144,7 @@ export default function LoginPage() {
         <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
 
-      <AlertModal 
+      <AlertModal
         isOpen={modal.isOpen}
         title={modal.title}
         message={modal.message}
