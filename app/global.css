@@ -24,8 +24,13 @@
   --dimmed: rgba(0, 0, 0, 0.5);
 
   /* 포인트(Accent) 및 브랜드 색상 */
-  --accent-primary: #4852db;
-  --accent-hover: #3a44c9;
+  --accent-primary: #4f46e5;
+  --accent-secondary: #818cf8;
+
+  /* 실력 등급 스펙트럼 컬러 */
+  --spectrum-yellow: #fae315;
+  --spectrum-orange: #fb923c;
+  --spectrum-red: #e43131;
 
   --accent-secondary: #ffc445;
   --accent-secondary-hover: #f0b331;

@@ -6,6 +6,9 @@ import layoutStyles from 'app/Layout.module.css';
 import styles from './typing-records.module.css';
 import { DefaultButton } from 'app/components/Button';
 import ActionList from 'app/components/ActionList';
+import TypingHistoryChart from './TypingHistoryChart';
+import Tooltip from 'app/overlays/Tooltip';
+import ProficiencyGauge from './ProficiencyGauge';
 
 interface TypingRecord {
   id: number;
@@ -40,6 +43,7 @@ export default function TypingRecordsPage() {
   const [allRecords, setAllRecords] = useState<TypingRecord[]>([]);
   const [stats, setStats] = useState<Stats>({ totalCount: 0, avgCpm: 0, avgAccuracy: 0 });
   const [filter, setFilter] = useState<'POSITION' | 'WORD' | 'NORMAL' | null>(null);
+  const [viewMode, setViewMode] = useState<'list' | 'analytics' | null>('analytics');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -84,21 +88,21 @@ export default function TypingRecordsPage() {
     return allRecords.filter(r => r.type === type).length;
   };
 
-  // 최근 20회 기준 정확도 보정 타수 계산
-  const calculateEffectiveCpm = () => {
+  // 최근 20회 평균 타수 * 평균 정확도를 통한 보정 타수 계산
+  const calculateAdjustedCpm = () => {
     if (allRecords.length === 0) return 0;
-
     const recentRecords = allRecords.slice(0, 20);
-    const avgCpm = recentRecords.reduce((acc, r) => acc + (r.cpm || 0), 0) / recentRecords.length;
-    const avgAcc = recentRecords.reduce((acc, r) => acc + (r.accuracy || 0), 0) / recentRecords.length;
-
-    return Math.round(avgCpm * avgAcc);
+    const avgCpm = recentRecords.reduce((acc, curr) => acc + (curr.cpm || 0), 0) / recentRecords.length;
+    const avgAccuracy = recentRecords.reduce((acc, curr) => acc + (curr.accuracy || 0), 0) / recentRecords.length;
+    // accuracy가 0~1 사이 값이므로 그대로 곱함
+    return Math.round(avgCpm * avgAccuracy);
   };
 
   const menuItems = [
-    { label: `자리 연습 (${getCount('POSITION')})`, onClick: () => setFilter('POSITION') },
-    { label: `낱말 연습 (${getCount('WORD')})`, onClick: () => setFilter('WORD') },
-    { label: `일반 연습 (${getCount('NORMAL')})`, onClick: () => setFilter('NORMAL') },
+    { label: '분석 보드', onClick: () => { setFilter(null); setViewMode('analytics'); } },
+    { label: `자리 연습 (${getCount('POSITION')})`, onClick: () => { setFilter('POSITION'); setViewMode('list'); } },
+    { label: `낱말 연습 (${getCount('WORD')})`, onClick: () => { setFilter('WORD'); setViewMode('list'); } },
+    { label: `일반 연습 (${getCount('NORMAL')})`, onClick: () => { setFilter('NORMAL'); setViewMode('list'); } },
   ];
 
   return (
@@ -113,9 +117,11 @@ export default function TypingRecordsPage() {
           {/* 미니멀 통계 섹션 */}
           <div className={styles.minimalStatsLayout}>
             <div className={styles.statBox}>
-              <span className={styles.statTitle}>나의 타수</span>
+              <Tooltip content="최근 10회 평균 타수 × 평균 정확도" position="right">
+                <span className={styles.statTitle}>나의 타수 (보정)</span>
+              </Tooltip>
               <div className={styles.statHugeValueContainer}>
-                <span className={styles.statHugeValue}>{calculateEffectiveCpm()}</span>
+                <span className={styles.statHugeValue}>{calculateAdjustedCpm()}</span>
                 <span className={styles.statHugeUnit}>타</span>
               </div>
             </div>
@@ -133,7 +139,7 @@ export default function TypingRecordsPage() {
 
           <ActionList items={menuItems} />
 
-          <div style={{ marginTop: 'auto', paddingTop: '32px' }}>
+          <div className={styles.sidebarFooter}>
             <DefaultButton
               text="대시보드로 돌아가기"
               onClick={() => router.push('/dashboard')}
@@ -143,20 +149,52 @@ export default function TypingRecordsPage() {
           </div>
         </aside>
 
-        {/* 오른쪽 카드: 기록 리스트 (Mailbox 스타일 100% 적용) */}
+        {/* 오른쪽 카드: 기록 리스트 또는 분석 보드 */}
         <section className={`${layoutStyles.formCard} ${styles.contentArea}`}>
           <div className={layoutStyles.header}>
             <h3 className={layoutStyles.title}>
-              {filter ? TYPE_NAME_MAP[filter] : '연습 기록'} {filter && `(${filteredRecords.length})`}
+              {viewMode === 'analytics' ? '분석 보드' : (filter ? TYPE_NAME_MAP[filter] : '연습 기록')}
+              {viewMode === 'list' && filter && ` (${filteredRecords.length})`}
             </h3>
           </div>
 
           <div className={layoutStyles.dataList}>
             {isLoading ? (
-              <div className={layoutStyles.dataItem} style={{ justifyContent: 'center', cursor: 'default' }}>로딩 중...</div>
-            ) : filter === null ? (
-              <div className={layoutStyles.dataItem} style={{ justifyContent: 'center', cursor: 'default', padding: '80px 20px', color: 'var(--text-muted)', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <p>열람할 연습 유형을 선택해 주세요.</p>
+              <div className={`${layoutStyles.dataItem} ${styles.emptyGuide}`}>로딩 중...</div>
+            ) : viewMode === 'analytics' ? (
+              <div className={styles.analyticsContainer}>
+                {(() => {
+                  const currentCpm = calculateAdjustedCpm();
+                  const getTierName = (cpm: number) => {
+                    if (cpm < 100) return '초보자 I';
+                    if (cpm < 200) return '초보자 II';
+                    if (cpm < 300) return '숙련자 I';
+                    if (cpm < 400) return '숙련자 II';
+                    if (cpm < 500) return '실력자 I';
+                    return '실력자 II';
+                  };
+                  const tierName = getTierName(currentCpm);
+                  return (
+                    <>
+                      <h5 className={styles.analyticsTitle}>현재 실력: {tierName}</h5>
+                      <ProficiencyGauge currentCpm={currentCpm} />
+                    </>
+                  );
+                })()}
+
+                <h5 className={styles.analyticsTitle}>나의 타수 변화</h5>
+                <div className={styles.chartWrapper}>
+                  <TypingHistoryChart records={allRecords} />
+                </div>
+
+                <h5 className={styles.analyticsTitle}>연습 시간 변화</h5>
+                <div className={styles.chartWrapper}>
+                  <TypingHistoryChart records={allRecords} mode="duration" />
+                </div>
+              </div>
+            ) : viewMode === null ? (
+              <div className={`${layoutStyles.dataItem} ${styles.emptyGuide}`}>
+                <p>열람할 연습 유형이나 분석 보드를 선택해 주세요.</p>
               </div>
             ) : filteredRecords.length > 0 ? (
               filteredRecords.map((record) => (
@@ -180,7 +218,14 @@ export default function TypingRecordsPage() {
                           <span>{record.accuracy !== null ? Math.round(record.accuracy * 100) : '-'}%</span>
                         </div>
                         <div className={styles.statUnit}>
-                          <span>{record.duration ?? '-'}초</span>
+                          <span>
+                            {(() => {
+                              if (!record.duration) return '-';
+                              const min = Math.floor(record.duration / 60);
+                              const sec = record.duration % 60;
+                              return min > 0 ? `${min}분 ${sec}초` : `${sec}초`;
+                            })()}
+                          </span>
                         </div>
                       </>
                     )}
