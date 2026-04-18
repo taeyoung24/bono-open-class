@@ -132,3 +132,65 @@
   align-items: flex-start;
   gap: 4px;
 }
+
+/* --- Global Data List Styles --- */
+.dataList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.dataItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: var(--border-width-thin) solid var(--bg-input);
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: var(--font-size-sm);
+  color: var(--text-sub);
+  font-weight: var(--font-weight-sb);
+  user-select: none;
+}
+
+.dataItem:last-child {
+  border-bottom: none;
+}
+
+.dataItem:hover {
+  background-color: var(--bg-input-hover);
+}
+
+.dataCol {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dataColFixed {
+  flex-shrink: 0;
+}
+
+.dataColGrow {
+  flex: 1;
+}
+
+.dataTextLabel {
+  font-weight: var(--font-weight-sb);
+  color: var(--text-sub);
+}
+
+.dataTextValue {
+  font-weight: var(--font-weight-sb);
+  color: var(--text-main);
+}
+
+.dataTextMuted {
+  font-weight: var(--font-weight-r);
+  color: var(--text-muted);
+}
+

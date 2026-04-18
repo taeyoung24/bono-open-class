@@ -1,0 +1,109 @@
+.layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: calc(var(--form-width-base) + var(--form-width-extra) + 24px);
+}
+
+/* Sidebar Styles */
+.sidebar {
+  width: var(--form-width-base);
+  max-width: var(--form-width-base);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 미니멀 통계 섹션 */
+.minimalStatsLayout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 0 32px 0;
+  margin-bottom: 24px;
+}
+
+.statBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.statDivider {
+  width: 1.5px;
+  height: 48px;
+  background-color: var(--bg-input);
+  margin: 0 4px;
+}
+
+.statTitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-sub);
+  font-weight: var(--font-weight-sb);
+  margin-bottom: 12px;
+  letter-spacing: -0.01em;
+}
+
+/* 위첨자 스타일을 위한 수치 컨테이너 */
+.statHugeValueContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  line-height: 1;
+}
+
+.statHugeValue {
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-eb);
+  color: var(--accent-primary);
+  line-height: 1;
+}
+
+.statHugeUnit {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-eb);
+  color: var(--accent-primary);
+  margin-top: 4px;
+  /* 상단 맞춤 보정 */
+}
+
+/* Content Area Styles */
+.contentArea {
+  width: var(--form-width-extra);
+  max-width: var(--form-width-extra) !important;
+  flex-grow: 1;
+  min-height: 540px;
+  max-height: 680px;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.recordList {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 8px;
+}
+
+/* 컬럼별 구체적 너비 지정 */
+.colStats {
+  display: flex;
+  gap: 24px;
+  padding-right: 16px;
+}
+
+.statUnit {
+  display: flex;
+  gap: 4px;
+  align-items: baseline;
+}
+
+.colDate {
+  width: 160px;
+  text-align: right;
+  display: block;
+}

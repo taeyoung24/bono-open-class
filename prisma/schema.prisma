@@ -27,6 +27,7 @@ model User {
   // 메일 관련 관계
   sentMails     Mail[] @relation("SentMails")
   receivedMails Mail[] @relation("ReceivedMails")
+  typingRecords TypingRecord[]
 
   @@map("users") // 테이블 이름을 명확하게 지정
 }
@@ -73,3 +74,26 @@ model VerificationCode {
   @@unique([target, type]) // 특정 대상이 특정 용도로는 하나의 코드만 가지게 함
   @@map("verification_codes")
 }
+
+// ─────────────────────────────────────────────
+// 타자 연습 기록 시스템
+// ─────────────────────────────────────────────
+model TypingRecord {
+  id        Int      @id @default(autoincrement())
+  
+  // 사용자 정보 (User 테이블의 userId와 매핑)
+  user      User     @relation(fields: [userId], references: [userId])
+  userId    String
+  
+  cpm       Int?     // 타수 (Characters Per Minute, 선택)
+  accuracy  Float?   // 정확도 (0~1 사이, 선택)
+  duration  Int?     // 소요 시간 (초 단위, 선택)
+  type      String   // 타자 연습 종류 (POSITION | WORD | NORMAL)
+  
+  createdAt DateTime @default(now()) // 기록 날짜 (필수)
+
+  @@index([userId]) // 사용자별 기록 조회를 위한 인덱스
+  @@map("typing_records")
+}
+
+

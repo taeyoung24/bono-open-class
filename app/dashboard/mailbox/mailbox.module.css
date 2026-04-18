@@ -115,29 +115,8 @@
   background: var(--text-muted);
 }
 
-.mailListItem {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--bg-input);
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.mailListItem:last-child {
-  border-bottom: none;
-}
-
-.mailListItem:hover {
-  background-color: var(--bg-input-hover);
-}
-
-.mailListItem.unread {
-  /* 배경 구분을 제거함 */
-}
-
-.mailListItem.unread .colName,
-.mailListItem.unread .listMailTitle {
+.mailListItemUnread .colName,
+.mailListItemUnread .listMailTitle {
   color: var(--text-main);
 }
 
@@ -157,33 +136,14 @@
 
 .colName {
   width: 110px;
-  flex-shrink: 0;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-sb);
-  color: var(--text-sub);
-  /* 읽은 메일 기본색 */
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   padding-right: 12px;
 }
 
 .colTitleContent {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  min-width: 0;
   padding-right: 16px;
 }
 
 .listMailTitle {
-  font-size: var(--font-size-sm);
-  color: var(--text-sub);
-  /* 읽은 메일 기본색 */
-  font-weight: var(--font-weight-sb);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 100%;
 }
 
@@ -199,12 +159,6 @@
 
 .colDate {
   width: 120px;
-  /* 고정너비 늘림 */
-  flex-shrink: 0;
-  font-size: var(--font-size-sm);
-  color: var(--text-sub);
-  text-align: right;
-  white-space: nowrap;
   padding-right: 4px;
 }
 

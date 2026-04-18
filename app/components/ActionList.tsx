@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './ActionList.module.css';
-import { HiChevronRight } from 'react-icons/hi';
+import { FaArrowRight } from 'react-icons/fa6';
 
 export interface ActionListItem {
   label: React.ReactNode;
@@ -21,7 +21,7 @@ export default function ActionList({ items }: ActionListProps) {
           onClick={item.onClick}
         >
           <span className={styles.itemLabel}>{item.label}</span>
-          <HiChevronRight className={styles.itemIcon} />
+          <FaArrowRight className={styles.itemIcon} />
         </button>
       ))}
     </nav>

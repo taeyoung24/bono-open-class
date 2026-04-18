@@ -237,7 +237,7 @@ export default function RegisterPage() {
               <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
             </label>
             <Tooltip
-              content="이 항목은 선생님도 알아낼 수 없도록 저장되므로 꼭 잘 기억해야 한다"
+              content="이 항목은 선생님도 알아낼 수 없도록 저장되므로 꼭 잘 기억해야 해요"
               position="left"
               show={isPasswordFocused}
             >

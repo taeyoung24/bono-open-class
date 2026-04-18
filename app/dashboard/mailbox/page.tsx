@@ -369,14 +369,14 @@ export default function MailboxPage() {
                       </div>
                     </div>
 
-                    <div className={styles.mailList}>
+                    <div className={layoutStyles.dataList}>
                       {filteredMails.map((mail) => (
                         <div
                           key={mail.id}
-                          className={`${styles.mailListItem} ${currentView === 'inbox' && !mail.isRead ? styles.unread : ''}`}
+                          className={`${layoutStyles.dataItem} ${currentView === 'inbox' && !mail.isRead ? styles.mailListItemUnread : ''}`}
                           onClick={() => handleSelectMail(mail)}
                         >
-                          <div className={styles.colCheckbox} onClick={(e) => e.stopPropagation()}>
+                          <div className={`${layoutStyles.dataCol} ${layoutStyles.dataColFixed} ${styles.colCheckbox}`} onClick={(e) => e.stopPropagation()}>
                             <input
                               type="checkbox"
                               className={styles.checkbox}
@@ -384,16 +384,16 @@ export default function MailboxPage() {
                               onChange={(e) => {
                                 if (e.target.checked) setSelectedIds(p => [...p, mail.id]);
                                 else setSelectedIds(p => p.filter(id => id !== mail.id));
-                              }}
+                                }}
                             />
                           </div>
-                          <div className={styles.colName}>
+                          <div className={`${layoutStyles.dataCol} ${layoutStyles.dataColFixed} ${styles.colName} ${layoutStyles.dataTextLabel}`}>
                             {currentView === 'inbox' ? mail.sender?.name || mail.senderId : mail.receiver?.name || mail.receiverId}
                           </div>
-                          <div className={styles.colTitleContent}>
-                            <span className={styles.listMailTitle}>{mail.title}</span>
+                          <div className={`${layoutStyles.dataCol} ${layoutStyles.dataColGrow} ${styles.colTitleContent}`}>
+                            <span className={`${styles.listMailTitle} ${layoutStyles.dataTextLabel}`}>{mail.title}</span>
                           </div>
-                          <div className={styles.colDate}>
+                          <div className={`${layoutStyles.dataCol} ${layoutStyles.dataColFixed} ${styles.colDate} ${layoutStyles.dataTextMuted}`}>
                             {formatDate(mail.createdAt)}
                           </div>
                         </div>
