@@ -87,11 +87,11 @@ export default function LoginPage() {
           <h3 className={layoutStyles.title}>로그인으로 시작</h3>
         </div>
 
-        <form onSubmit={handleLogin} className={styles.form} noValidate>
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>
+        <form onSubmit={handleLogin} className={layoutStyles.form} noValidate>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>
               아이디
-              <FaAsterisk className={styles.requiredIcon} size={8} />
+              <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
             </label>
             <TextInput
               value={userId}
@@ -100,17 +100,17 @@ export default function LoginPage() {
               required={true}
             />
             {errorStatus?.field === 'userId' && (
-              <span className={styles.errorText}>
-                <IoAlertCircleOutline size={16} />
+              <span className={layoutStyles.errorText}>
+                <IoAlertCircleOutline />
                 {errorStatus.message}
               </span>
             )}
           </div>
 
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>
               비밀번호
-              <FaAsterisk className={styles.requiredIcon} size={8} />
+              <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
             </label>
             <TextInput
               type="password"
@@ -120,8 +120,8 @@ export default function LoginPage() {
               required={true}
             />
             {errorStatus?.field === 'password' && (
-              <span className={styles.errorText}>
-                <IoAlertCircleOutline size={16} />
+              <span className={layoutStyles.errorText}>
+                <IoAlertCircleOutline />
                 {errorStatus.message}
               </span>
             )}

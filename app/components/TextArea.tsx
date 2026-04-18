@@ -8,6 +8,7 @@ interface TextAreaProps {
   rows?: number;
   required?: boolean;
   disabled?: boolean;
+  maxLength?: number;
 }
 
 export default function TextArea({
@@ -16,7 +17,8 @@ export default function TextArea({
   placeholder,
   rows = 5,
   required = false,
-  disabled = false
+  disabled = false,
+  maxLength
 }: TextAreaProps) {
   return (
     <div className={styles.container}>
@@ -28,6 +30,7 @@ export default function TextArea({
         rows={rows}
         required={required}
         disabled={disabled}
+        maxLength={maxLength}
       />
     </div>
   );

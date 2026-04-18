@@ -59,7 +59,7 @@
 }
 
 .errorMessage {
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-sb);
   color: var(--status-failure);
   margin-top: 4px;

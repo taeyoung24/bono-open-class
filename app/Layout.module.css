@@ -42,7 +42,93 @@
   left: 0;
   right: 0;
   text-align: center;
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-r);
   color: var(--text-sub);
+}
+
+/* --- Global Form Styles --- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-sb);
+  color: var(--text-main);
+  margin-left: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.labelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.charCount {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+  font-weight: var(--font-weight-r);
+  transition: color 0.2s;
+}
+
+.charCountAtLimit {
+  color: var(--accent-primary);
+  font-weight: var(--font-weight-sb);
+}
+
+.requiredIcon {
+  color: var(--accent-primary);
+  margin-bottom: 4px;
+}
+
+.inputWithAction {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inputWithAction>div {
+  flex: 1;
+}
+
+.errorText {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-sb);
+  color: var(--status-failure);
+  margin-top: 4px;
+  padding-left: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.errorText svg,
+.successText svg {
+  width: 1em;
+  height: 1em;
+  margin-top: 1px;
+  flex-shrink: 0;
+}
+
+.successText {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-sb);
+  color: var(--status-success);
+  margin-top: 4px;
+  padding-left: 4px;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
 }

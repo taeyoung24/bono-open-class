@@ -13,6 +13,7 @@ interface TextInputProps {
   onFocus?: () => void;
   onBlur?: () => void;
   name?: string;
+  maxLength?: number;
 }
 
 export default function TextInput({
@@ -24,7 +25,8 @@ export default function TextInput({
   onChange,
   onFocus,
   onBlur,
-  name
+  name,
+  maxLength = 100
 }: TextInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -43,6 +45,7 @@ export default function TextInput({
           required={required}
           disabled={disabled}
           name={name}
+          maxLength={maxLength}
           onFocus={onFocus}
           onBlur={onBlur}
           style={(type === 'password' || type === 'search') ? { paddingRight: '40px' } : {}}

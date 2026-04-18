@@ -26,6 +26,12 @@ export async function GET(request: Request) {
             email: true,
           },
         },
+        receiver: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',

@@ -20,6 +20,12 @@ export async function GET(request: Request) {
         deletedBySender: false,
       },
       include: {
+        sender: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
         receiver: {
           select: {
             name: true,

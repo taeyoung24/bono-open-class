@@ -71,6 +71,8 @@
   /* 18px */
   --font-size-base: 1rem;
   /* 16px */
+  --font-size-sm: 0.875rem;
+  /* 14px */
 
   /* Typography - Weights */
   --font-weight-eb: 800;

@@ -1,7 +1,6 @@
 'use client';
 
 import ActionList from 'app/components/ActionList';
-import formStyles from 'app/components/AuthFormLayout.module.css';
 import { DefaultButton, FieldButton } from 'app/components/Button';
 import SelectInput from 'app/components/SelectInput';
 import TextArea from 'app/components/TextArea';
@@ -10,6 +9,8 @@ import layoutStyles from 'app/Layout.module.css';
 import ConfirmModal from 'app/modals/ConfirmModal';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { FaAsterisk } from 'react-icons/fa';
+import { IoAlertCircleOutline } from 'react-icons/io5';
 import styles from './mailbox.module.css';
 
 type MailView = 'inbox' | 'sent' | 'compose' | 'view';
@@ -33,6 +34,7 @@ export default function MailboxPage() {
   const [mails, setMails] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedMail, setSelectedMail] = useState<any | null>(null);
+  const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
 
   // 툴바 및 필터 상태
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -66,7 +68,7 @@ export default function MailboxPage() {
         fetch(`/api/mailbox/sent?userId=${userId}`)
       ]);
       const [inboxData, sentData] = await Promise.all([inboxRes.json(), sentRes.json()]);
-      
+
       if (inboxRes.ok) setInboxCount(inboxData.inbox.length);
       if (sentRes.ok) setSentCount(sentData.sent.length);
     } catch (e) {
@@ -133,8 +135,18 @@ export default function MailboxPage() {
 
   const handleSendMail = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!receiverEmail || !title || !content) {
-      alert('모든 필드를 입력해주세요.');
+    setErrorStatus(null);
+
+    if (!receiverEmail) {
+      setErrorStatus({ field: 'receiverEmail', message: '받는 사람의 이메일 주소를 입력해주세요.' });
+      return;
+    }
+    if (!title) {
+      setErrorStatus({ field: 'title', message: '메일 제목을 입력해주세요.' });
+      return;
+    }
+    if (!content) {
+      setErrorStatus({ field: 'content', message: '메일 내용을 입력해주세요.' });
       return;
     }
 
@@ -151,9 +163,11 @@ export default function MailboxPage() {
         setReceiverEmail('');
         setTitle('');
         setContent('');
+        setErrorStatus(null);
       } else {
         const data = await response.json();
-        alert(data.message || '메일 발송에 실패했습니다.');
+        const field = data.field || 'receiverEmail';
+        setErrorStatus({ field, message: data.message || '메일 발송에 실패했습니다.' });
       }
     } catch (error) {
       alert('서버 통신 중 오류가 발생했습니다.');
@@ -175,6 +189,7 @@ export default function MailboxPage() {
         setSelectedMail(null);
         setSelectedIds([]);
         setSearchQuery('');
+        setErrorStatus(null);
       }
     },
     {
@@ -189,6 +204,7 @@ export default function MailboxPage() {
         setSelectedMail(null);
         setSelectedIds([]);
         setSearchQuery('');
+        setErrorStatus(null);
       }
     }
   ];
@@ -197,7 +213,7 @@ export default function MailboxPage() {
     .filter(mail => {
       if (!searchQuery) return true;
       const q = searchQuery.toLowerCase();
-      const targetName = currentView === 'inbox' 
+      const targetName = currentView === 'inbox'
         ? (mail.sender?.name || mail.senderId)
         : (mail.receiver?.name || mail.receiverId);
       return (
@@ -276,6 +292,7 @@ export default function MailboxPage() {
               onClick={() => {
                 setCurrentView('compose');
                 setIsSentSuccess(false);
+                setErrorStatus(null);
               }}
               variant="primary"
             />
@@ -301,7 +318,7 @@ export default function MailboxPage() {
             <h3 className={styles.viewTitle}>
               {currentView === 'inbox' && '받은메일함'}
               {currentView === 'sent' && '보낸메일함'}
-              {currentView === 'compose' && '새 메일 작성'}
+              {currentView === 'compose' && ''}
               {currentView === 'view' && (selectedMail?.title || '메일 읽기')}
             </h3>
           </div>
@@ -315,11 +332,11 @@ export default function MailboxPage() {
                   <>
                     <div className={styles.toolbar}>
                       <div className={styles.colCheckbox}>
-                        <input 
-                          type="checkbox" 
+                        <input
+                          type="checkbox"
                           className={styles.checkbox}
                           checked={filteredMails.length > 0 && selectedIds.length === filteredMails.length}
-                          onChange={handleToggleSelectAll} 
+                          onChange={handleToggleSelectAll}
                         />
                       </div>
                       <div className={styles.toolbarActions}>
@@ -330,8 +347,8 @@ export default function MailboxPage() {
                         ) : (
                           <div className={styles.filterGroup}>
                             <div style={{ width: '120px' }}>
-                              <SelectInput 
-                                value={sortOrder} 
+                              <SelectInput
+                                value={sortOrder}
                                 onChange={(val: string) => setSortOrder(val as 'desc' | 'asc')}
                                 options={[
                                   { value: 'desc', label: '최신순' },
@@ -340,7 +357,7 @@ export default function MailboxPage() {
                               />
                             </div>
                             <div style={{ width: '200px' }}>
-                              <TextInput 
+                              <TextInput
                                 type="search"
                                 value={searchQuery}
                                 onChange={setSearchQuery}
@@ -351,7 +368,7 @@ export default function MailboxPage() {
                         )}
                       </div>
                     </div>
-                    
+
                     <div className={styles.mailList}>
                       {filteredMails.map((mail) => (
                         <div
@@ -360,14 +377,14 @@ export default function MailboxPage() {
                           onClick={() => handleSelectMail(mail)}
                         >
                           <div className={styles.colCheckbox} onClick={(e) => e.stopPropagation()}>
-                            <input 
-                              type="checkbox" 
+                            <input
+                              type="checkbox"
                               className={styles.checkbox}
                               checked={selectedIds.includes(mail.id)}
                               onChange={(e) => {
                                 if (e.target.checked) setSelectedIds(p => [...p, mail.id]);
                                 else setSelectedIds(p => p.filter(id => id !== mail.id));
-                              }} 
+                              }}
                             />
                           </div>
                           <div className={styles.colName}>
@@ -394,13 +411,23 @@ export default function MailboxPage() {
             {currentView === 'view' && selectedMail && (
               <div className={styles.viewContainer}>
                 <div className={styles.viewHeader}>
-                  <div className={styles.senderInfo}>
-                    {selectedMail.senderId === userId ? (
-                      <span>수신: {selectedMail.receiver?.name || selectedMail.receiverId} ({selectedMail.receiver?.email || selectedMail.receiverId})</span>
-                    ) : (
-                      <span>발신: {selectedMail.sender?.name || selectedMail.senderId} ({selectedMail.sender?.email || selectedMail.senderId})</span>
-                    )}
-                    <span style={{ marginLeft: '12px' }}>| {formatDate(selectedMail.createdAt)}</span>
+                  <div className={styles.mailInfoGrid}>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>받는 사람:</span>
+                      <span className={styles.infoValue}>
+                        {selectedMail.receiver?.email || selectedMail.receiverId} ({selectedMail.receiver?.name || '정보 없음'})
+                      </span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>보낸 사람:</span>
+                      <span className={styles.infoValue}>
+                        {(selectedMail.sender?.email || selectedMail.senderId)} ({selectedMail.sender?.name || '정보 없음'})
+                      </span>
+                    </div>
+                    <div className={styles.infoRow}>
+                      <span className={styles.infoLabel}>날짜:</span>
+                      <span className={styles.infoValue}>{formatDate(selectedMail.createdAt)}</span>
+                    </div>
                   </div>
                 </div>
                 <div className={styles.mailContentBody}>
@@ -419,58 +446,113 @@ export default function MailboxPage() {
 
             {currentView === 'compose' && !isSentSuccess && (
               <div className={styles.composeContainer}>
-                <form onSubmit={handleSendMail} className={formStyles.form}>
-                <div className={formStyles.fieldGroup}>
-                  <label className={formStyles.label}>받는 사람 이메일</label>
-                  <div className={formStyles.inputWithAction}>
+                <form onSubmit={handleSendMail} className={layoutStyles.form} noValidate>
+                  <div className={layoutStyles.fieldGroup}>
+                    <div className={layoutStyles.labelRow}>
+                      <label className={layoutStyles.label}>
+                        받는 사람 이메일
+                        <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
+                      </label>
+                    </div>
+                    <div className={layoutStyles.inputWithAction}>
+                      <TextInput
+                        value={receiverEmail}
+                        onChange={(val) => {
+                          setReceiverEmail(val);
+                          if (errorStatus?.field === 'receiverEmail') setErrorStatus(null);
+                        }}
+                        placeholder="상대방의 이메일 주소를 입력하세요"
+                        required
+                      />
+                      <FieldButton
+                        text="나에게 보내기"
+                        type="button"
+                        onClick={() => {
+                          setReceiverEmail(userEmail);
+                          if (errorStatus?.field === 'receiverEmail') setErrorStatus(null);
+                        }}
+                      />
+                    </div>
+                    {errorStatus?.field === 'receiverEmail' && (
+                      <span className={layoutStyles.errorText}>
+                        <IoAlertCircleOutline />
+                        {errorStatus.message}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className={layoutStyles.fieldGroup}>
+                    <div className={layoutStyles.labelRow}>
+                      <label className={layoutStyles.label}>
+                        제목
+                        <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
+                      </label>
+                      <span className={`${layoutStyles.charCount} ${title.length >= 100 ? layoutStyles.charCountAtLimit : ''}`}>
+                        {title.length}/100
+                      </span>
+                    </div>
                     <TextInput
-                      value={receiverEmail}
-                      onChange={setReceiverEmail}
-                      placeholder="상대방의 이메일 주소를 입력하세요"
+                      value={title}
+                      onChange={(val) => {
+                        setTitle(val);
+                        if (errorStatus?.field === 'title') setErrorStatus(null);
+                      }}
+                      placeholder="제목을 입력하세요"
                       required
                     />
-                    <FieldButton
-                      text="나에게 보내기"
-                      type="button"
-                      onClick={() => setReceiverEmail(userEmail)}
+                    {errorStatus?.field === 'title' && (
+                      <span className={layoutStyles.errorText}>
+                        <IoAlertCircleOutline />
+                        {errorStatus.message}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className={layoutStyles.fieldGroup}>
+                    <div className={layoutStyles.labelRow}>
+                      <label className={layoutStyles.label}>
+                        내용
+                        <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
+                      </label>
+                      <span className={`${layoutStyles.charCount} ${content.length >= 1000 ? layoutStyles.charCountAtLimit : ''}`}>
+                        {content.length}/1000
+                      </span>
+                    </div>
+                    <TextArea
+                      value={content}
+                      onChange={(val) => {
+                        setContent(val);
+                        if (errorStatus?.field === 'content') setErrorStatus(null);
+                      }}
+                      placeholder="내용을 입력하세요"
+                      rows={8}
+                      required
+                      maxLength={1000}
+                    />
+                    {errorStatus?.field === 'content' && (
+                      <span className={layoutStyles.errorText}>
+                        <IoAlertCircleOutline />
+                        {errorStatus.message}
+                      </span>
+                    )}
+                  </div>
+
+                  <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
+                    <DefaultButton
+                      text={isSending ? '보내는 중...' : '보내기'}
+                      type="submit"
+                      variant="primary"
+                      disabled={isSending}
+                    />
+                    <DefaultButton
+                      text="취소"
+                      onClick={() => {
+                        setCurrentView('inbox');
+                        setErrorStatus(null);
+                      }}
+                      variant="none"
                     />
                   </div>
-                </div>
-
-                <div className={formStyles.fieldGroup}>
-                  <label className={formStyles.label}>제목</label>
-                  <TextInput
-                    value={title}
-                    onChange={setTitle}
-                    placeholder="제목을 입력하세요"
-                    required
-                  />
-                </div>
-
-                <div className={formStyles.fieldGroup}>
-                  <label className={formStyles.label}>내용</label>
-                  <TextArea
-                    value={content}
-                    onChange={setContent}
-                    placeholder="내용을 입력하세요"
-                    rows={8}
-                    required
-                  />
-                </div>
-
-                <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
-                  <DefaultButton
-                    text={isSending ? '보내는 중...' : '보내기'}
-                    type="submit"
-                    variant="primary"
-                    disabled={isSending}
-                  />
-                  <DefaultButton
-                    text="취소"
-                    onClick={() => setCurrentView('inbox')}
-                    variant="none"
-                  />
-                </div>
                 </form>
               </div>
             )}
