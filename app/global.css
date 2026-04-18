@@ -25,7 +25,7 @@
 
   /* 포인트(Accent) 및 브랜드 색상 */
   --accent-primary: #4f46e5;
-  --accent-secondary: #818cf8;
+  --accent-primary-hover: #4337ce;
 
   /* 실력 등급 스펙트럼 컬러 */
   --spectrum-yellow: #fae315;
