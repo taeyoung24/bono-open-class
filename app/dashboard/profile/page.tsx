@@ -90,9 +90,9 @@ export default function ProfilePage() {
           <p className={layoutStyles.subtitle}>프로필 정보를 변경할 수 있습니다.</p>
         </div>
 
-        <form onSubmit={handleUpdate} className={styles.form} noValidate>
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>아이디 (수정 불가)</label>
+        <form onSubmit={handleUpdate} className={layoutStyles.form} noValidate>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>아이디 (수정 불가)</label>
             <TextInput
               value={userId}
               onChange={() => {}}
@@ -101,8 +101,8 @@ export default function ProfilePage() {
             />
           </div>
 
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>이름</label>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>이름</label>
             <TextInput
               value={name}
               onChange={setName}

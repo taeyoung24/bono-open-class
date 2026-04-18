@@ -14,7 +14,9 @@
 
 .select {
   width: 100%;
-  padding: 12px 28px 12px 4px; /* 아이콘 공간 확보 */
+  padding: 10px 28px 10px 4px;
+  /* 아이콘 공간 확보 */
+  line-height: 1.5;
   background-color: var(--bg-card);
   border: none;
   border-bottom: var(--border-width) solid var(--text-muted);
@@ -26,7 +28,8 @@
   transition: border-color 0.1s ease;
   box-shadow: none;
   outline: none;
-  appearance: none; /* 기본 화살표 제거 */
+  appearance: none;
+  /* 기본 화살표 제거 */
   cursor: pointer;
 }
 
@@ -43,7 +46,8 @@
 .icon {
   position: absolute;
   right: 4px;
-  pointer-events: none; /* 클릭 이벤트 통과 (select 요소 클릭되도록 함) */
+  pointer-events: none;
+  /* 클릭 이벤트 통과 (select 요소 클릭되도록 함) */
   color: var(--text-sub);
   display: flex;
   align-items: center;

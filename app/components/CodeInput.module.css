@@ -10,8 +10,10 @@
 .codeSlot {
   flex: 1;
   min-width: 0;
-  max-width: 54px; /* 지나치게 넓어지는 것을 방지 */
-  padding: 12px 0;
+  max-width: 54px;
+  /* 지나치게 넓어지는 것을 방지 */
+  padding: 10px 0;
+  line-height: 1.5;
   text-align: center;
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-sb);

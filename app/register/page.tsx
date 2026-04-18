@@ -178,14 +178,14 @@ export default function RegisterPage() {
           <h3 className={layoutStyles.title}>회원가입 정보 입력</h3>
         </div>
 
-        <form onSubmit={handleRegister} className={styles.form} noValidate>
+        <form onSubmit={handleRegister} className={layoutStyles.form} noValidate>
           {/* 아이디 필드 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>
               사용할 아이디
-              <FaAsterisk className={styles.requiredIcon} size={8} />
+              <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
             </label>
-            <div className={styles.inputWithAction}>
+            <div className={layoutStyles.inputWithAction}>
               <TextInput
                 value={userId}
                 onChange={(val) => {
@@ -203,18 +203,18 @@ export default function RegisterPage() {
               />
             </div>
             {errorStatus?.field === 'userId' && (
-              <span className={errorStatus.success ? styles.successText : styles.errorText}>
-                {errorStatus.success ? <IoCheckmarkCircleOutline size={16} /> : <IoAlertCircleOutline size={16} />}
+              <span className={errorStatus.success ? layoutStyles.successText : layoutStyles.errorText}>
+                {errorStatus.success ? <IoCheckmarkCircleOutline /> : <IoAlertCircleOutline />}
                 {errorStatus.message}
               </span>
             )}
           </div>
 
           {/* 이름 필드 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>
               이름
-              <FaAsterisk className={styles.requiredIcon} size={8} />
+              <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
             </label>
             <TextInput
               value={name}
@@ -223,21 +223,21 @@ export default function RegisterPage() {
               required={true}
             />
             {errorStatus?.field === 'name' && (
-              <span className={styles.errorText}>
-                <IoAlertCircleOutline size={16} />
+              <span className={layoutStyles.errorText}>
+                <IoAlertCircleOutline />
                 {errorStatus.message}
               </span>
             )}
           </div>
 
           {/* 비밀번호 필드 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>
               비밀번호
-              <FaAsterisk className={styles.requiredIcon} size={8} />
+              <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
             </label>
             <Tooltip
-              content="이 항목은 선생님도 알아낼 수 없도록 저장되므로 꼭 잘 기억해야 한다"
+              content="이 항목은 선생님도 알아낼 수 없도록 저장되므로 꼭 잘 기억해야 해요"
               position="left"
               show={isPasswordFocused}
             >
@@ -252,18 +252,18 @@ export default function RegisterPage() {
               />
             </Tooltip>
             {errorStatus?.field === 'password' && (
-              <span className={styles.errorText}>
-                <IoAlertCircleOutline size={16} />
+              <span className={layoutStyles.errorText}>
+                <IoAlertCircleOutline />
                 {errorStatus.message}
               </span>
             )}
           </div>
 
           {/* 비밀번호 확인 필드 (정확히 여기 에러가 위치해야 함) */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>
               비밀번호 확인
-              <FaAsterisk className={styles.requiredIcon} size={8} />
+              <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
             </label>
             <TextInput
               type="password"
@@ -273,20 +273,20 @@ export default function RegisterPage() {
               required={true}
             />
             {errorStatus?.field === 'confirmPassword' && (
-              <span className={styles.errorText}>
-                <IoAlertCircleOutline size={16} />
+              <span className={layoutStyles.errorText}>
+                <IoAlertCircleOutline />
                 {errorStatus.message}
               </span>
             )}
           </div>
 
           {/* 가입 인증코드 필드 */}
-          <div className={styles.fieldGroup}>
-            <label className={styles.label}>
+          <div className={layoutStyles.fieldGroup}>
+            <label className={layoutStyles.label}>
               가입 인증코드
-              <FaAsterisk className={styles.requiredIcon} size={8} />
+              <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
             </label>
-            <div className={styles.inputWithAction}>
+            <div className={layoutStyles.inputWithAction}>
               <CodeInput
                 length={4}
                 value={verificationCode}
@@ -302,8 +302,8 @@ export default function RegisterPage() {
               />
             </div>
             {errorStatus?.field === 'verificationCode' && (
-              <span className={styles.errorText}>
-                <IoAlertCircleOutline size={16} />
+              <span className={layoutStyles.errorText}>
+                <IoAlertCircleOutline />
                 {errorStatus.message}
               </span>
             )}

@@ -95,13 +95,14 @@
 
 /* Field Variant */
 .field {
-  flex-shrink: 0; /* 버튼이 찌그러지지 않도록 고정 */
+  flex-shrink: 0;
+  /* 버튼이 찌그러지지 않도록 고정 */
   height: 44px;
   /* 입력 필드와 시각적으로 정렬되도록 조정 */
   padding: 0 16px;
   border: var(--border-width) solid var(--border-main);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: var(--font-size-sm);
   box-shadow: inset 0 calc(var(--shadow-depth-sm) * -1) 0 var(--shadow-inset);
 }
 

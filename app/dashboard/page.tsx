@@ -34,6 +34,7 @@ export default function DashboardPage() {
 
   const menuItems = [
     { label: '메일함', onClick: () => router.push('/dashboard/mailbox') },
+    { label: '타자연습 기록실', onClick: () => router.push('/dashboard/typing-records') },
     { label: '내 정보 수정', onClick: () => router.push('/dashboard/profile') },
   ];
 
@@ -41,16 +42,16 @@ export default function DashboardPage() {
     <main className={layoutStyles.container}>
       <div className={layoutStyles.formCard}>
         <div className={layoutStyles.header}>
-          <h3 className={layoutStyles.title}>{userName}의 작업공간</h3>
+          <h3 className={layoutStyles.title}>대쉬보드 메뉴 ({userName})</h3>
         </div>
 
         <ActionList items={menuItems} />
 
         <div className={styles.logoutSection}>
-          <DefaultButton 
-            text="로그아웃" 
-            onClick={() => setIsLogoutModalOpen(true)} 
-            width='fill' 
+          <DefaultButton
+            text="로그아웃"
+            onClick={() => setIsLogoutModalOpen(true)}
+            width='fill'
             variant="none"
           />
         </div>

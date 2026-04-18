@@ -1,7 +1,8 @@
 .listContainer {
   display: flex;
   flex-direction: column;
-  margin: 0 -40px; /* 카드의 패딩(40px) 밖으로 확장되도록 설정 */
+  margin: 0 -40px;
+  /* 카드의 패딩(40px) 밖으로 확장되도록 설정 */
   /* 상단 구분선 제거 */
 }
 
@@ -9,7 +10,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 40px; /* 카드의 패딩값을 대체 */
+  padding: 20px 40px;
+  /* 카드의 패딩값을 대체 */
   background-color: var(--bg-card);
   border: none;
   cursor: pointer;
@@ -20,12 +22,15 @@
 }
 
 .listItem:hover {
-  background-color: rgba(0, 0, 0, 0.03); /* 약간 어둡게 처리 */
+  background-color: rgba(0, 0, 0, 0.03);
+  /* 약간 어둡게 처리 */
 }
 
 .listItem:active {
-  transform: translateY(var(--shadow-depth-sm)); /* 설정된 깊이만큼 완전히 눌림 */
-  box-shadow: inset 0 var(--shadow-depth-sm) 0 var(--shadow-inset); /* 상단에 생기는 안쪽 입체감 */
+  transform: translateY(var(--shadow-depth-sm));
+  /* 설정된 깊이만큼 완전히 눌림 */
+  box-shadow: inset 0 var(--shadow-depth-sm) 0 var(--shadow-inset);
+  /* 상단에 생기는 안쪽 입체감 */
 }
 
 .itemLabel {
@@ -36,5 +41,5 @@
 
 .itemIcon {
   color: var(--text-sub);
-  font-size: 20px;
+  font-size: var(--font-size-base);
 }

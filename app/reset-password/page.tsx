@@ -160,11 +160,11 @@ export default function ResetPasswordPage() {
 
         {/* STEP 1: 아이디 입력 */}
         {step === 'request' && (
-          <form onSubmit={handleRequestCode} className={styles.form} noValidate>
-            <div className={styles.fieldGroup}>
-              <label className={styles.label}>
+          <form onSubmit={handleRequestCode} className={layoutStyles.form} noValidate>
+            <div className={layoutStyles.fieldGroup}>
+              <label className={layoutStyles.label}>
                 아이디
-                <FaAsterisk className={styles.requiredIcon} size={8} />
+                <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
               </label>
               <TextInput
                 value={userId}
@@ -173,8 +173,8 @@ export default function ResetPasswordPage() {
                 required={true}
               />
               {errorStatus?.field === 'userId' && (
-                <span className={styles.errorText}>
-                  <IoAlertCircleOutline size={16} />
+                <span className={layoutStyles.errorText}>
+                  <IoAlertCircleOutline />
                   {errorStatus.message}
                 </span>
               )}
@@ -185,11 +185,11 @@ export default function ResetPasswordPage() {
 
         {/* STEP 2: 인증코드 입력 */}
         {step === 'verify' && (
-          <form onSubmit={handleVerifyCode} className={styles.form} noValidate>
-            <div className={styles.fieldGroup}>
-              <label className={styles.label}>
+          <form onSubmit={handleVerifyCode} className={layoutStyles.form} noValidate>
+            <div className={layoutStyles.fieldGroup}>
+              <label className={layoutStyles.label}>
                 인증코드
-                <FaAsterisk className={styles.requiredIcon} size={8} />
+                <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
               </label>
               <CodeInput
                 length={4}
@@ -198,8 +198,8 @@ export default function ResetPasswordPage() {
                 disabled={isLoading}
               />
               {errorStatus?.field === 'code' && (
-                <span className={styles.errorText}>
-                  <IoAlertCircleOutline size={16} />
+                <span className={layoutStyles.errorText}>
+                  <IoAlertCircleOutline />
                   {errorStatus.message}
                 </span>
               )}
@@ -210,11 +210,11 @@ export default function ResetPasswordPage() {
 
         {/* STEP 3: 새 비밀번호 */}
         {step === 'reset' && (
-          <form onSubmit={handleResetPassword} className={styles.form} noValidate>
-            <div className={styles.fieldGroup}>
-              <label className={styles.label}>
+          <form onSubmit={handleResetPassword} className={layoutStyles.form} noValidate>
+            <div className={layoutStyles.fieldGroup}>
+              <label className={layoutStyles.label}>
                 새 비밀번호
-                <FaAsterisk className={styles.requiredIcon} size={8} />
+                <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
               </label>
               <TextInput
                 type="password"
@@ -224,16 +224,16 @@ export default function ResetPasswordPage() {
                 required={true}
               />
               {errorStatus?.field === 'newPassword' && (
-                <span className={styles.errorText}>
-                  <IoAlertCircleOutline size={16} />
+                <span className={layoutStyles.errorText}>
+                  <IoAlertCircleOutline />
                   {errorStatus.message}
                 </span>
               )}
             </div>
-            <div className={styles.fieldGroup}>
-              <label className={styles.label}>
+            <div className={layoutStyles.fieldGroup}>
+              <label className={layoutStyles.label}>
                 비밀번호 확인
-                <FaAsterisk className={styles.requiredIcon} size={8} />
+                <FaAsterisk className={layoutStyles.requiredIcon} size={8} />
               </label>
               <TextInput
                 type="password"
@@ -243,8 +243,8 @@ export default function ResetPasswordPage() {
                 required={true}
               />
               {errorStatus?.field === 'confirmPassword' && (
-                <span className={styles.errorText}>
-                  <IoAlertCircleOutline size={16} />
+                <span className={layoutStyles.errorText}>
+                  <IoAlertCircleOutline />
                   {errorStatus.message}
                 </span>
               )}
