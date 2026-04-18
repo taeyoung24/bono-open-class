@@ -22,7 +22,8 @@
 
 .input {
   width: 100%;
-  padding: 12px 4px;
+  padding: 10px 4px;
+  line-height: 1.5;
   background-color: var(--bg-card);
   border: none;
   border-bottom: var(--border-width) solid var(--text-muted);
@@ -52,6 +53,7 @@
   color: var(--text-sub);
   cursor: not-allowed;
   border-bottom-style: dashed;
+  background-color: var(--bg-input-hover);
 }
 
 .inputError {
