@@ -14,6 +14,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
 import { logger } from 'src/utils/log';
 import { getUserDisplayName } from 'src/userHelpers';
+import { formatCompactNumber } from 'src/utils/str';
 
 export default function PostDetailPage() {
   const router = useRouter();
@@ -109,12 +110,6 @@ export default function PostDetailPage() {
         <aside className={`${layoutStyles.formCard} ${styles.sidebar}`}>
           <div className={styles.sidebarFooter}>
             <DefaultButton
-              text="작성자 프로필 보기"
-              onClick={() => router.push(`/dashboard/sns/user/${post.authorId}`)}
-              variant="primary"
-              width="fill"
-            />
-            <DefaultButton
               text="돌아가기"
               onClick={() => router.push('/dashboard/sns')}
               variant="none"
@@ -137,7 +132,7 @@ export default function PostDetailPage() {
           <div className={styles.commentAreaCard}>
             {/* 댓글 입력 섹션 */}
             <div className={styles.commentInputSection}>
-              <h5 className={styles.commentHeaderTitle}>댓글 {post.comments?.length || 0}</h5>
+              <h5 className={styles.commentHeaderTitle}>댓글 {formatCompactNumber(post.comments?.length || 0)}</h5>
               <form onSubmit={handleCommentSubmit} className={styles.commentInputGroup}>
                 <div style={{ flex: 1 }}>
                   <TextInput
@@ -171,7 +166,7 @@ export default function PostDetailPage() {
                     <div className={styles.commentBody}>
                       <div className={styles.postHeader}>
                         <div className={styles.authorInfo}>
-                          <span 
+                          <span
                             className={`${styles.nickname} ${styles.clickable}`}
                             onClick={() => router.push(`/dashboard/sns/user/${comment.authorId}`)}
                           >

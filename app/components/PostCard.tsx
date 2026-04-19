@@ -9,9 +9,10 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaComment, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa6';
+import { getUserDisplayName } from 'src/userHelpers';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
 import { logger } from 'src/utils/log';
-import { getUserDisplayName } from 'src/userHelpers';
+import { formatCompactNumber } from 'src/utils/str';
 
 interface PostCardProps {
   post: any;
@@ -183,11 +184,11 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
             onClick={handleLike}
           >
             {isLiked ? <FaHeart /> : <FaRegHeart />}
-            <span>{post._count?.likes || 0}</span>
+            <span>{formatCompactNumber(post._count?.likes || 0)}</span>
           </button>
           <button className={styles.actionButton}>
             <FaComment />
-            <span>{post._count?.comments || 0}</span>
+            <span>{formatCompactNumber(post._count?.comments || 0)}</span>
           </button>
         </div>
       </div>

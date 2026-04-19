@@ -119,9 +119,6 @@ export default function SNSPage() {
                 {getUserDisplayName(user)}
               </span>
               <span className={styles.miniBio}>{user.bio || '자기소개가 없습니다.'}</span>
-              <div className={styles.pointsBadge}>
-                {user.points?.toLocaleString() || 0} P
-              </div>
             </div>
           </div>
 
