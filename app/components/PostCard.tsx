@@ -44,6 +44,18 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
     onCancel: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
   });
 
+  const [particles, setParticles] = useState<{ id: number; left: number; delay: number }[]>([]);
+
+  const createParticles = () => {
+    const newParticles = Array.from({ length: 12 }).map((_, i) => ({
+      id: Date.now() + i,
+      left: Math.random() * 40 - 20, // -20px to 20px
+      delay: Math.random() * 0.5,
+    }));
+    setParticles(newParticles);
+    setTimeout(() => setParticles([]), 1100);
+  };
+
   const showAlert = (message: string, title: string = '알림') => {
     setModal({
       isOpen: true,
@@ -84,6 +96,9 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
     e.stopPropagation();
     try {
       const token = localStorage.getItem('auth_token');
+      if (!isLiked) {
+        createParticles();
+      }
       await axios.post('/api/sns/likes', { postId: post.id }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -180,11 +195,25 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
 
         <div className={styles.postFooter}>
           <button
-            className={`${styles.actionButton} ${isLiked ? styles.actionButtonActive : ''}`}
+            className={`${styles.actionButton} ${styles.likeButton} ${isLiked ? styles.likeButtonActive : ''}`}
             onClick={handleLike}
           >
             {isLiked ? <FaHeart /> : <FaRegHeart />}
             <span>{formatCompactNumber(post._count?.likes || 0)}</span>
+
+            {/* Particle Container */}
+            {particles.map(p => (
+              <span
+                key={p.id}
+                className={styles.heartParticle}
+                style={{
+                  left: `${10 + p.left}px`,
+                  animationDelay: `${p.delay}s`
+                }}
+              >
+                <FaHeart size={10} />
+              </span>
+            ))}
           </button>
           <button className={styles.actionButton}>
             <FaComment />
