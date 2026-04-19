@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
+import { logger } from 'src/utils/log';
 
 export async function GET(
   request: Request,
@@ -56,7 +57,7 @@ export async function GET(
 
     return NextResponse.json({ profile, posts }, { status: 200 });
   } catch (error) {
-    console.error('Fetch public profile error:', error);
+    logger.e(`Fetch public profile error: ${error}`);
     return NextResponse.json(
       { message: '프로필 정보를 불러오는 중 오류가 발생했습니다.' },
       { status: 500 }

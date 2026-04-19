@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
 import { verifyAuth, unauthorizedResponse } from 'src/utils/auth';
+import { logger } from 'src/utils/log';
 
 export async function POST(request: Request) {
   try {
@@ -40,7 +41,7 @@ export async function POST(request: Request) {
       comment,
     }, { status: 201 });
   } catch (error) {
-    console.error('Create comment error:', error);
+    logger.e(`Create comment error: ${error}`);
     return NextResponse.json(
       { message: '댓글 등록 중 오류가 발생했습니다.' },
       { status: 500 }

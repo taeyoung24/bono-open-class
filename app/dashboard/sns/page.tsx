@@ -5,10 +5,12 @@ import { DefaultButton } from 'app/components/Button';
 import PostCard from 'app/components/PostCard';
 import TextArea from 'app/components/TextArea';
 import layoutStyles from 'app/Layout.module.css';
+import AlertModal from 'app/modals/AlertModal';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
+import { logger } from 'src/utils/log';
 import styles from './sns.module.css';
 
 export default function SNSPage() {
@@ -19,13 +21,30 @@ export default function SNSPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 모달 상태
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '알림',
+    message: '',
+    onConfirm: () => setModal(prev => ({ ...prev, isOpen: false }))
+  });
+
+  const showAlert = (message: string, title: string = '알림') => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => setModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
+
   // 데이터 불러오기
   const fetchPosts = useCallback(async () => {
     try {
       const response = await axios.get('/api/sns/posts');
       setPosts(response.data.posts);
     } catch (error) {
-      console.error('Fetch posts error:', error);
+      logger.e(`Fetch posts error: ${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -57,8 +76,8 @@ export default function SNSPage() {
       setNewPostContent('');
       fetchPosts();
     } catch (error) {
-      console.error('Create post error:', error);
-      alert('게시글 등록 중 오류가 발생했습니다.');
+      logger.e(`Create post error: ${error}`);
+      showAlert('게시글 등록 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }
@@ -169,6 +188,13 @@ export default function SNSPage() {
           </div>
         </section>
       </div>
+
+      <AlertModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+      />
     </main>
   );
 }

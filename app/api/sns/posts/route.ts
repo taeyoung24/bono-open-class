@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
 import { verifyAuth, unauthorizedResponse } from 'src/utils/auth';
+import { logger } from 'src/utils/log';
 
 export async function GET() {
   try {
@@ -33,7 +34,7 @@ export async function GET() {
 
     return NextResponse.json({ posts }, { status: 200 });
   } catch (error) {
-    console.error('Fetch posts error:', error);
+    logger.e(`Fetch posts error: ${error}`);
     return NextResponse.json(
       { message: '게시글을 불러오는 중 오류가 발생했습니다.' },
       { status: 500 }
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
       post,
     }, { status: 201 });
   } catch (error) {
-    console.error('Create post error:', error);
+    logger.e(`Create post error: ${error}`);
     return NextResponse.json(
       { message: '게시글 등록 중 오류가 발생했습니다.' },
       { status: 500 }

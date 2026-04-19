@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline } from 'react-icons/io5';
+import { logger } from 'src/utils/log';
 
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
@@ -72,7 +73,7 @@ export default function LoginPage() {
 
       router.push('/dashboard');
     } catch (error) {
-      console.error('Login error:', error);
+      logger.e(`Login error: ${error}`);
       showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
     }
   };

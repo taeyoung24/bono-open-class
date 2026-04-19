@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
 import { verifyAuth, unauthorizedResponse } from 'src/utils/auth';
+import { logger } from 'src/utils/log';
 
 export async function GET(
   request: Request,
@@ -72,7 +73,7 @@ export async function GET(
 
     return NextResponse.json({ post }, { status: 200 });
   } catch (error) {
-    console.error('Fetch post detail error:', error);
+    logger.e(`Fetch post detail error: ${error}`);
     return NextResponse.json(
       { message: '게시글 상세 정보를 불러오는 중 오류가 발생했습니다.' },
       { status: 500 }
@@ -115,7 +116,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: '게시글이 삭제되었습니다.' }, { status: 200 });
   } catch (error) {
-    console.error('Delete post error:', error);
+    logger.e(`Delete post error: ${error}`);
     return NextResponse.json(
       { message: '게시글 삭제 중 오류가 발생했습니다.' },
       { status: 500 }

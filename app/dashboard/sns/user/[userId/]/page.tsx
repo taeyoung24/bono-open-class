@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Image from 'next/image';
 import layoutStyles from 'app/Layout.module.css';
-import styles from 'app/dashboard/sns/sns.module.css';
 import { DefaultButton } from 'app/components/Button';
 import PostCard from 'app/components/PostCard';
+import styles from 'app/dashboard/sns/sns.module.css';
+import AlertModal from 'app/modals/AlertModal';
 import axios from 'axios';
-import { FaChevronLeft } from 'react-icons/fa6';
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { logger } from 'src/utils/log';
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -20,15 +21,36 @@ export default function UserProfilePage() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 모달 상태
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '알림',
+    message: '',
+    onConfirm: () => setModal(prev => ({ ...prev, isOpen: false }))
+  });
+
+  const showAlert = (message: string, onConfirm?: () => void, title: string = '알림') => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        if (onConfirm) onConfirm();
+        setModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get(`/api/sns/users/${targetUserId}`);
       setProfile(response.data.profile);
       setPosts(response.data.posts);
     } catch (error) {
-      console.error('Fetch user profile error:', error);
-      alert('사용자 정보를 불러올 수 없습니다.');
-      router.push('/dashboard/sns');
+      logger.e(`Fetch user profile error: ${error}`);
+      showAlert('사용자 정보를 불러올 수 없습니다.', () => {
+        router.push('/dashboard/sns');
+      });
     } finally {
       setIsLoading(false);
     }
@@ -115,6 +137,13 @@ export default function UserProfilePage() {
           </div>
         </section>
       </div>
+
+      <AlertModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+      />
     </main>
   );
 }

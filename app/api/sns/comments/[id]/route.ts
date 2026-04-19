@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
 import { verifyAuth, unauthorizedResponse } from 'src/utils/auth';
+import { logger } from 'src/utils/log';
 
 export async function DELETE(
   request: Request,
@@ -36,7 +37,7 @@ export async function DELETE(
 
     return NextResponse.json({ message: '댓글이 삭제되었습니다.' }, { status: 200 });
   } catch (error) {
-    console.error('Delete comment error:', error);
+    logger.e(`Delete comment error: ${error}`);
     return NextResponse.json(
       { message: '댓글 삭제 중 오류가 발생했습니다.' },
       { status: 500 }

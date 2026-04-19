@@ -6,11 +6,13 @@ import SelectInput from 'app/components/SelectInput';
 import TextArea from 'app/components/TextArea';
 import TextInput from 'app/components/TextInput';
 import layoutStyles from 'app/Layout.module.css';
+import AlertModal from 'app/modals/AlertModal';
 import ConfirmModal from 'app/modals/ConfirmModal';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline } from 'react-icons/io5';
+import { logger } from 'src/utils/log';
 import styles from './mailbox.module.css';
 
 type MailView = 'inbox' | 'sent' | 'compose' | 'view';
@@ -29,6 +31,23 @@ export default function MailboxPage() {
   const [isSending, setIsSending] = useState(false);
   const [isSentSuccess, setIsSentSuccess] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  // 알림 모달 상태
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    title: '알림',
+    message: '',
+    onConfirm: () => setAlertModal(prev => ({ ...prev, isOpen: false }))
+  });
+
+  const showAlert = (message: string, title: string = '알림') => {
+    setAlertModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => setAlertModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
 
   // 리스트 상태
   const [mails, setMails] = useState<any[]>([]);
@@ -72,7 +91,7 @@ export default function MailboxPage() {
       if (inboxRes.ok) setInboxCount(inboxData.inbox.length);
       if (sentRes.ok) setSentCount(sentData.sent.length);
     } catch (e) {
-      console.error('Failed to fetch counts:', e);
+      logger.e(`Failed to fetch counts: ${e}`);
     }
   };
 
@@ -96,7 +115,7 @@ export default function MailboxPage() {
         setMails(view === 'inbox' ? data.inbox : data.sent);
       }
     } catch (error) {
-      console.error('Failed to fetch mails:', error);
+      logger.e(`Failed to fetch mails: ${error}`);
     } finally {
       setIsLoading(false);
     }
@@ -128,7 +147,7 @@ export default function MailboxPage() {
           m.id === mail.id ? { ...m, isRead: true } : m
         ));
       } catch (e) {
-        console.error('Failed to mark as read');
+        logger.e(`Failed to mark as read: ${e}`);
       }
     }
   };
@@ -170,7 +189,7 @@ export default function MailboxPage() {
         setErrorStatus({ field, message: data.message || '메일 발송에 실패했습니다.' });
       }
     } catch (error) {
-      alert('서버 통신 중 오류가 발생했습니다.');
+      showAlert('서버 통신 중 오류가 발생했습니다.');
     } finally {
       setIsSending(false);
     }
@@ -262,11 +281,11 @@ export default function MailboxPage() {
         setSelectedIds([]);
       } else {
         const data = await res.json();
-        alert(data.message || '삭제 중 오류가 발생했습니다.');
+        showAlert(data.message || '삭제 중 오류가 발생했습니다.');
       }
     } catch (e) {
-      console.error(e);
-      alert('서버 요청 중 오류가 발생했습니다.');
+      logger.e(`Bulk delete error: ${e}`);
+      showAlert('서버 요청 중 오류가 발생했습니다.');
     }
   };
 
@@ -587,6 +606,13 @@ export default function MailboxPage() {
         variant="danger"
         onConfirm={executeBulkDelete}
         onCancel={() => setIsDeleteModalOpen(false)}
+      />
+
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        onConfirm={alertModal.onConfirm}
       />
     </main>
   );

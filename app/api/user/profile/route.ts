@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
 import { verifyAuth, unauthorizedResponse } from 'src/utils/auth';
+import { logger } from 'src/utils/log';
 
 export async function PATCH(request: Request) {
   try {
@@ -28,7 +29,7 @@ export async function PATCH(request: Request) {
       },
     }, { status: 200 });
   } catch (error) {
-    console.error('Profile update error:', error);
+    logger.e(`Profile update error: ${error}`);
     return NextResponse.json(
       { message: '프로필 수정 중 오류가 발생했습니다.' },
       { status: 500 }

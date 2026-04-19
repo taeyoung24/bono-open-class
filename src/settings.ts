@@ -35,3 +35,4 @@ export const GLOBAL_CONFIG = {
   emailDomain: 'bono.com',
 };
 
+

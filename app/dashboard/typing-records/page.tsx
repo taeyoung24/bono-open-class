@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import layoutStyles from 'app/Layout.module.css';
-import styles from './typing-records.module.css';
-import { DefaultButton } from 'app/components/Button';
 import ActionList from 'app/components/ActionList';
-import TypingHistoryChart from './TypingHistoryChart';
+import { DefaultButton } from 'app/components/Button';
+import layoutStyles from 'app/Layout.module.css';
 import Tooltip from 'app/overlays/Tooltip';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { logger } from 'src/utils/log';
 import ProficiencyGauge from './ProficiencyGauge';
+import styles from './typing-records.module.css';
+import TypingHistoryChart from './TypingHistoryChart';
 
 interface TypingRecord {
   id: number;
@@ -66,7 +67,7 @@ export default function TypingRecordsPage() {
         setStats(data.stats);
       }
     } catch (error) {
-      console.error('Failed to fetch records:', error);
+      logger.e(`Failed to fetch records: ${error}`);
     } finally {
       setIsLoading(false);
     }

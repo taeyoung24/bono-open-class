@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import layoutStyles from 'app/Layout.module.css';
-import styles from 'app/components/AuthFormLayout.module.css';
-import { DefaultButton, TextButton } from 'app/components/Button';
+import { DefaultButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
 import AlertModal from 'app/modals/AlertModal';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { logger } from 'src/utils/log';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function ProfilePage() {
         setProfileImage(user.profileImage || '');
         setBio(user.bio || '');
       } catch (e) {
-        console.error('Failed to parse user info');
+        logger.e(`Failed to parse user info: ${e}`);
       }
     } else {
       router.push('/login');
@@ -53,13 +53,13 @@ export default function ProfilePage() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     setIsLoading(true);
     try {
       const token = localStorage.getItem('auth_token');
       const response = await fetch('/api/user/profile', {
         method: 'PATCH',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -102,7 +102,7 @@ export default function ProfilePage() {
             <label className={layoutStyles.label}>아이디</label>
             <TextInput
               value={userId}
-              onChange={() => {}}
+              onChange={() => { }}
               disabled={true}
             />
           </div>
@@ -111,7 +111,7 @@ export default function ProfilePage() {
             <label className={layoutStyles.label}>이름 (실명)</label>
             <TextInput
               value={name}
-              onChange={() => {}}
+              onChange={() => { }}
               disabled={true}
             />
           </div>
@@ -146,15 +146,15 @@ export default function ProfilePage() {
           </div>
 
           <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <DefaultButton 
-              type="submit" 
-              text={isLoading ? '저장 중...' : '프로필 저장하기'} 
-              disabled={isLoading} 
+            <DefaultButton
+              type="submit"
+              text={isLoading ? '저장 중...' : '프로필 저장하기'}
+              disabled={isLoading}
               variant="correct"
             />
-            <DefaultButton 
-              text="취소하고 돌아가기" 
-              onClick={() => router.back()} 
+            <DefaultButton
+              text="취소하고 돌아가기"
+              onClick={() => router.back()}
               variant="none"
             />
           </div>

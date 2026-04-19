@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from './dashboard.module.css';
 import layoutStyles from 'app/Layout.module.css';
-import { DefaultButton } from 'app/components/Button';
 import ActionList from 'app/components/ActionList';
+import { DefaultButton } from 'app/components/Button';
 import ConfirmModal from 'app/modals/ConfirmModal';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { logger } from 'src/utils/log';
+import styles from './dashboard.module.css';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function DashboardPage() {
         const user = JSON.parse(storedUser);
         setUserName(user.name || user.userId || '사용자');
       } catch (e) {
-        console.error('Failed to parse user info');
+        logger.e(`Failed to parse user info: ${e}`);
       }
     }
   }, []);

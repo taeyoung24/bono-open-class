@@ -99,10 +99,6 @@
   width: 100%;
 }
 
-.postForm {
-  margin-bottom: 1.5rem;
-}
-
 .postListItem {
   border: none;
   border-radius: 0;
@@ -139,10 +135,6 @@
   flex-direction: column;
   gap: 0.75rem;
   min-width: 0;
-}
-
-.postFormRight {
-  gap: 1rem;
 }
 
 .postHeader {

@@ -1,6 +1,8 @@
 'use client';
 
 import styles from 'app/dashboard/sns/sns.module.css';
+import AlertModal from 'app/modals/AlertModal';
+import ConfirmModal from 'app/modals/ConfirmModal';
 import Tooltip from 'app/overlays/Tooltip';
 import axios from 'axios';
 import Image from 'next/image';
@@ -8,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaComment, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa6';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
+import { logger } from 'src/utils/log';
 
 interface PostCardProps {
   post: any;
@@ -22,6 +25,44 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
 
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
+
+  // 모달 상태
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '알림',
+    message: '',
+    onConfirm: () => setModal(prev => ({ ...prev, isOpen: false }))
+  });
+
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '확인',
+    message: '',
+    onConfirm: () => { },
+    onCancel: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+  });
+
+  const showAlert = (message: string, title: string = '알림') => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => setModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
+
+  const showConfirm = (message: string, onConfirm: () => void, title: string = '확인') => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        onConfirm();
+        setConfirmModal(prev => ({ ...prev, isOpen: false }));
+      },
+      onCancel: () => setConfirmModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
 
   const isLiked = post.likes?.some((like: any) => like.userId === currentUser.userId);
   const isOwner = post.authorId === currentUser.userId || currentUser.role === 'ADMIN';
@@ -46,28 +87,28 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
       });
       onRefresh();
     } catch (error) {
-      console.error('Like error:', error);
+      logger.e(`Like error: ${error}`);
     }
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) return;
-
-    try {
-      const token = localStorage.getItem('auth_token');
-      await axios.delete(`/api/sns/posts/${post.id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (isDetail) {
-        router.push('/dashboard/sns');
-      } else {
-        onRefresh();
+    showConfirm('정말로 이 게시글을 삭제하시겠습니까?', async () => {
+      try {
+        const token = localStorage.getItem('auth_token');
+        await axios.delete(`/api/sns/posts/${post.id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (isDetail) {
+          router.push('/dashboard/sns');
+        } else {
+          onRefresh();
+        }
+      } catch (error) {
+        logger.e(`Delete error: ${error}`);
+        showAlert('게시글 삭제 중 오류가 발생했습니다.');
       }
-    } catch (error) {
-      console.error('Delete error:', error);
-      alert('게시글 삭제 중 오류가 발생했습니다.');
-    }
+    });
   };
 
   const goToDetail = () => {
@@ -149,6 +190,22 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
           </button>
         </div>
       </div>
+
+      <AlertModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+      />
+
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        onConfirm={confirmModal.onConfirm}
+        onCancel={confirmModal.onCancel}
+        variant="danger"
+      />
     </div>
   );
 }

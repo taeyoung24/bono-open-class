@@ -5,12 +5,14 @@ import { DefaultButton, FieldButton } from 'app/components/Button';
 import PostCard from 'app/components/PostCard';
 import TextInput from 'app/components/TextInput';
 import styles from 'app/dashboard/sns/sns.module.css';
+import AlertModal from 'app/modals/AlertModal';
 import Tooltip from 'app/overlays/Tooltip';
 import axios from 'axios';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
+import { logger } from 'src/utils/log';
 
 export default function PostDetailPage() {
   const router = useRouter();
@@ -23,14 +25,35 @@ export default function PostDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // 모달 상태
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '알림',
+    message: '',
+    onConfirm: () => setModal(prev => ({ ...prev, isOpen: false }))
+  });
+
+  const showAlert = (message: string, onConfirm?: () => void, title: string = '알림') => {
+    setModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        if (onConfirm) onConfirm();
+        setModal(prev => ({ ...prev, isOpen: false }));
+      }
+    });
+  };
+
   const fetchData = useCallback(async () => {
     try {
       const response = await axios.get(`/api/sns/posts/${postId}`);
       setPost(response.data.post);
     } catch (error) {
-      console.error('Fetch post detail error:', error);
-      alert('게시글을 불러올 수 없습니다.');
-      router.push('/dashboard/sns');
+      logger.e(`Fetch post detail error: ${error}`);
+      showAlert('게시글을 불러올 수 없습니다.', () => {
+        router.push('/dashboard/sns');
+      });
     } finally {
       setIsLoading(false);
     }
@@ -63,8 +86,8 @@ export default function PostDetailPage() {
       setNewComment('');
       fetchData();
     } catch (error) {
-      console.error('Comment error:', error);
-      alert('댓글 등록 중 오류가 발생했습니다.');
+      logger.e(`Comment error: ${error}`);
+      showAlert('댓글 등록 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }
@@ -169,6 +192,13 @@ export default function PostDetailPage() {
           </div>
         </section>
       </div>
+
+      <AlertModal
+        isOpen={modal.isOpen}
+        title={modal.title}
+        message={modal.message}
+        onConfirm={modal.onConfirm}
+      />
     </main>
   );
 }

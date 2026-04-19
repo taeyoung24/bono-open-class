@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
+import { logger } from 'src/utils/log';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
 
@@ -18,10 +19,10 @@ export async function verifyAuth(request: Request): Promise<AuthUser | null> {
 
     const token = authHeader.split(' ')[1];
     const decoded = jwt.verify(token, JWT_SECRET) as AuthUser;
-    
+
     return decoded;
   } catch (error) {
-    console.error('JWT verification failed:', error);
+    logger.e(`JWT verification failed: ${error}`);
     return null;
   }
 }
