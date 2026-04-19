@@ -110,10 +110,6 @@ export default function TypingRecordsPage() {
       <div className={styles.layout}>
         {/* 왼쪽 카드: 통계 및 메뉴 */}
         <aside className={`${layoutStyles.formCard} ${styles.sidebar}`}>
-          <div className={layoutStyles.header}>
-            <h3 className={layoutStyles.title}>타자연습 기록실</h3>
-          </div>
-
           {/* 미니멀 통계 섹션 */}
           <div className={styles.minimalStatsLayout}>
             <div className={styles.statBox}>
