@@ -137,7 +137,7 @@ export default function TypingRecordsPage() {
 
           <div className={styles.sidebarFooter}>
             <DefaultButton
-              text="대시보드로 돌아가기"
+              text="대쉬보드로 돌아가기"
               onClick={() => router.push('/dashboard')}
               variant="none"
               width="fill"
@@ -238,10 +238,6 @@ export default function TypingRecordsPage() {
             )}
           </div>
         </section>
-      </div>
-
-      <div className={layoutStyles.bottomFooter}>
-        <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
     </main>
   );

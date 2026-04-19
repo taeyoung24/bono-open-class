@@ -35,6 +35,7 @@ export default function DashboardPage() {
   const menuItems = [
     { label: '메일함', onClick: () => router.push('/dashboard/mailbox') },
     { label: '타자연습 기록실', onClick: () => router.push('/dashboard/typing-records') },
+    { label: '본오스퀘어', onClick: () => router.push('/dashboard/sns') },
     { label: '내 정보 수정', onClick: () => router.push('/dashboard/profile') },
   ];
 

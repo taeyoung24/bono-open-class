@@ -38,10 +38,10 @@ export function DefaultButton({
   return (
     <button
       type={type}
-      className={`${styles.button} ${styles.wide} ${styles[variant]}`}
+      className={`${styles.button} ${styles.wide} ${styles[variant]} ${width === 'fill' ? styles.fill : ''} ${width === 'hug' ? styles.hug : ''}`}
       onClick={onClick}
       disabled={disabled}
-      style={{ width: getWidthStyle() }}
+      style={width !== 'fill' && width !== 'hug' ? { width } : {}}
     >
       {text}
     </button>
