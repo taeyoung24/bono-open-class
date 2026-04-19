@@ -1,15 +1,17 @@
 'use client';
 
+import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import Image from 'next/image';
 import layoutStyles from 'app/Layout.module.css';
+import styles from 'app/dashboard/sns/sns.module.css';
 import { DefaultButton } from 'app/components/Button';
 import PostCard from 'app/components/PostCard';
-import styles from 'app/dashboard/sns/sns.module.css';
-import AlertModal from 'app/modals/AlertModal';
 import axios from 'axios';
-import Image from 'next/image';
-import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
+import { FaChevronLeft } from 'react-icons/fa6';
 import { logger } from 'src/utils/log';
+import AlertModal from 'app/modals/AlertModal';
+import { getUserDisplayName } from 'src/userHelpers';
 
 export default function UserProfilePage() {
   const router = useRouter();
@@ -90,7 +92,7 @@ export default function UserProfilePage() {
               className={styles.miniProfileImage}
             />
             <div className={styles.miniProfileInfo}>
-              <span className={styles.miniNickname}>{profile.nickname || '무명'}</span>
+              <span className={styles.miniNickname}>{getUserDisplayName(profile)}</span>
               <span className={styles.miniBio}>{profile.bio || '자기소개가 없습니다.'}</span>
             </div>
           </div>
@@ -109,7 +111,7 @@ export default function UserProfilePage() {
         <section className={styles.contentArea}>
           <div className={`${layoutStyles.formCard} ${styles.contentCard}`}>
             <h4 className={`${layoutStyles.title} ${styles.titleSmallMargin}`}>
-              {profile.nickname || '무명'} 님의 활동
+              {getUserDisplayName(profile)} 님의 활동
             </h4>
             <p className={layoutStyles.subtitle}>
               총 {posts.length}개의 글을 남겼습니다.
@@ -121,7 +123,7 @@ export default function UserProfilePage() {
             <div className={styles.feedScrollArea}>
               {posts.length === 0 ? (
                 <div className={styles.emptyFeedCard}>
-                  <p>아직 작성한 게시글이 없습니다.</p>
+                  <p>아직 작성한 게시글이 없습니다. 첫 글을 남겨보세요!</p>
                 </div>
               ) : (
                 posts.map((post) => (

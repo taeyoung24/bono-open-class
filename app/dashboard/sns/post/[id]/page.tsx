@@ -13,6 +13,7 @@ import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
 import { logger } from 'src/utils/log';
+import { getUserDisplayName } from 'src/userHelpers';
 
 export default function PostDetailPage() {
   const router = useRouter();
@@ -164,13 +165,17 @@ export default function PostDetailPage() {
                       alt="Commenter"
                       width={40}
                       height={40}
-                      className={styles.commentProfileImage}
+                      className={`${styles.commentProfileImage} ${styles.clickable}`}
+                      onClick={() => router.push(`/dashboard/sns/user/${comment.authorId}`)}
                     />
                     <div className={styles.commentBody}>
                       <div className={styles.postHeader}>
                         <div className={styles.authorInfo}>
-                          <span className={styles.nickname}>
-                            {comment.author.nickname || comment.author.userId || '무명'}
+                          <span 
+                            className={`${styles.nickname} ${styles.clickable}`}
+                            onClick={() => router.push(`/dashboard/sns/user/${comment.authorId}`)}
+                          >
+                            {getUserDisplayName(comment.author)}
                           </span>
                           <div className={styles.postMeta}>
                             <Tooltip content={formatFullDate(new Date(comment.createdAt))}>

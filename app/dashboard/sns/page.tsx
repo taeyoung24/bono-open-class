@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { logger } from 'src/utils/log';
 import styles from './sns.module.css';
+import { getUserDisplayName } from 'src/userHelpers';
 
 export default function SNSPage() {
   const router = useRouter();
@@ -107,10 +108,16 @@ export default function SNSPage() {
               alt="My Profile"
               width={100}
               height={100}
-              className={styles.miniProfileImage}
+              className={`${styles.miniProfileImage} ${styles.clickable}`}
+              onClick={() => router.push(`/dashboard/sns/user/${user.userId}`)}
             />
             <div className={styles.miniProfileInfo}>
-              <span className={styles.miniNickname}>{user.nickname || user.name || '무명'}</span>
+              <span 
+                className={`${styles.miniNickname} ${styles.clickable}`}
+                onClick={() => router.push(`/dashboard/sns/user/${user.userId}`)}
+              >
+                {getUserDisplayName(user)}
+              </span>
               <span className={styles.miniBio}>{user.bio || '자기소개가 없습니다.'}</span>
               <div className={styles.pointsBadge}>
                 {user.points?.toLocaleString() || 0} P

@@ -380,3 +380,7 @@
 .postCardDefault {
   cursor: default;
 }
+
+.clickable {
+  cursor: pointer;
+}

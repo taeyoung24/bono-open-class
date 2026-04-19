@@ -11,6 +11,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FaComment, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa6';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
 import { logger } from 'src/utils/log';
+import { getUserDisplayName } from 'src/userHelpers';
 
 interface PostCardProps {
   post: any;
@@ -148,7 +149,7 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
         <div className={styles.postHeader}>
           <div className={styles.authorInfo}>
             <span className={styles.nickname} onClick={goToProfile}>
-              {post.author.nickname || post.author.userId || '무명'}
+              {getUserDisplayName(post.author)}
             </span>
             <div className={styles.postMeta}>
               <Tooltip content={fullDate}>
