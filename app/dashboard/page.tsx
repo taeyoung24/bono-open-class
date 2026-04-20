@@ -4,6 +4,7 @@ import layoutStyles from 'app/Layout.module.css';
 import ActionList from 'app/components/ActionList';
 import { DefaultButton } from 'app/components/Button';
 import ConfirmModal from 'app/modals/ConfirmModal';
+import Tooltip from 'app/overlays/Tooltip';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -11,7 +12,7 @@ import { logger } from 'src/utils/log';
 import { UserRole } from 'src/types';
 import styles from './dashboard.module.css';
 
-import { FaEnvelope, FaUserTag } from 'react-icons/fa6';
+import { FaEnvelope, FaUserTag, FaStamp } from 'react-icons/fa6';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function DashboardPage() {
   const [userName, setUserName] = useState('사용자');
   const [userEmail, setUserEmail] = useState('');
   const [userRole, setUserRole] = useState<UserRole | ''>('');
+  const [stickerCount, setStickerCount] = useState(0); // 추후 API 연동 필요
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -48,6 +50,7 @@ export default function DashboardPage() {
   }, []);
 
   const menuItems = [
+    { label: '스티커판', onClick: () => transitionTo('/dashboard/stickers') },
     { label: '메일함', onClick: () => transitionTo('/dashboard/mailbox') },
     { label: '타자연습 기록실', onClick: () => transitionTo('/dashboard/typing-records') },
     { label: '본오스퀘어', onClick: () => transitionTo('/dashboard/sns') },
@@ -66,16 +69,26 @@ export default function DashboardPage() {
         <div className={layoutStyles.header}>
           <h3 className={layoutStyles.title}>대쉬보드 메뉴 ({userName})</h3>
           <div className={styles.userInfo}>
-            <div className={styles.infoItem}>
-              <span className={styles.infoIcon}><FaEnvelope /></span>
-              <span>{userEmail}</span>
-            </div>
             {userRole && (
               <div className={styles.infoItem}>
-                <span className={styles.infoIcon}><FaUserTag /></span>
+                <Tooltip content="권한" position="bottom">
+                  <span className={styles.infoIcon}><FaUserTag /></span>
+                </Tooltip>
                 <span>{ROLE_NAME_MAP[userRole] || userRole}</span>
               </div>
             )}
+            <div className={styles.infoItem}>
+              <Tooltip content="이메일" position="bottom">
+                <span className={styles.infoIcon}><FaEnvelope /></span>
+              </Tooltip>
+              <span>{userEmail}</span>
+            </div>
+            <div className={styles.infoItem}>
+              <Tooltip content="스티커" position="bottom">
+                <span className={styles.infoIcon}><FaStamp /></span>
+              </Tooltip>
+              <span>모은 스티커 {stickerCount}개</span>
+            </div>
           </div>
         </div>
 
