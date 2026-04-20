@@ -65,7 +65,7 @@ export async function POST(request: Request) {
     response.cookies.set('auth_token', token, {
       path: '/',
       httpOnly: false, // 클라이언트 측(로그아웃)에서 지울 수 있도록 허용
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.COOKIE_SECURE === 'true',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 // 1일
     });
