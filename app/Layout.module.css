@@ -45,6 +45,8 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-r);
   color: var(--text-sub);
+  z-index: 0; /* 배경 레이어 수준으로 낮춤 */
+  pointer-events: none; /* 클릭 간섭 방지 */
 }
 
 /* --- Global Form Styles --- */

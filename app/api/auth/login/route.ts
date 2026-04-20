@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
-import { prisma } from 'src/lib/prisma';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { NextResponse } from 'next/server';
+import { prisma } from 'src/lib/prisma';
+import { logger } from 'src/utils/log';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
 
@@ -40,10 +41,10 @@ export async function POST(request: Request) {
 
     // 토큰 생성
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        userId: user.userId, 
-        role: user.role 
+      {
+        id: user.id,
+        userId: user.userId,
+        role: user.role
       },
       JWT_SECRET,
       { expiresIn: '1d' }
@@ -52,16 +53,26 @@ export async function POST(request: Request) {
     // 응답 구성 (보안을 위해 비밀번호 제외)
     const { password: _, ...userWithoutPassword } = user;
 
-    return NextResponse.json(
-      { 
-        message: '로그인 성공', 
-        token, 
-        user: userWithoutPassword 
+    const response = NextResponse.json(
+      {
+        message: '로그인 성공',
+        token,
+        user: userWithoutPassword
       },
       { status: 200 }
     );
+
+    response.cookies.set('auth_token', token, {
+      path: '/',
+      httpOnly: false, // 클라이언트 측(로그아웃)에서 지울 수 있도록 허용
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 // 1일
+    });
+
+    return response;
   } catch (error) {
-    console.error('Login error:', error);
+    logger.e(`Login error: ${error}`);
     return NextResponse.json(
       { message: '서버 오류가 발생했습니다.' },
       { status: 500 }

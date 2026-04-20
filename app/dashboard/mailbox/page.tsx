@@ -2,21 +2,26 @@
 
 import ActionList from 'app/components/ActionList';
 import { DefaultButton, FieldButton } from 'app/components/Button';
+import CircleLoader from 'app/components/loaders/circle';
 import SelectInput from 'app/components/SelectInput';
 import TextArea from 'app/components/TextArea';
 import TextInput from 'app/components/TextInput';
 import layoutStyles from 'app/Layout.module.css';
+import AlertModal from 'app/modals/AlertModal';
 import ConfirmModal from 'app/modals/ConfirmModal';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline } from 'react-icons/io5';
+import { logger } from 'src/utils/log';
 import styles from './mailbox.module.css';
 
 type MailView = 'inbox' | 'sent' | 'compose' | 'view';
 
 export default function MailboxPage() {
   const router = useRouter();
+  const { transitionTo, setPageReady } = useTransitionNav();
   const [currentView, setCurrentView] = useState<MailView>('inbox');
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState('');
@@ -30,9 +35,27 @@ export default function MailboxPage() {
   const [isSentSuccess, setIsSentSuccess] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+  // 알림 모달 상태
+  const [alertModal, setAlertModal] = useState({
+    isOpen: false,
+    title: '알림',
+    message: '',
+    onConfirm: () => setAlertModal(prev => ({ ...prev, isOpen: false }))
+  });
+
+  const showAlert = (message: string, title: string = '알림') => {
+    setAlertModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => setAlertModal(prev => ({ ...prev, isOpen: false }))
+    });
+  };
+
   // 리스트 상태
   const [mails, setMails] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
   const [selectedMail, setSelectedMail] = useState<any | null>(null);
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
 
@@ -72,9 +95,14 @@ export default function MailboxPage() {
       if (inboxRes.ok) setInboxCount(inboxData.inbox.length);
       if (sentRes.ok) setSentCount(sentData.sent.length);
     } catch (e) {
-      console.error('Failed to fetch counts:', e);
+      logger.e(`Failed to fetch counts: ${e}`);
     }
   };
+
+  useEffect(() => {
+    // 메일함 최초 진입 시에만 전역 연필 로더 대기 명령
+    setPageReady(false);
+  }, [setPageReady]);
 
   useEffect(() => {
     if (userId) {
@@ -87,6 +115,7 @@ export default function MailboxPage() {
     if (view !== 'inbox' && view !== 'sent') return;
 
     setIsLoading(true);
+    // 내부 탭 전환 시에는 지역 로더(CircleLoader)만 사용 (setPageReady 미호출)
     try {
       const endpoint = `/api/mailbox/${view}?userId=${userId}`;
       const response = await fetch(endpoint);
@@ -96,9 +125,10 @@ export default function MailboxPage() {
         setMails(view === 'inbox' ? data.inbox : data.sent);
       }
     } catch (error) {
-      console.error('Failed to fetch mails:', error);
+      logger.e(`Failed to fetch mails: ${error}`);
     } finally {
       setIsLoading(false);
+      setHasFetched(true);
     }
   };
 
@@ -109,6 +139,13 @@ export default function MailboxPage() {
       fetchCounts(); // 뷰 전환시마다도 최신화
     }
   }, [userId, currentView]);
+
+  // 데이터 무결성 검증: 메일함 초기 데이터가 준비되었을 때만 연필 로더 해제
+  useEffect(() => {
+    if (hasFetched) {
+      setPageReady(true);
+    }
+  }, [hasFetched, setPageReady]);
 
   const handleSelectMail = async (mail: any) => {
     setSelectedMail(mail);
@@ -128,7 +165,7 @@ export default function MailboxPage() {
           m.id === mail.id ? { ...m, isRead: true } : m
         ));
       } catch (e) {
-        console.error('Failed to mark as read');
+        logger.e(`Failed to mark as read: ${e}`);
       }
     }
   };
@@ -170,7 +207,7 @@ export default function MailboxPage() {
         setErrorStatus({ field, message: data.message || '메일 발송에 실패했습니다.' });
       }
     } catch (error) {
-      alert('서버 통신 중 오류가 발생했습니다.');
+      showAlert('서버 통신 중 오류가 발생했습니다.');
     } finally {
       setIsSending(false);
     }
@@ -262,11 +299,11 @@ export default function MailboxPage() {
         setSelectedIds([]);
       } else {
         const data = await res.json();
-        alert(data.message || '삭제 중 오류가 발생했습니다.');
+        showAlert(data.message || '삭제 중 오류가 발생했습니다.');
       }
     } catch (e) {
-      console.error(e);
-      alert('서버 요청 중 오류가 발생했습니다.');
+      logger.e(`Bulk delete error: ${e}`);
+      showAlert('서버 요청 중 오류가 발생했습니다.');
     }
   };
 
@@ -305,7 +342,7 @@ export default function MailboxPage() {
           <div style={{ marginTop: '32px' }}>
             <DefaultButton
               text="대쉬보드로 돌아가기"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => transitionTo('/dashboard')}
               variant="none"
               width="fill"
             />
@@ -327,7 +364,9 @@ export default function MailboxPage() {
             {(currentView === 'inbox' || currentView === 'sent') && (
               <>
                 {isLoading ? (
-                  <div className={styles.emptyState}><p>로딩 중...</p></div>
+                  <div className={styles.emptyState} style={{ padding: '40px 0' }}>
+                    <CircleLoader />
+                  </div>
                 ) : mails.length > 0 ? (
                   <>
                     <div className={styles.toolbar}>
@@ -384,7 +423,7 @@ export default function MailboxPage() {
                               onChange={(e) => {
                                 if (e.target.checked) setSelectedIds(p => [...p, mail.id]);
                                 else setSelectedIds(p => p.filter(id => id !== mail.id));
-                                }}
+                              }}
                             />
                           </div>
                           <div className={`${layoutStyles.dataCol} ${layoutStyles.dataColFixed} ${styles.colName} ${layoutStyles.dataTextLabel}`}>
@@ -446,7 +485,8 @@ export default function MailboxPage() {
 
             {currentView === 'compose' && !isSentSuccess && (
               <div className={styles.composeContainer}>
-                <form onSubmit={handleSendMail} className={layoutStyles.form} noValidate>
+                {/* 폼 필드 영역: layoutStyles.form 사용 */}
+                <form id="mail-compose-form" onSubmit={handleSendMail} className={layoutStyles.form} noValidate>
                   <div className={layoutStyles.fieldGroup}>
                     <div className={layoutStyles.labelRow}>
                       <label className={layoutStyles.label}>
@@ -536,24 +576,20 @@ export default function MailboxPage() {
                       </span>
                     )}
                   </div>
-
-                  <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
-                    <DefaultButton
-                      text={isSending ? '보내는 중...' : '보내기'}
-                      type="submit"
-                      variant="primary"
-                      disabled={isSending}
-                    />
-                    <DefaultButton
-                      text="취소"
-                      onClick={() => {
-                        setCurrentView('inbox');
-                        setErrorStatus(null);
-                      }}
-                      variant="none"
-                    />
-                  </div>
                 </form>
+
+                {/* 푸터 영역: 폼 외부에 별도로 분리하여 버튼 애니메이션 독립성 보장 */}
+                <div style={{ marginTop: '24px', paddingBottom: '4px' }}>
+                  <DefaultButton
+                    text="보내기"
+                    type="submit"
+                    form="mail-compose-form"
+                    variant="primary"
+                    isLoading={isSending}
+                    disabled={isSending}
+                    width="fill"
+                  />
+                </div>
               </div>
             )}
 
@@ -587,6 +623,13 @@ export default function MailboxPage() {
         variant="danger"
         onConfirm={executeBulkDelete}
         onCancel={() => setIsDeleteModalOpen(false)}
+      />
+
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        onConfirm={alertModal.onConfirm}
       />
     </main>
   );

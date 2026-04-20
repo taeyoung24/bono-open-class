@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
+import { logger } from 'src/utils/log';
 
 export async function POST(request: Request) {
   try {
@@ -9,8 +10,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: '아이디와 인증코드를 입력해주세요.' }, { status: 400 });
     }
 
-    const record = await prisma.verificationCode.findUnique({ 
-      where: { target_type: { target: userId, type: 'PASSWORD_RESET' } } 
+    const record = await prisma.verificationCode.findUnique({
+      where: { target_type: { target: userId, type: 'PASSWORD_RESET' } }
     });
 
     if (!record) {
@@ -18,8 +19,8 @@ export async function POST(request: Request) {
     }
 
     if (new Date() > record.expiresAt) {
-      await prisma.verificationCode.delete({ 
-        where: { target_type: { target: userId, type: 'PASSWORD_RESET' } } 
+      await prisma.verificationCode.delete({
+        where: { target_type: { target: userId, type: 'PASSWORD_RESET' } }
       });
       return NextResponse.json({ message: '인증코드가 만료되었습니다. 다시 요청해주세요.' }, { status: 410 });
     }
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ message: '인증 성공. 새 비밀번호를 입력해주세요.' }, { status: 200 });
   } catch (error) {
-    console.error('Reset verify error:', error);
+    logger.e(`Reset verify error: ${error}`);
     return NextResponse.json({ message: '서버 오류가 발생했습니다.' }, { status: 500 });
   }
 }

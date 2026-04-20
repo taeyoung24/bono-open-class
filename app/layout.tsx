@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   description: "본오동 열린 컴퓨터 교실",
 };
 
+import { TransitionProvider } from "./providers/TransitionProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,8 +31,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className={atoz.variable}>
-      <body className={atoz.className}>{children}</body>
+      <body className={atoz.className}>
+        <TransitionProvider>
+          {children}
+        </TransitionProvider>
+      </body>
     </html>
   );
 }
+
 
