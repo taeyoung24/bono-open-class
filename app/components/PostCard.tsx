@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaComment, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa6';
 import { getUserDisplayName } from 'src/userHelpers';
+import { AuthUser } from 'src/types';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
 import { logger } from 'src/utils/log';
 import { formatCompactNumber } from 'src/utils/str';
@@ -17,7 +18,7 @@ import SkeletonImage from './loaders/SkeletonImage';
 
 interface PostCardProps {
   post: any;
-  currentUser: any;
+  currentUser: AuthUser;
   onRefresh: () => void;
   isDetail?: boolean
   isListItem?: boolean;

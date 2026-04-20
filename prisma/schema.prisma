@@ -35,6 +35,10 @@ model User {
   posts         Post[]
   comments      Comment[]
   likes         Like[]
+  
+  // 아이템 및 스티커 시스템
+  inventories      UserInventory[]
+  stickerPlacements UserStickerPlacement[]
 
   @@map("users") // 테이블 이름을 명확하게 지정
 }
@@ -156,6 +160,57 @@ model TypingRecord {
 
   @@index([userId]) // 사용자별 기록 조회를 위한 인덱스
   @@map("typing_records")
+}
+
+// ─────────────────────────────────────────────
+// 아이템 및 보상 시스템 (스티커, 테마 등)
+// ─────────────────────────────────────────────
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String   // 아이템 이름
+  description String?  // 아이템 설명
+  imageUrl    String   // 아이템 이미지 URL
+  type        String   @default("STICKER") // STICKER | THEME | BACKGROUND 등
+  
+  createdAt   DateTime @default(now())
+
+  inventories  UserInventory[]
+  placements   UserStickerPlacement[]
+
+  @@map("items")
+}
+
+model UserInventory {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId    String
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId    Int
+  quantity  Int      @default(1)
+  
+  createdAt DateTime @default(now())
+
+  @@unique([userId, itemId])
+  @@map("user_inventories")
+}
+
+model UserStickerPlacement {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId    String
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId    Int
+
+  // 자유 배치를 위한 좌표 및 회전값
+  x         Float    // 0~100 사이의 % 값 추천
+  y         Float    // 0~100 사이의 % 값 추천
+  rotation  Float    @default(0) // 회전 각도 (0~360)
+
+  placedAt  DateTime @default(now())
+
+  @@index([userId])
+  @@map("user_sticker_placements")
 }
 
 

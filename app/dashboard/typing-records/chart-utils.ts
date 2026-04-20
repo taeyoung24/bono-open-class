@@ -1,11 +1,4 @@
-export interface TypingRecord {
-  id: number;
-  cpm: number | null;
-  accuracy: number | null;
-  duration: number | null;
-  type: string;
-  createdAt: string;
-}
+import { TypingRecord } from 'src/types';
 
 /**
  * 전 과정에 대한 '나의 타수(보정 타수)' 시계열 데이터를 생성합니다.

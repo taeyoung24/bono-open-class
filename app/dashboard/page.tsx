@@ -8,12 +8,17 @@ import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { logger } from 'src/utils/log';
+import { UserRole } from 'src/types';
 import styles from './dashboard.module.css';
+
+import { FaEnvelope, FaUserTag } from 'react-icons/fa6';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { transitionTo } = useTransitionNav();
   const [userName, setUserName] = useState('사용자');
+  const [userEmail, setUserEmail] = useState('');
+  const [userRole, setUserRole] = useState<UserRole | ''>('');
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -34,6 +39,8 @@ export default function DashboardPage() {
       try {
         const user = JSON.parse(storedUser);
         setUserName(user.name || user.userId || '사용자');
+        setUserEmail(user.email || '');
+        setUserRole(user.role || '');
       } catch (e) {
         logger.e(`Failed to parse user info: ${e}`);
       }
@@ -47,11 +54,29 @@ export default function DashboardPage() {
     { label: '내 정보 수정', onClick: () => transitionTo('/dashboard/profile') },
   ];
 
+  const ROLE_NAME_MAP: Record<string, string> = {
+    'ADMIN': '관리자',
+    'STUDENT': '학생',
+    'TEACHER': '선생님'
+  };
+
   return (
     <main className={layoutStyles.container}>
       <div className={layoutStyles.formCard}>
         <div className={layoutStyles.header}>
           <h3 className={layoutStyles.title}>대쉬보드 메뉴 ({userName})</h3>
+          <div className={styles.userInfo}>
+            <div className={styles.infoItem}>
+              <span className={styles.infoIcon}><FaEnvelope /></span>
+              <span>{userEmail}</span>
+            </div>
+            {userRole && (
+              <div className={styles.infoItem}>
+                <span className={styles.infoIcon}><FaUserTag /></span>
+                <span>{ROLE_NAME_MAP[userRole] || userRole}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         <ActionList items={menuItems} />

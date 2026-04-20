@@ -7,19 +7,11 @@ import Tooltip from 'app/overlays/Tooltip';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { TypingRecord, TypingType } from 'src/types';
 import { logger } from 'src/utils/log';
 import ProficiencyGauge from './ProficiencyGauge';
 import styles from './typing-records.module.css';
 import TypingHistoryChart from './TypingHistoryChart';
-
-interface TypingRecord {
-  id: number;
-  cpm: number | null;
-  accuracy: number | null;
-  duration: number | null;
-  type: string;
-  createdAt: string;
-}
 
 interface Stats {
   totalCount: number;
@@ -45,7 +37,7 @@ export default function TypingRecordsPage() {
   const { transitionTo, setPageReady } = useTransitionNav();
   const [allRecords, setAllRecords] = useState<TypingRecord[]>([]);
   const [stats, setStats] = useState<Stats>({ totalCount: 0, avgCpm: 0, avgAccuracy: 0 });
-  const [filter, setFilter] = useState<'POSITION' | 'WORD' | 'NORMAL' | null>(null);
+  const [filter, setFilter] = useState<TypingType | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'analytics' | null>('analytics');
   const [isLoading, setIsLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
@@ -90,8 +82,8 @@ export default function TypingRecordsPage() {
     return record.type === filter;
   });
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+  const formatDate = (dateValue: string | Date) => {
+    const date = new Date(dateValue);
     return new Intl.DateTimeFormat('ko-KR', {
       year: 'numeric', month: '2-digit', day: '2-digit',
     }).format(date);

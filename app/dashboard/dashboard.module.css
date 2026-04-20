@@ -3,3 +3,30 @@
 .logoutSection {
   margin-top: 32px;
 }
+
+.userInfo {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.infoItem {
+  display: flex;
+  align-items: center; /* 세로 중앙 정렬 */
+  gap: 10px;
+  color: var(--text-sub);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-sb);
+  line-height: 1; /* 일관된 라인 높이 */
+}
+
+.infoIcon {
+  color: var(--text-muted);
+  font-size: 0.9em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* 아이콘이 살짝 위로 치우쳐 보일 경우를 대비한 미세 조정 */
+  transform: translateY(1px); 
+}
