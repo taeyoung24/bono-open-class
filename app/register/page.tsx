@@ -319,10 +319,6 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      <div className={layoutStyles.bottomFooter}>
-        <p>© 2026 Bono Open Class. All rights reserved.</p>
-      </div>
-
       <AlertModal
         isOpen={modal.isOpen}
         title={modal.title}

@@ -5,7 +5,8 @@ import { DefaultButton, TextButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
 import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
-import { useRouter } from 'next/navigation';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
+
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline } from 'react-icons/io5';
@@ -71,14 +72,16 @@ export default function LoginPage() {
       localStorage.setItem('auth_token', data.token);
       localStorage.setItem('user_info', JSON.stringify(data.user));
 
-      router.push('/dashboard');
+      transitionTo('/dashboard');
+
     } catch (error) {
       logger.e(`Login error: ${error}`);
       showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
     }
   };
 
-  const router = useRouter();
+  const { transitionTo } = useTransitionNav();
+
 
   return (
     <main className={layoutStyles.container}>
@@ -133,11 +136,12 @@ export default function LoginPage() {
         </form>
 
         <div className={styles.helperActions}>
-          <TextButton text="비밀번호 찾기" onClick={() => router.push('/reset-password')} />
+          <TextButton text="비밀번호 찾기" onClick={() => transitionTo('/reset-password')} />
           <div className={styles.divider} />
-          <TextButton text="새로 가입하기" onClick={() => router.push('/register')} />
+          <TextButton text="새로 가입하기" onClick={() => transitionTo('/register')} />
           <div className={styles.divider} />
-          <TextButton text="앱 정보" onClick={() => router.push('/about')} />
+          <TextButton text="앱 정보" onClick={() => transitionTo('/about')} />
+
         </div>
       </div>
 

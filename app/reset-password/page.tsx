@@ -6,7 +6,8 @@ import CodeInput from 'app/components/CodeInput';
 import styles from 'app/components/AuthFormLayout.module.css';
 import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
-import { useRouter } from 'next/navigation';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
+
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
 import { IoAlertCircleOutline } from 'react-icons/io5';
@@ -15,7 +16,8 @@ import { GLOBAL_CONFIG } from 'src/settings';
 type Step = 'request' | 'verify' | 'reset';
 
 export default function ResetPasswordPage() {
-  const router = useRouter();
+  const { transitionTo } = useTransitionNav();
+
 
   const [step, setStep] = useState<Step>('request');
   const [userId, setUserId] = useState('');
@@ -129,7 +131,8 @@ export default function ResetPasswordPage() {
 
       showModal('완료', '비밀번호가 성공적으로 변경되었습니다.', () => {
         setModal(prev => ({ ...prev, isOpen: false }));
-        router.push('/login');
+        transitionTo('/login');
+
       });
     } catch {
       showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
@@ -254,12 +257,9 @@ export default function ResetPasswordPage() {
         )}
 
         <div className={styles.footer}>
-          <TextButton text="로그인으로 돌아가기" onClick={() => router.push('/login')} />
-        </div>
-      </div>
+          <TextButton text="로그인으로 돌아가기" onClick={() => transitionTo('/login')} />
 
-      <div className={layoutStyles.bottomFooter}>
-        <p>© 2026 Bono Open Class. All rights reserved.</p>
+        </div>
       </div>
 
       <AlertModal
