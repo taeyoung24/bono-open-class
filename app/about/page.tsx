@@ -2,9 +2,9 @@
 
 import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton } from 'app/components/Button';
+import SkeletonImage from 'app/components/loaders/SkeletonImage';
 import Tooltip from 'app/overlays/Tooltip';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import styles from './About.module.css';
 
@@ -23,7 +23,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className={styles.logo}>
-            <Image
+            <SkeletonImage
               src="/app/logo-square-256.png"
               alt="App Logo"
               width={80}
@@ -82,7 +82,7 @@ export default function AboutPage() {
             <div className={styles.profileList}>
               <Tooltip content="안개비">
                 <div className={styles.profileItem}>
-                  <Image
+                  <SkeletonImage
                     src="/app/LOGO 2024 3.png"
                     alt="안개비"
                     width={48}
@@ -93,7 +93,7 @@ export default function AboutPage() {
               </Tooltip>
               <Tooltip content="디아이 스페이스">
                 <div className={styles.profileItem}>
-                  <Image
+                  <SkeletonImage
                     src="/app/dispace-profile.png"
                     alt="D. I. Space"
                     width={48}

@@ -9,6 +9,7 @@ interface ButtonProps {
   type?: 'button' | 'submit' | 'reset';
   disabled?: boolean;
   isLoading?: boolean;
+  form?: string;
 }
 
 interface DefaultButtonProps extends ButtonProps {
@@ -28,14 +29,17 @@ export function DefaultButton({
   disabled = false,
   isLoading = false,
   width = 'fill',
-  variant = 'primary'
+  variant = 'primary',
+  form
 }: DefaultButtonProps) {
   return (
     <button
       type={type}
-      className={`${styles.button} ${styles.wide} ${styles[variant]} ${isLoading ? styles.loading : ''}`}
+      form={form}
+      className={`${styles.button} ${styles.wide} ${styles[width] || ''} ${styles[variant]} ${isLoading ? styles.loading : ''}`}
       onClick={onClick}
       disabled={disabled || isLoading}
+      style={!['fill', 'hug'].includes(width) ? { width } : {}}
     >
       <div className={styles.contentWrapper}>
         {/* sizer: 버튼의 폭을 고정하기 위해 보이지 않게 자리만 차지함 */}
@@ -78,11 +82,13 @@ export function TextButton({
   onClick,
   type = 'button',
   disabled = false,
-  isLoading = false
+  isLoading = false,
+  form
 }: ButtonProps) {
   return (
     <button
       type={type}
+      form={form}
       className={`${styles.button} ${styles.text} ${isLoading ? styles.loadingText : ''}`}
       onClick={onClick}
       disabled={disabled || isLoading}
@@ -127,7 +133,8 @@ export function FieldButton({
   disabled = false,
   isLoading = false,
   width = 'hug',
-  variant = 'default'
+  variant = 'default',
+  form
 }: FieldButtonProps) {
   const getWidthStyle = () => {
     switch (width) {
@@ -140,6 +147,7 @@ export function FieldButton({
   return (
     <button
       type={type}
+      form={form}
       className={`${styles.button} ${styles.field} ${styles[variant]} ${isLoading ? styles.loadingField : ''}`}
       onClick={onClick}
       disabled={disabled || isLoading}

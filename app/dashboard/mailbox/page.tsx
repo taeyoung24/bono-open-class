@@ -2,6 +2,7 @@
 
 import ActionList from 'app/components/ActionList';
 import { DefaultButton, FieldButton } from 'app/components/Button';
+import CircleLoader from 'app/components/loaders/circle';
 import SelectInput from 'app/components/SelectInput';
 import TextArea from 'app/components/TextArea';
 import TextInput from 'app/components/TextInput';
@@ -20,7 +21,7 @@ type MailView = 'inbox' | 'sent' | 'compose' | 'view';
 
 export default function MailboxPage() {
   const router = useRouter();
-  const { transitionTo } = useTransitionNav();
+  const { transitionTo, setPageReady } = useTransitionNav();
   const [currentView, setCurrentView] = useState<MailView>('inbox');
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState('');
@@ -54,6 +55,7 @@ export default function MailboxPage() {
   // 리스트 상태
   const [mails, setMails] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasFetched, setHasFetched] = useState(false);
   const [selectedMail, setSelectedMail] = useState<any | null>(null);
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
 
@@ -98,6 +100,11 @@ export default function MailboxPage() {
   };
 
   useEffect(() => {
+    // 메일함 최초 진입 시에만 전역 연필 로더 대기 명령
+    setPageReady(false);
+  }, [setPageReady]);
+
+  useEffect(() => {
     if (userId) {
       fetchCounts();
     }
@@ -108,6 +115,7 @@ export default function MailboxPage() {
     if (view !== 'inbox' && view !== 'sent') return;
 
     setIsLoading(true);
+    // 내부 탭 전환 시에는 지역 로더(CircleLoader)만 사용 (setPageReady 미호출)
     try {
       const endpoint = `/api/mailbox/${view}?userId=${userId}`;
       const response = await fetch(endpoint);
@@ -120,6 +128,7 @@ export default function MailboxPage() {
       logger.e(`Failed to fetch mails: ${error}`);
     } finally {
       setIsLoading(false);
+      setHasFetched(true);
     }
   };
 
@@ -130,6 +139,13 @@ export default function MailboxPage() {
       fetchCounts(); // 뷰 전환시마다도 최신화
     }
   }, [userId, currentView]);
+
+  // 데이터 무결성 검증: 메일함 초기 데이터가 준비되었을 때만 연필 로더 해제
+  useEffect(() => {
+    if (hasFetched) {
+      setPageReady(true);
+    }
+  }, [hasFetched, setPageReady]);
 
   const handleSelectMail = async (mail: any) => {
     setSelectedMail(mail);
@@ -348,7 +364,9 @@ export default function MailboxPage() {
             {(currentView === 'inbox' || currentView === 'sent') && (
               <>
                 {isLoading ? (
-                  <div className={styles.emptyState}><p>로딩 중...</p></div>
+                  <div className={styles.emptyState} style={{ padding: '40px 0' }}>
+                    <CircleLoader />
+                  </div>
                 ) : mails.length > 0 ? (
                   <>
                     <div className={styles.toolbar}>
@@ -467,7 +485,8 @@ export default function MailboxPage() {
 
             {currentView === 'compose' && !isSentSuccess && (
               <div className={styles.composeContainer}>
-                <form onSubmit={handleSendMail} className={layoutStyles.form} noValidate>
+                {/* 폼 필드 영역: layoutStyles.form 사용 */}
+                <form id="mail-compose-form" onSubmit={handleSendMail} className={layoutStyles.form} noValidate>
                   <div className={layoutStyles.fieldGroup}>
                     <div className={layoutStyles.labelRow}>
                       <label className={layoutStyles.label}>
@@ -557,24 +576,20 @@ export default function MailboxPage() {
                       </span>
                     )}
                   </div>
-
-                  <div style={{ marginTop: '20px', display: 'flex', gap: '12px' }}>
-                    <DefaultButton
-                      text={isSending ? '보내는 중...' : '보내기'}
-                      type="submit"
-                      variant="primary"
-                      disabled={isSending}
-                    />
-                    <DefaultButton
-                      text="취소"
-                      onClick={() => {
-                        setCurrentView('inbox');
-                        setErrorStatus(null);
-                      }}
-                      variant="none"
-                    />
-                  </div>
                 </form>
+
+                {/* 푸터 영역: 폼 외부에 별도로 분리하여 버튼 애니메이션 독립성 보장 */}
+                <div style={{ marginTop: '24px', paddingBottom: '4px' }}>
+                  <DefaultButton
+                    text="보내기"
+                    type="submit"
+                    form="mail-compose-form"
+                    variant="primary"
+                    isLoading={isSending}
+                    disabled={isSending}
+                    width="fill"
+                  />
+                </div>
               </div>
             )}
 

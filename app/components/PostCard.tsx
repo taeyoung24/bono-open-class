@@ -6,7 +6,6 @@ import ConfirmModal from 'app/modals/ConfirmModal';
 import Tooltip from 'app/overlays/Tooltip';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
 import axios from 'axios';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaComment, FaHeart, FaRegHeart, FaTrash } from 'react-icons/fa6';
@@ -14,6 +13,7 @@ import { getUserDisplayName } from 'src/userHelpers';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
 import { logger } from 'src/utils/log';
 import { formatCompactNumber } from 'src/utils/str';
+import SkeletonImage from './loaders/SkeletonImage';
 
 interface PostCardProps {
   post: any;
@@ -161,7 +161,7 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
     >
       {/* 1. 왼쪽: 프로필 영역 */}
       <div className={styles.postLeft}>
-        <Image
+        <SkeletonImage
           src={post.author.profileImage || '/app/logo-square-256.png'}
           alt="Profile"
           width={48}

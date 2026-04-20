@@ -42,12 +42,13 @@ const TYPE_SHORT_MAP: Record<string, string> = {
 
 export default function TypingRecordsPage() {
   const router = useRouter();
-  const { transitionTo } = useTransitionNav();
+  const { transitionTo, setPageReady } = useTransitionNav();
   const [allRecords, setAllRecords] = useState<TypingRecord[]>([]);
   const [stats, setStats] = useState<Stats>({ totalCount: 0, avgCpm: 0, avgAccuracy: 0 });
   const [filter, setFilter] = useState<'POSITION' | 'WORD' | 'NORMAL' | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'analytics' | null>('analytics');
   const [isLoading, setIsLoading] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user_info');
@@ -60,7 +61,15 @@ export default function TypingRecordsPage() {
     fetchRecords(userId);
   }, [router]);
 
+  // 데이터 무결성 검증: 타자 기록 데이터가 모두 준비되었을 때만 연필 로더 해제
+  useEffect(() => {
+    if (hasFetched) {
+      setPageReady(true);
+    }
+  }, [hasFetched, setPageReady]);
+
   const fetchRecords = async (userId: string) => {
+    setPageReady(false); // 연필 로더 대기 시작
     try {
       const response = await fetch(`/api/typing-records?userId=${userId}`);
       const data = await response.json();
@@ -72,6 +81,7 @@ export default function TypingRecordsPage() {
       logger.e(`Failed to fetch records: ${error}`);
     } finally {
       setIsLoading(false);
+      setHasFetched(true);
     }
   };
 

@@ -4,20 +4,22 @@ import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton, FieldButton } from 'app/components/Button';
 import PostCard from 'app/components/PostCard';
 import TextInput from 'app/components/TextInput';
+import SkeletonImage from 'app/components/loaders/SkeletonImage';
 import styles from 'app/dashboard/sns/sns.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import Tooltip from 'app/overlays/Tooltip';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import axios from 'axios';
-import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
+import { getUserDisplayName } from 'src/userHelpers';
 import { formatFullDate, formatRelativeTime } from 'src/utils/date';
 import { logger } from 'src/utils/log';
-import { getUserDisplayName } from 'src/userHelpers';
 import { formatCompactNumber } from 'src/utils/str';
 
 export default function PostDetailPage() {
   const router = useRouter();
+  const { transitionTo, setPageReady } = useTransitionNav();
   const params = useParams();
   const postId = params.id;
 
@@ -25,6 +27,7 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<any>(null);
   const [newComment, setNewComment] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 모달 상태
@@ -48,6 +51,7 @@ export default function PostDetailPage() {
   };
 
   const fetchData = useCallback(async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get(`/api/sns/posts/${postId}`);
       setPost(response.data.post);
@@ -58,8 +62,21 @@ export default function PostDetailPage() {
       });
     } finally {
       setIsLoading(false);
+      setHasFetched(true);
     }
   }, [postId, router]);
+
+  // 최초 진입 시 1회만 연필 로더 대기 명령
+  useEffect(() => {
+    setPageReady(false);
+  }, [setPageReady]);
+
+  // 데이터 무결성 검증: 게시글 데이터가 준비되었을 때만 연필 로더 해제
+  useEffect(() => {
+    if (post && hasFetched) {
+      setPageReady(true);
+    }
+  }, [post, hasFetched, setPageReady]);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user_info');
@@ -95,13 +112,6 @@ export default function PostDetailPage() {
     }
   };
 
-  if (isLoading || !user || !post) {
-    return (
-      <main className={layoutStyles.container}>
-        <p>로딩 중...</p>
-      </main>
-    );
-  }
 
   return (
     <main className={layoutStyles.container}>
@@ -111,7 +121,7 @@ export default function PostDetailPage() {
           <div className={styles.sidebarFooter}>
             <DefaultButton
               text="돌아가기"
-              onClick={() => router.push('/dashboard/sns')}
+              onClick={() => transitionTo('/dashboard/sns')}
               variant="none"
               width="fill"
             />
@@ -120,55 +130,64 @@ export default function PostDetailPage() {
 
         {/* 오른쪽 메인 컨텐츠: 게시글 상세 및 댓글 목록 */}
         <section className={styles.contentArea}>
-          <PostCard
-            post={post}
-            currentUser={user}
-            onRefresh={fetchData}
-            isDetail={true}
-            isListItem={false}
-          />
+          {post ? (
+            <PostCard
+              post={post}
+              currentUser={user}
+              onRefresh={fetchData}
+              isDetail={true}
+              isListItem={false}
+            />
+          ) : (
+            <div style={{ minHeight: '200px' }}>
+              {/* 데이터 로딩 전 빈 공간 유지 */}
+            </div>
+          )}
 
           {/* 댓글 영역: 게시글 카드와 동일한 너비의 독립 카드 */}
           <div className={styles.commentAreaCard}>
-            {/* 댓글 입력 섹션 */}
+            {/* 댓글 입력 섹션: 항상 노출 */}
             <div className={styles.commentInputSection}>
-              <h5 className={styles.commentHeaderTitle}>댓글 {formatCompactNumber(post.comments?.length || 0)}</h5>
+              <h5 className={styles.commentHeaderTitle}>
+                댓글 {post ? formatCompactNumber(post.comments?.length || 0) : ''}
+              </h5>
               <form onSubmit={handleCommentSubmit} className={styles.commentInputGroup}>
                 <div style={{ flex: 1 }}>
                   <TextInput
                     placeholder="따뜻한 댓글로 응원해주세요."
                     value={newComment}
                     onChange={setNewComment}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !post}
                   />
                 </div>
                 <FieldButton
-                  text={isSubmitting ? '...' : '작성'}
+                  text="작성"
                   type="submit"
-                  disabled={isSubmitting || !newComment.trim()}
+                  isLoading={isSubmitting}
+                  disabled={isSubmitting || !newComment.trim() || !post}
                 />
               </form>
             </div>
 
             {/* 댓글 목록 섹션 */}
             <div className={styles.commentList}>
-              {post.comments && post.comments.length > 0 ? (
+              {post?.comments && post.comments.length > 0 ? (
                 post.comments.map((comment: any) => (
                   <div key={comment.id} className={styles.commentItem}>
-                    <Image
+                    <SkeletonImage
                       src={comment.author.profileImage || '/app/logo-square-256.png'}
                       alt="Commenter"
                       width={40}
                       height={40}
                       className={`${styles.commentProfileImage} ${styles.clickable}`}
-                      onClick={() => router.push(`/dashboard/sns/user/${comment.authorId}`)}
+                      onClick={() => transitionTo(`/dashboard/sns/user/${comment.authorId}`)}
                     />
                     <div className={styles.commentBody}>
                       <div className={styles.postHeader}>
                         <div className={styles.authorInfo}>
                           <span
                             className={`${styles.nickname} ${styles.clickable}`}
-                            onClick={() => router.push(`/dashboard/sns/user/${comment.authorId}`)}
+                            onClick={() => transitionTo(`/dashboard/sns/user/${comment.authorId}`)}
                           >
                             {getUserDisplayName(comment.author)}
                           </span>
@@ -183,11 +202,11 @@ export default function PostDetailPage() {
                     </div>
                   </div>
                 ))
-              ) : (
+              ) : post ? (
                 <div className={layoutStyles.dataTextMuted} style={{ textAlign: 'center', padding: '20px 0' }}>
                   아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </section>

@@ -3,11 +3,12 @@
 import Loader from 'app/components/loaders/pencil';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 interface TransitionContextType {
   transitionTo: (href: string) => void;
   transitionBack: () => void;
+  setPageReady: (ready: boolean) => void;
   isPending: boolean;
 }
 
@@ -25,6 +26,7 @@ export const TransitionProvider = ({ children }: { children: React.ReactNode }) 
   const router = useRouter();
   const pathname = usePathname();
   const [isPending, setIsPending] = useState(false);
+  const [isPageReady, setIsPageReady] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
 
   // 전역 스타일로 스크롤바 점유 공간을 고정하고 가로 스크롤을 원천 차단
@@ -34,23 +36,40 @@ export const TransitionProvider = ({ children }: { children: React.ReactNode }) 
     document.body.style.overflowX = 'hidden';
   }, []);
 
+  const [prevPathname, setPrevPathname] = useState(pathname);
+
+  // 경로가 변경될 때 자식 페이지가 마운트되기 직전에 준비 상태를 리셋
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
+    setIsPageReady(true);
+  }
+
   // 애니메이션 상태에 따른 스크롤 제어
+  const shouldWait = isPending || !isPageReady;
+
   useEffect(() => {
-    if (isPending || isAnimating) {
+    if (shouldWait || isAnimating) {
       document.body.style.overflowY = 'hidden';
       document.body.style.height = '100vh';
     } else {
       document.body.style.overflowY = 'auto';
       document.body.style.height = 'auto';
     }
-  }, [isPending, isAnimating]);
+  }, [shouldWait, isAnimating]);
 
   useEffect(() => {
+    // 실제 경로가 변경되었을 때 펜딩 해제
     setIsPending(false);
-    // 경로 도달 시에도 안전장치로 애니메이션 상태 해제 (100ms 뒤)
-    const timer = setTimeout(() => setIsAnimating(false), 100);
-    return () => clearTimeout(timer);
   }, [pathname]);
+
+  useEffect(() => {
+    // 경로 도달 + 페이지 준비 완료 두 조건이 모두 충족되었을 때만 로더 닫기
+    if (!shouldWait) {
+      const timer = setTimeout(() => setIsAnimating(false), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldWait]);
+
 
   const transitionTo = (href: string) => {
     if (href === pathname) return;
@@ -68,17 +87,15 @@ export const TransitionProvider = ({ children }: { children: React.ReactNode }) 
 
     setTimeout(() => {
       router.back();
-      // Next.js router.back()은 비동기이므로 펜딩 상태를 수동으로 풀어줄 필요가 있을 수 있으나
-      // 여기서는 pathname 변경 시 useEffect에서 처리됨
     }, 500);
   };
 
+  const setPageReady = useCallback((ready: boolean) => {
+    setIsPageReady(ready);
+  }, []);
+
   return (
-    <TransitionContext.Provider value={{ transitionTo, transitionBack, isPending }}>
-      {/* 
-          Container는 뷰포트에 고정되어 있으며, 
-          내부에서 애니메이션이 일어나는 동안 스크롤을 절대 생성하지 않음 
-      */}
+    <TransitionContext.Provider value={{ transitionTo, transitionBack, setPageReady, isPending: shouldWait }}>
       <div style={{
         position: 'relative',
         width: '100%',
@@ -86,30 +103,33 @@ export const TransitionProvider = ({ children }: { children: React.ReactNode }) 
         overflow: 'hidden'
       }}>
         <AnimatePresence mode="wait" onExitComplete={() => setIsAnimating(true)}>
-          {!isPending ? (
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, scale: 1.1 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              onAnimationStart={() => setIsAnimating(true)}
-              onAnimationComplete={() => setIsAnimating(false)}
-              style={{
-                width: '100%',
-                minHeight: '100vh',
-                display: 'flex',
-                flexDirection: 'column'
-              }}
-            >
-              {children}
-            </motion.div>
-          ) : (
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: shouldWait ? 0 : 1, scale: shouldWait ? 1.05 : 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            onAnimationStart={() => setIsAnimating(true)}
+            onAnimationComplete={() => setIsAnimating(false)}
+            style={{
+              width: '100%',
+              minHeight: '100vh',
+              display: 'flex',
+              flexDirection: 'column'
+            }}
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {shouldWait && (
             <motion.div
               key="loader"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
               className="flex-center min-h-screen"
               style={{
                 position: 'fixed',

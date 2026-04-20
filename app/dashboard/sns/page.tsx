@@ -2,13 +2,13 @@
 
 import ActionList from 'app/components/ActionList';
 import { DefaultButton } from 'app/components/Button';
+import SkeletonImage from 'app/components/loaders/SkeletonImage';
 import PostCard from 'app/components/PostCard';
 import TextArea from 'app/components/TextArea';
 import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
 import axios from 'axios';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
 import { getUserDisplayName } from 'src/userHelpers';
@@ -17,11 +17,12 @@ import styles from './sns.module.css';
 
 export default function SNSPage() {
   const router = useRouter();
-  const { transitionTo } = useTransitionNav();
+  const { transitionTo, setPageReady } = useTransitionNav();
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [newPostContent, setNewPostContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 모달 상태
@@ -32,36 +33,56 @@ export default function SNSPage() {
     onConfirm: () => setModal(prev => ({ ...prev, isOpen: false }))
   });
 
-  const showAlert = (message: string, title: string = '알림') => {
+  const showAlert = (message: string, onConfirm?: () => void, title: string = '알림') => {
     setModal({
       isOpen: true,
       title,
       message,
-      onConfirm: () => setModal(prev => ({ ...prev, isOpen: false }))
+      onConfirm: () => {
+        if (onConfirm) onConfirm();
+        setModal(prev => ({ ...prev, isOpen: false }));
+      }
     });
   };
 
-  // 데이터 불러오기
   const fetchPosts = useCallback(async () => {
+    setIsLoading(true);
+
     try {
       const response = await axios.get('/api/sns/posts');
       setPosts(response.data.posts);
     } catch (error) {
       logger.e(`Fetch posts error: ${error}`);
+      showAlert('게시글을 불러올 수 없습니다.');
     } finally {
       setIsLoading(false);
+      setHasFetched(true);
     }
   }, []);
 
+  // 최초 진입 시 1회만 연필 로더 대기 명령
   useEffect(() => {
-    const storedUser = localStorage.getItem('user_info');
-    if (!storedUser) {
-      router.push('/login');
-      return;
+    setPageReady(false);
+  }, [setPageReady]);
+
+  // 데이터 무결성 검증: 유저 정보와 포스트 데이터가 모두 준비되었을 때만 연필 로더 해제
+  useEffect(() => {
+    if (user && hasFetched) {
+      setPageReady(true);
     }
-    setUser(JSON.parse(storedUser));
+  }, [user, hasFetched, setPageReady]);
+
+  useEffect(() => {
+    if (!user && typeof window !== 'undefined') {
+      const storedUser = localStorage.getItem('user_info');
+      if (!storedUser) {
+        router.push('/login');
+        return;
+      }
+      setUser(JSON.parse(storedUser));
+    }
     fetchPosts();
-  }, [router, fetchPosts]);
+  }, [fetchPosts, router]);
 
   const handlePostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,17 +90,16 @@ export default function SNSPage() {
 
     setIsSubmitting(true);
     try {
-      const trimmedContent = newPostContent.trim();
       const token = localStorage.getItem('auth_token');
       await axios.post('/api/sns/posts', {
-        content: trimmedContent
+        content: newPostContent
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewPostContent('');
       fetchPosts();
     } catch (error) {
-      logger.e(`Create post error: ${error}`);
+      logger.e(`Post error: ${error}`);
       showAlert('게시글 등록 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
@@ -96,27 +116,34 @@ export default function SNSPage() {
       <div className={styles.layoutContainer}>
         {/* 왼쪽 사이드바: 프로필 및 메뉴 통합 카드 (메일함 구조 차용) */}
         <aside className={`${layoutStyles.formCard} ${styles.sidebar}`}>
-          {user && (
-            <div className={styles.sidebarProfileSection}>
-              <Image
-                src={user.profileImage || '/app/logo-square-256.png'}
-                alt="My Profile"
-                width={100}
-                height={100}
-                className={`${styles.miniProfileImage} ${styles.clickable}`}
-                onClick={() => transitionTo(`/dashboard/sns/user/${user.userId}`)}
-              />
-              <div className={styles.miniProfileInfo}>
-                <span
-                  className={`${styles.miniNickname} ${styles.clickable}`}
-                  onClick={() => transitionTo(`/dashboard/sns/user/${user.userId}`)}
-                >
-                  {getUserDisplayName(user)}
-                </span>
-                <span className={styles.miniBio}>{user.bio || '자기소개가 없습니다.'}</span>
-              </div>
+          <div className={styles.sidebarProfileSection}>
+            <SkeletonImage
+              src={user?.profileImage || '/app/logo-square-256.png'}
+              alt="My Profile"
+              width={100}
+              height={100}
+              className={`${styles.miniProfileImage} ${styles.clickable}`}
+              onClick={() => user && transitionTo(`/dashboard/sns/user/${user.userId}`)}
+            />
+            <div className={styles.miniProfileInfo}>
+              {user ? (
+                <>
+                  <span
+                    className={`${styles.miniNickname} ${styles.clickable}`}
+                    onClick={() => transitionTo(`/dashboard/sns/user/${user.userId}`)}
+                  >
+                    {getUserDisplayName(user)}
+                  </span>
+                  <span className={styles.miniBio}>{user.bio || '자기소개가 없습니다.'}</span>
+                </>
+              ) : (
+                <>
+                  <span className={styles.miniNickname} style={{ opacity: 0.3 }}>정보 로딩 중...</span>
+                  <span className={styles.miniBio} style={{ opacity: 0.3 }}>잠시만 기다려주세요.</span>
+                </>
+              )}
             </div>
-          )}
+          </div>
 
           <div className={styles.navSection}>
             <ActionList items={menuItems} />
@@ -138,7 +165,7 @@ export default function SNSPage() {
           <div className={styles.postForm}>
             {user && (
               <div className={styles.postLeft}>
-                <Image
+                <SkeletonImage
                   src={user.profileImage || '/app/logo-square-256.png'}
                   alt="My Profile"
                   width={48}
@@ -150,7 +177,7 @@ export default function SNSPage() {
             <div className={styles.postFormRight}>
               <form onSubmit={handlePostSubmit} className={styles.flexColumnGap}>
                 <TextArea
-                  placeholder="오늘의 생각이나 기록을 예쁘게 남겨보세요."
+                  placeholder="무슨 생각을 하고 계신가요?"
                   value={newPostContent}
                   onChange={setNewPostContent}
                   disabled={isSubmitting}
@@ -170,26 +197,34 @@ export default function SNSPage() {
             </div>
           </div>
 
-          {/* 피드 리스트 영역: 순수 리스트형 카드 구조 */}
+          {/* 피드 영역: 데이터가 준비되면 즉시 노출 (연필 로더가 가려줌) */}
           <div className={styles.feedContainer}>
-            <div className={styles.feedScrollArea}>
-              {isLoading ? (
-                <div className={styles.emptyFeedCard}>
-                  <p>로딩 중...</p>
+            <div
+              style={{
+                maxHeight: 800,
+                overflowY: 'auto',
+                display: 'flex',
+                flexDirection: 'column'
+              }}
+              className={styles.feedScrollArea}
+            >
+              {hasFetched && (
+                <div style={{ width: '100%' }}>
+                  {posts.length > 0 ? (
+                    posts.map((post) => (
+                      <PostCard
+                        key={post.id}
+                        post={post}
+                        currentUser={user}
+                        onRefresh={fetchPosts}
+                      />
+                    ))
+                  ) : (
+                    <div className={styles.emptyFeedCard}>
+                      <p className={layoutStyles.dataTextMuted}>아직 게시글이 없습니다. 첫 글을 남겨보세요!</p>
+                    </div>
+                  )}
                 </div>
-              ) : posts.length === 0 ? (
-                <div className={styles.emptyFeedCard}>
-                  <p>아직 게시글이 없습니다. 첫 글을 남겨보세요!</p>
-                </div>
-              ) : (
-                posts.map((post) => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    currentUser={user}
-                    onRefresh={fetchPosts}
-                  />
-                ))
               )}
             </div>
           </div>
