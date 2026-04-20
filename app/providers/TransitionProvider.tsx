@@ -1,12 +1,13 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import { AnimatePresence, motion } from 'framer-motion';
 import Loader from 'app/components/loaders/pencil';
+import { AnimatePresence, motion } from 'framer-motion';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface TransitionContextType {
   transitionTo: (href: string) => void;
+  transitionBack: () => void;
   isPending: boolean;
 }
 
@@ -55,23 +56,34 @@ export const TransitionProvider = ({ children }: { children: React.ReactNode }) 
     if (href === pathname) return;
     setIsPending(true);
     setIsAnimating(true);
-    
+
     setTimeout(() => {
       router.push(href);
-    }, 500); 
+    }, 500);
+  };
+
+  const transitionBack = () => {
+    setIsPending(true);
+    setIsAnimating(true);
+
+    setTimeout(() => {
+      router.back();
+      // Next.js router.back()은 비동기이므로 펜딩 상태를 수동으로 풀어줄 필요가 있을 수 있으나
+      // 여기서는 pathname 변경 시 useEffect에서 처리됨
+    }, 500);
   };
 
   return (
-    <TransitionContext.Provider value={{ transitionTo, isPending }}>
+    <TransitionContext.Provider value={{ transitionTo, transitionBack, isPending }}>
       {/* 
           Container는 뷰포트에 고정되어 있으며, 
           내부에서 애니메이션이 일어나는 동안 스크롤을 절대 생성하지 않음 
       */}
-      <div style={{ 
-        position: 'relative', 
-        width: '100%', 
+      <div style={{
+        position: 'relative',
+        width: '100%',
         minHeight: '100vh',
-        overflow: 'hidden' 
+        overflow: 'hidden'
       }}>
         <AnimatePresence mode="wait" onExitComplete={() => setIsAnimating(true)}>
           {!isPending ? (
@@ -83,8 +95,8 @@ export const TransitionProvider = ({ children }: { children: React.ReactNode }) 
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
               onAnimationStart={() => setIsAnimating(true)}
               onAnimationComplete={() => setIsAnimating(false)}
-              style={{ 
-                width: '100%', 
+              style={{
+                width: '100%',
                 minHeight: '100vh',
                 display: 'flex',
                 flexDirection: 'column'
@@ -99,10 +111,10 @@ export const TransitionProvider = ({ children }: { children: React.ReactNode }) 
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="flex-center min-h-screen"
-              style={{ 
-                position: 'fixed', 
-                inset: 0, 
-                zIndex: 999, 
+              style={{
+                position: 'fixed',
+                inset: 0,
+                zIndex: 999,
                 background: 'var(--bg-main)',
                 display: 'flex',
                 alignItems: 'center',

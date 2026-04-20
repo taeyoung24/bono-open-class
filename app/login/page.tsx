@@ -15,6 +15,7 @@ import { logger } from 'src/utils/log';
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const [errorStatus, setErrorStatus] = useState<{ field: string; message: string } | null>(null);
 
   // 모달 상태
@@ -48,6 +49,7 @@ export default function LoginPage() {
     }
 
     setErrorStatus(null);
+    setIsLoading(true);
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -65,6 +67,7 @@ export default function LoginPage() {
           field: isPasswordError ? 'password' : 'userId',
           message: data.message || '로그인 중 오류가 발생했습니다.'
         });
+        setIsLoading(false);
         return;
       }
 
@@ -77,6 +80,7 @@ export default function LoginPage() {
     } catch (error) {
       logger.e(`Login error: ${error}`);
       showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
+      setIsLoading(false);
     }
   };
 
@@ -132,7 +136,7 @@ export default function LoginPage() {
             )}
           </div>
 
-          <DefaultButton type="submit" text="로그인" />
+          <DefaultButton type="submit" text="로그인" isLoading={isLoading} />
         </form>
 
         <div className={styles.helperActions}>

@@ -1,9 +1,9 @@
 'use client';
 
-import { DefaultButton, TextButton } from 'app/components/Button';
-import TextInput from 'app/components/TextInput';
-import CodeInput from 'app/components/CodeInput';
 import styles from 'app/components/AuthFormLayout.module.css';
+import { DefaultButton, TextButton } from 'app/components/Button';
+import CodeInput from 'app/components/CodeInput';
+import TextInput from 'app/components/TextInput';
 import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
@@ -182,7 +182,7 @@ export default function ResetPasswordPage() {
                 </span>
               )}
             </div>
-            <DefaultButton type="submit" text={isLoading ? '요청 중...' : '인증코드 요청'} disabled={isLoading} />
+            <DefaultButton type="submit" text="인증코드 요청" isLoading={isLoading} />
           </form>
         )}
 

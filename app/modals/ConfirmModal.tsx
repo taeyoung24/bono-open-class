@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
-import styles from './ConfirmModal.module.css';
 import { DefaultButton } from 'app/components/Button';
+import styles from './ConfirmModal.module.css';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -13,6 +12,7 @@ interface ConfirmModalProps {
   onConfirm: () => void;
   onCancel: () => void;
   variant?: 'primary' | 'danger' | 'correct';
+  isLoading?: boolean;
 }
 
 export default function ConfirmModal({
@@ -23,7 +23,8 @@ export default function ConfirmModal({
   cancelText = '취소',
   onConfirm,
   onCancel,
-  variant = 'primary'
+  variant = 'primary',
+  isLoading = false
 }: ConfirmModalProps) {
   if (!isOpen) return null;
 
@@ -38,12 +39,14 @@ export default function ConfirmModal({
             onClick={onCancel}
             variant="none"
             width="fill"
+            disabled={isLoading}
           />
           <DefaultButton
             text={confirmText}
             onClick={onConfirm}
             variant={variant}
             width="fill"
+            isLoading={isLoading}
           />
         </div>
       </div>

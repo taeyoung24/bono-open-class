@@ -4,6 +4,7 @@ import layoutStyles from 'app/Layout.module.css';
 import ActionList from 'app/components/ActionList';
 import { DefaultButton } from 'app/components/Button';
 import ConfirmModal from 'app/modals/ConfirmModal';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { logger } from 'src/utils/log';
@@ -11,14 +12,19 @@ import styles from './dashboard.module.css';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { transitionTo } = useTransitionNav();
   const [userName, setUserName] = useState('사용자');
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = () => {
+    setIsLoggingOut(true);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
     document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    router.push('/login');
+
+    // 로그아웃 시에도 매끄러운 전환을 위해 transitionTo 사용
+    transitionTo('/login');
   };
 
   useEffect(() => {
@@ -69,6 +75,7 @@ export default function DashboardPage() {
         onConfirm={handleLogout}
         onCancel={() => setIsLogoutModalOpen(false)}
         variant="danger"
+        isLoading={isLoggingOut}
       />
     </main>
   );

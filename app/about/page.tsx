@@ -3,12 +3,14 @@
 import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton } from 'app/components/Button';
 import Tooltip from 'app/overlays/Tooltip';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import styles from './About.module.css';
 
 export default function AboutPage() {
   const router = useRouter();
+  const { transitionBack } = useTransitionNav();
 
   return (
     <main className={layoutStyles.container}>
@@ -105,7 +107,11 @@ export default function AboutPage() {
         </div>
 
         <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'center' }}>
-          <DefaultButton text="뒤로 가기" onClick={() => router.back()} />
+          <DefaultButton
+            text="뒤로 가기"
+            variant="none"
+            onClick={transitionBack}
+          />
         </div>
       </div>
 

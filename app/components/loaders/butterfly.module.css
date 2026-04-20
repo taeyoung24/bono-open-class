@@ -1,0 +1,263 @@
+.loaderContainer {
+  /* Variables scoped to the component */
+  --bal-bg-top: #00d2ff;
+  --bal-bg-bottom: #3a7bd5;
+  --bal-bird-primary: #ff5e62;
+  --bal-bird-secondary: #ff9966;
+  --bal-bird-highlight: #fff3b0;
+  --bal-cloud-color: var(--bg-card);
+  --bal-wind-color: var(--bg-card);
+  --bal-text-color: var(--bg-card);
+  --bal-bird-body-main: var(--bg-input);
+  --bal-bird-body-sub: var(--bg-card);
+
+  width: 320px;
+  height: 320px;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg,
+      var(--bal-bg-top) 0%,
+      var(--bal-bg-bottom) 100%);
+  border-radius: 40px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Enable 3D perspective */
+  perspective: 800px;
+
+  /* Using relative positioning for the component itself instead of fixed or absolute centering */
+  margin: 20px auto;
+  transition: all 0.3s ease;
+}
+
+/* Mini Variant for Buttons */
+.loaderContainer.mini {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.mini .birdWrapper {
+  width: 40px;
+  height: 40px;
+  top: 50%;
+}
+
+.mini .cloud {
+  filter: blur(2px);
+  opacity: 1;
+  /* 선명한 흰색 유지 */
+}
+
+.mini .windLine {
+  opacity: 1;
+  /* 선명한 흰색 유지 */
+}
+
+/* Scoped Environment Styles */
+.windLine {
+  position: absolute;
+  width: 2px;
+  background: var(--bal-wind-color);
+  border-radius: 4px;
+  top: -100px;
+  animation: balWindFall 1.5s linear infinite;
+}
+
+.wind1 {
+  left: 10%;
+  height: 80px;
+  animation-duration: 1.2s;
+}
+
+.wind2 {
+  left: 90%;
+  height: 100px;
+  animation-duration: 1.8s;
+  animation-delay: 0.1s;
+}
+
+.wind3 {
+  left: 50%;
+  height: 50px;
+  animation-duration: 1.5s;
+  animation-delay: 0.3s;
+}
+
+.wind4 {
+  left: 75%;
+  height: 70px;
+  animation-duration: 1.4s;
+  animation-delay: 0.2s;
+}
+
+.cloud {
+  position: absolute;
+  background: var(--bal-cloud-color);
+  border-radius: 50px;
+  top: -150px;
+  filter: blur(4px);
+  animation: balCloudFall 3s linear infinite;
+}
+
+.cloud::after,
+.cloud::before {
+  content: "";
+  position: absolute;
+  background: inherit;
+  border-radius: 50%;
+}
+
+.cloud1 {
+  width: 80px;
+  height: 30px;
+  left: -10px;
+  animation-duration: 2.5s;
+}
+
+.cloud1::after {
+  width: 40px;
+  height: 40px;
+  top: -15px;
+  left: 15px;
+}
+
+.cloud2 {
+  width: 100px;
+  height: 40px;
+  right: -20px;
+  animation-duration: 4s;
+  animation-delay: 1s;
+}
+
+.cloud2::after {
+  width: 50px;
+  height: 50px;
+  top: -20px;
+  left: 25px;
+}
+
+/* Scoped Bird Animation Styles */
+.birdWrapper {
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%);
+  width: 140px;
+  height: 140px;
+  z-index: 10;
+  animation: balGentleBob 2s ease-in-out infinite;
+}
+
+.birdSvg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.3));
+}
+
+.wingRight {
+  transform-origin: 256px 256px;
+  animation: balFlapRight3D 0.4s ease-in-out infinite alternate;
+}
+
+.wingLeft {
+  transform-origin: 256px 256px;
+  animation: balFlapLeft3D 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes balFlapRight3D {
+  0% {
+    transform: rotateZ(30deg) rotateY(0deg) rotateX(0deg) scale(0.9);
+  }
+
+  100% {
+    transform: rotateZ(-20deg) rotateY(-40deg) rotateX(20deg) scale(1.1);
+  }
+}
+
+@keyframes balFlapLeft3D {
+  0% {
+    transform: rotateZ(-30deg) rotateY(0deg) rotateX(0deg) scale(0.9);
+  }
+
+  100% {
+    transform: rotateZ(20deg) rotateY(40deg) rotateX(20deg) scale(1.1);
+  }
+}
+
+@keyframes balGentleBob {
+
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotateX(5deg);
+  }
+
+  50% {
+    transform: translate(-50%, -56%) rotateX(15deg);
+  }
+}
+
+@keyframes balCloudFall {
+  0% {
+    top: -150px;
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 0.8;
+  }
+
+  100% {
+    top: 400px;
+    opacity: 0;
+  }
+}
+
+@keyframes balWindFall {
+  0% {
+    top: -100px;
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 400px;
+    opacity: 0;
+  }
+}
+
+.loadingText {
+  position: absolute;
+  bottom: 30px;
+  width: 100%;
+  text-align: center;
+  color: var(--bal-text-color);
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+}
