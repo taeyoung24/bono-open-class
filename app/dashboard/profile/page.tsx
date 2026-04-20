@@ -82,7 +82,6 @@ export default function ProfilePage() {
 
       showModal('수정 완료', '프로필 정보가 성공적으로 수정되었습니다.', () => {
         setModal(prev => ({ ...prev, isOpen: false }));
-        transitionTo('/dashboard');
       });
     } catch (error) {
       showModal('오류', '서버와 통신 중 오류가 발생했습니다.');

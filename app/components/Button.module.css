@@ -114,6 +114,7 @@
   height: 44px;
   /* 입력 필드와 시각적으로 정렬되도록 조정 */
   padding: 0 16px;
+  min-width: 80px;
   border: var(--border-width) solid var(--border-main);
   border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
