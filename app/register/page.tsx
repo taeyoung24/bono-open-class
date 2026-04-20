@@ -1,12 +1,13 @@
 'use client';
 
-import { DefaultButton, FieldButton, TextButton } from 'app/components/Button';
-import TextInput from 'app/components/TextInput';
-import CodeInput from 'app/components/CodeInput';
 import styles from 'app/components/AuthFormLayout.module.css';
+import { DefaultButton, FieldButton, TextButton } from 'app/components/Button';
+import CodeInput from 'app/components/CodeInput';
+import TextInput from 'app/components/TextInput';
 import layoutStyles from 'app/Layout.module.css';
-import Tooltip from 'app/overlays/Tooltip';
 import AlertModal from 'app/modals/AlertModal';
+import Tooltip from 'app/overlays/Tooltip';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
@@ -15,6 +16,7 @@ import { GLOBAL_CONFIG } from 'src/settings';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { transitionTo } = useTransitionNav();
   const [userId, setUserId] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -25,6 +27,8 @@ export default function RegisterPage() {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isRequestingCode, setIsRequestingCode] = useState(false);
   const [hasRequestedCode, setHasRequestedCode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingIdCheck, setIsLoadingIdCheck] = useState(false);
 
   const [modal, setModal] = useState({
     isOpen: false,
@@ -48,6 +52,7 @@ export default function RegisterPage() {
       return;
     }
 
+    setIsLoadingIdCheck(true);
     try {
       const response = await fetch('/api/auth/check-id', {
         method: 'POST',
@@ -65,6 +70,8 @@ export default function RegisterPage() {
       }
     } catch (error) {
       showModal('오류', '아이디 중복 확인 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoadingIdCheck(false);
     }
   };
 
@@ -145,6 +152,7 @@ export default function RegisterPage() {
     }
 
     // 8. 서버 전송
+    setIsSubmitting(true);
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
@@ -159,6 +167,7 @@ export default function RegisterPage() {
           field: data.field || 'userId',
           message: data.message || '가입 중 오류가 발생했습니다.'
         });
+        setIsSubmitting(false);
         return;
       }
 
@@ -168,6 +177,8 @@ export default function RegisterPage() {
       });
     } catch (error) {
       showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -200,6 +211,7 @@ export default function RegisterPage() {
                 type="button"
                 onClick={checkIdDuplication}
                 variant={isIdChecked ? "correct" : "default"}
+                isLoading={isLoadingIdCheck}
               />
             </div>
             {errorStatus?.field === 'userId' && (
@@ -294,10 +306,10 @@ export default function RegisterPage() {
                 disabled={isRequestingCode}
               />
               <FieldButton
-                text={isRequestingCode ? "요청 중..." : (hasRequestedCode ? "다시 요청" : "코드 요청")}
+                text={hasRequestedCode ? "다시 요청" : "코드 요청"}
                 type="button"
                 onClick={requestRegisterCode}
-                disabled={isRequestingCode}
+                isLoading={isRequestingCode}
                 variant={hasRequestedCode ? "none" : "default"}
               />
             </div>
@@ -310,17 +322,13 @@ export default function RegisterPage() {
           </div>
 
           <div style={{ marginTop: '10px' }}>
-            <DefaultButton type="submit" text="가입 완료" />
+            <DefaultButton type="submit" text="가입 완료" isLoading={isSubmitting} />
           </div>
         </form>
 
         <div className={styles.footer}>
-          <TextButton text="이미 계정이 있으신가요? 로그인하러 가기" onClick={() => router.push('/login')} />
+          <TextButton text="이미 계정이 있으신가요? 로그인하러 가기" onClick={() => transitionTo('/login')} />
         </div>
-      </div>
-
-      <div className={layoutStyles.bottomFooter}>
-        <p>© 2026 Bono Open Class. All rights reserved.</p>
       </div>
 
       <AlertModal

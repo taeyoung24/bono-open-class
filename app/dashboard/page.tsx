@@ -1,22 +1,30 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from './dashboard.module.css';
 import layoutStyles from 'app/Layout.module.css';
-import { DefaultButton } from 'app/components/Button';
 import ActionList from 'app/components/ActionList';
+import { DefaultButton } from 'app/components/Button';
 import ConfirmModal from 'app/modals/ConfirmModal';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { logger } from 'src/utils/log';
+import styles from './dashboard.module.css';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { transitionTo } = useTransitionNav();
   const [userName, setUserName] = useState('사용자');
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = () => {
+    setIsLoggingOut(true);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
-    router.push('/login');
+    document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+
+    // 로그아웃 시에도 매끄러운 전환을 위해 transitionTo 사용
+    transitionTo('/login');
   };
 
   useEffect(() => {
@@ -27,15 +35,16 @@ export default function DashboardPage() {
         const user = JSON.parse(storedUser);
         setUserName(user.name || user.userId || '사용자');
       } catch (e) {
-        console.error('Failed to parse user info');
+        logger.e(`Failed to parse user info: ${e}`);
       }
     }
   }, []);
 
   const menuItems = [
-    { label: '메일함', onClick: () => router.push('/dashboard/mailbox') },
-    { label: '타자연습 기록실', onClick: () => router.push('/dashboard/typing-records') },
-    { label: '내 정보 수정', onClick: () => router.push('/dashboard/profile') },
+    { label: '메일함', onClick: () => transitionTo('/dashboard/mailbox') },
+    { label: '타자연습 기록실', onClick: () => transitionTo('/dashboard/typing-records') },
+    { label: '본오스퀘어', onClick: () => transitionTo('/dashboard/sns') },
+    { label: '내 정보 수정', onClick: () => transitionTo('/dashboard/profile') },
   ];
 
   return (
@@ -66,6 +75,7 @@ export default function DashboardPage() {
         onConfirm={handleLogout}
         onCancel={() => setIsLogoutModalOpen(false)}
         variant="danger"
+        isLoading={isLoggingOut}
       />
     </main>
   );

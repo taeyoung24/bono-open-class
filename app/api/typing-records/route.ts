@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
+import { logger } from 'src/utils/log';
 
 export async function GET(request: Request) {
   try {
@@ -25,15 +26,15 @@ export async function GET(request: Request) {
 
     // 간단한 통계 계산
     const totalCount = records.length;
-    const avgCpm = totalCount > 0 
-      ? Math.round(records.reduce((acc, curr) => acc + (curr.cpm || 0), 0) / totalCount) 
+    const avgCpm = totalCount > 0
+      ? Math.round(records.reduce((acc, curr) => acc + (curr.cpm || 0), 0) / totalCount)
       : 0;
-    const avgAccuracy = totalCount > 0 
+    const avgAccuracy = totalCount > 0
       ? (records.reduce((acc, curr) => acc + (curr.accuracy || 0), 0) / totalCount).toFixed(1)
       : '0';
 
-    return NextResponse.json({ 
-      records, 
+    return NextResponse.json({
+      records,
       stats: {
         totalCount,
         avgCpm,
@@ -41,7 +42,7 @@ export async function GET(request: Request) {
       }
     }, { status: 200 });
   } catch (error) {
-    console.error('Fetch typing records error:', error);
+    logger.e(`Fetch typing records error: ${error}`);
     return NextResponse.json(
       { message: '기록을 불러오는 중 오류가 발생했습니다.' },
       { status: 500 }

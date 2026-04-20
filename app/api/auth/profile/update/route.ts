@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
+import { logger } from 'src/utils/log';
 
 export async function POST(request: Request) {
   try {
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
       },
     }, { status: 200 });
   } catch (error) {
-    console.error('Profile update error:', error);
+    logger.e(`Profile update error: ${error}`);
     return NextResponse.json(
       { message: '서버 오류가 발생했습니다.' },
       { status: 500 }

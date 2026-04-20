@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
+import { logger } from 'src/utils/log';
 
 export async function DELETE(request: Request) {
   try {
@@ -49,7 +50,7 @@ export async function DELETE(request: Request) {
 
     return NextResponse.json({ message: '성공적으로 삭제되었습니다.' }, { status: 200 });
   } catch (error) {
-    console.error('Mail deletion error:', error);
+    logger.e(`Mail deletion error: ${error}`);
     return NextResponse.json(
       { message: '메일 삭제 중 오류가 발생했습니다.' },
       { status: 500 }

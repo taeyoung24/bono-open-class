@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
+import { logger } from 'src/utils/log';
 
 export async function GET(request: Request) {
   try {
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ inbox }, { status: 200 });
   } catch (error) {
-    console.error('Mailbox inbox error:', error);
+    logger.e(`Mailbox inbox error: ${error}`);
     return NextResponse.json(
       { message: '서버 오류가 발생했습니다.' },
       { status: 500 }

@@ -18,16 +18,23 @@ model User {
   refreshToken String?  // JWT Refresh Token 보관용 (선택 사항)
   
   // 기본 프로필 정보
+  nickname     String?  // SNS용 닉네임
   name         String?  // 사용자 이름
   role         String   @default("STUDENT") // ADMIN | STUDENT | TEACHER
+  profileImage String?  // 프로필 이미지 URL
+  bio          String?  // 한 줄 소개
+  points       Int      @default(0) // 사용자 보유 포인트 (재화)
   
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  // 메일 관련 관계
+  // 관계 설정
   sentMails     Mail[] @relation("SentMails")
   receivedMails Mail[] @relation("ReceivedMails")
   typingRecords TypingRecord[]
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
 
   @@map("users") // 테이블 이름을 명확하게 지정
 }
@@ -58,6 +65,61 @@ model Mail {
   createdAt   DateTime @default(now())   // 보낸 시간
 
   @@map("mails")
+}
+
+// ─────────────────────────────────────────────
+// SNS 시스템 (Bono Square)
+// ─────────────────────────────────────────────
+model Post {
+  id        Int      @id @default(autoincrement())
+  content   String   // 게시글 내용
+  
+  author    User     @relation(fields: [authorId], references: [userId])
+  authorId  String
+  
+  comments  Comment[]
+  likes     Like[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("posts")
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String   // 댓글 내용
+  
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  
+  author    User     @relation(fields: [authorId], references: [userId])
+  authorId  String
+  
+  // 대댓글(답글)을 위한 셀프 참조
+  parent    Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  parentCommentId Int?
+  replies   Comment[] @relation("CommentReplies")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comments")
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  
+  user      User     @relation(fields: [userId], references: [userId])
+  userId    String
+  
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    Int
+  
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId]) // 한 사용자가 한 게시글에 한 번만 좋아요 가능
+  @@map("likes")
 }
 
 // ─────────────────────────────────────────────

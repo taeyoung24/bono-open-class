@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from 'src/lib/prisma';
+import { logger } from 'src/utils/log';
 
 export async function POST(request: Request) {
   try {
@@ -39,7 +40,7 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error('Mail send error:', error);
+    logger.e(`Mail send error: ${error}`);
     return NextResponse.json(
       { message: '서버 오류가 발생했습니다.' },
       { status: 500 }
