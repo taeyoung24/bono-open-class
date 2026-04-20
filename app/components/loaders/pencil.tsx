@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './pencil.module.css';
 
 const Loader = () => {
@@ -10,42 +9,42 @@ const Loader = () => {
             <rect height={30} width={30} ry={5} rx={5} />
           </clipPath>
         </defs>
-        <circle 
-          transform="rotate(-113,100,100)" 
-          strokeLinecap="round" 
-          strokeDashoffset="439.82" 
-          strokeDasharray="439.82 439.82" 
-          strokeWidth={2} 
-          stroke="currentColor" 
-          fill="none" 
-          r={70} 
-          className={styles.pencilStroke} 
+        <circle
+          transform="rotate(-113,100,100)"
+          strokeLinecap="round"
+          strokeDashoffset="439.82"
+          strokeDasharray="439.82 439.82"
+          strokeWidth={2}
+          stroke="currentColor"
+          fill="none"
+          r={70}
+          className={styles.pencilStroke}
         />
         <g transform="translate(100,100)" className={styles.pencilRotate}>
           <g fill="none">
-            <circle 
-              transform="rotate(-90)" 
-              strokeDashoffset={402} 
-              strokeDasharray="402.12 402.12" 
-              strokeWidth={30} 
-              r={64} 
-              className={styles.pencilBody1} 
+            <circle
+              transform="rotate(-90)"
+              strokeDashoffset={402}
+              strokeDasharray="402.12 402.12"
+              strokeWidth={30}
+              r={64}
+              className={styles.pencilBody1}
             />
-            <circle 
-              transform="rotate(-90)" 
-              strokeDashoffset={465} 
-              strokeDasharray="464.96 464.96" 
-              strokeWidth={10} 
-              r={74} 
-              className={styles.pencilBody2} 
+            <circle
+              transform="rotate(-90)"
+              strokeDashoffset={465}
+              strokeDasharray="464.96 464.96"
+              strokeWidth={10}
+              r={74}
+              className={styles.pencilBody2}
             />
-            <circle 
-              transform="rotate(-90)" 
-              strokeDashoffset={339} 
-              strokeDasharray="339.29 339.29" 
-              strokeWidth={10} 
-              r={54} 
-              className={styles.pencilBody3} 
+            <circle
+              transform="rotate(-90)"
+              strokeDashoffset={339}
+              strokeDasharray="339.29 339.29"
+              strokeWidth={10}
+              r={54}
+              className={styles.pencilBody3}
             />
           </g>
           <g transform="rotate(-90) translate(49,0)" className={styles.pencilEraser}>

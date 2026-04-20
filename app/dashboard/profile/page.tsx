@@ -4,12 +4,14 @@ import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton } from 'app/components/Button';
 import TextInput from 'app/components/TextInput';
 import AlertModal from 'app/modals/AlertModal';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { logger } from 'src/utils/log';
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { transitionTo, transitionBack } = useTransitionNav();
   const [userId, setUserId] = useState('');
   const [name, setName] = useState('');
   const [nickname, setNickname] = useState('');
@@ -80,7 +82,7 @@ export default function ProfilePage() {
 
       showModal('수정 완료', '프로필 정보가 성공적으로 수정되었습니다.', () => {
         setModal(prev => ({ ...prev, isOpen: false }));
-        router.push('/dashboard');
+        transitionTo('/dashboard');
       });
     } catch (error) {
       showModal('오류', '서버와 통신 중 오류가 발생했습니다.');
@@ -148,13 +150,14 @@ export default function ProfilePage() {
           <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <DefaultButton
               type="submit"
-              text={isLoading ? '저장 중...' : '프로필 저장하기'}
+              text="프로필 저장하기"
+              isLoading={isLoading}
               disabled={isLoading}
               variant="correct"
             />
             <DefaultButton
               text="취소하고 돌아가기"
-              onClick={() => router.back()}
+              onClick={transitionBack}
               variant="none"
             />
           </div>

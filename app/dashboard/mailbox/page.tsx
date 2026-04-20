@@ -8,6 +8,7 @@ import TextInput from 'app/components/TextInput';
 import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import ConfirmModal from 'app/modals/ConfirmModal';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FaAsterisk } from 'react-icons/fa';
@@ -19,6 +20,7 @@ type MailView = 'inbox' | 'sent' | 'compose' | 'view';
 
 export default function MailboxPage() {
   const router = useRouter();
+  const { transitionTo } = useTransitionNav();
   const [currentView, setCurrentView] = useState<MailView>('inbox');
   const [userEmail, setUserEmail] = useState('');
   const [userId, setUserId] = useState('');
@@ -324,7 +326,7 @@ export default function MailboxPage() {
           <div style={{ marginTop: '32px' }}>
             <DefaultButton
               text="대쉬보드로 돌아가기"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => transitionTo('/dashboard')}
               variant="none"
               width="fill"
             />

@@ -4,6 +4,7 @@ import ActionList from 'app/components/ActionList';
 import { DefaultButton } from 'app/components/Button';
 import layoutStyles from 'app/Layout.module.css';
 import Tooltip from 'app/overlays/Tooltip';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { logger } from 'src/utils/log';
@@ -41,6 +42,7 @@ const TYPE_SHORT_MAP: Record<string, string> = {
 
 export default function TypingRecordsPage() {
   const router = useRouter();
+  const { transitionTo } = useTransitionNav();
   const [allRecords, setAllRecords] = useState<TypingRecord[]>([]);
   const [stats, setStats] = useState<Stats>({ totalCount: 0, avgCpm: 0, avgAccuracy: 0 });
   const [filter, setFilter] = useState<'POSITION' | 'WORD' | 'NORMAL' | null>(null);
@@ -139,7 +141,7 @@ export default function TypingRecordsPage() {
           <div className={styles.sidebarFooter}>
             <DefaultButton
               text="대쉬보드로 돌아가기"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => transitionTo('/dashboard')}
               variant="none"
               width="fill"
             />

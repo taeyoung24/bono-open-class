@@ -1,20 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Image from 'next/image';
 import layoutStyles from 'app/Layout.module.css';
-import styles from 'app/dashboard/sns/sns.module.css';
 import { DefaultButton } from 'app/components/Button';
 import PostCard from 'app/components/PostCard';
-import axios from 'axios';
-import { FaChevronLeft } from 'react-icons/fa6';
-import { logger } from 'src/utils/log';
+import styles from 'app/dashboard/sns/sns.module.css';
 import AlertModal from 'app/modals/AlertModal';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
+import axios from 'axios';
+import Image from 'next/image';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { getUserDisplayName } from 'src/userHelpers';
+import { logger } from 'src/utils/log';
 
 export default function UserProfilePage() {
   const router = useRouter();
+  const { transitionTo } = useTransitionNav();
   const params = useParams();
   const targetUserId = params.userId;
 
@@ -68,39 +69,31 @@ export default function UserProfilePage() {
     fetchData();
   }, [fetchData, router]);
 
-  if (isLoading || !currentUser || !profile) {
-    return (
-      <main className={layoutStyles.container}>
-        <div className={layoutStyles.formCard}>
-          <p>로딩 중...</p>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className={layoutStyles.container}>
       <div className={styles.layoutContainer}>
         {/* 왼쪽 사이드바: 타인 프로필 정보 카드 (메일함 구조 차용) */}
         <aside className={`${layoutStyles.formCard} ${styles.sidebar}`}>
-          <div className={styles.sidebarProfileSection}>
-            <Image
-              src={profile.profileImage || '/app/logo-square-256.png'}
-              alt="Profile"
-              width={100}
-              height={100}
-              className={styles.miniProfileImage}
-            />
-            <div className={styles.miniProfileInfo}>
-              <span className={styles.miniNickname}>{getUserDisplayName(profile)}</span>
-              <span className={styles.miniBio}>{profile.bio || '자기소개가 없습니다.'}</span>
+          {profile && (
+            <div className={styles.sidebarProfileSection}>
+              <Image
+                src={profile.profileImage || '/app/logo-square-256.png'}
+                alt="Profile"
+                width={100}
+                height={100}
+                className={styles.miniProfileImage}
+              />
+              <div className={styles.miniProfileInfo}>
+                <span className={styles.miniNickname}>{getUserDisplayName(profile)}</span>
+                <span className={styles.miniBio}>{profile.bio || '자기소개가 없습니다.'}</span>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className={styles.sidebarFooter}>
             <DefaultButton
               text="돌아가기"
-              onClick={() => router.push('/dashboard/sns')}
+              onClick={() => transitionTo('/dashboard/sns')}
               variant="none"
               width="fill"
             />
@@ -111,17 +104,21 @@ export default function UserProfilePage() {
         <section className={styles.contentArea}>
           <div className={`${layoutStyles.formCard} ${styles.contentCard}`}>
             <h4 className={`${layoutStyles.title} ${styles.titleSmallMargin}`}>
-              {getUserDisplayName(profile)} 님의 활동
+              {profile ? `${getUserDisplayName(profile)} 님의 활동` : '...'}
             </h4>
             <p className={layoutStyles.subtitle}>
-              총 {posts.length}개의 글을 남겼습니다.
+              {profile ? `총 ${posts.length}개의 글을 남겼습니다.` : '정보를 불러오고 있습니다.'}
             </p>
           </div>
 
           {/* 피드 리스트 영역: 순수 리스트형 카드 구조 */}
           <div className={styles.feedContainer}>
             <div className={styles.feedScrollArea}>
-              {posts.length === 0 ? (
+              {isLoading ? (
+                <div className={styles.emptyFeedCard}>
+                  <p>로딩 중...</p>
+                </div>
+              ) : posts.length === 0 ? (
                 <div className={styles.emptyFeedCard}>
                   <p>아직 작성한 게시글이 없습니다. 첫 글을 남겨보세요!</p>
                 </div>

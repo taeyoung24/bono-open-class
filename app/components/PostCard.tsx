@@ -4,6 +4,7 @@ import styles from 'app/dashboard/sns/sns.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import ConfirmModal from 'app/modals/ConfirmModal';
 import Tooltip from 'app/overlays/Tooltip';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -24,6 +25,7 @@ interface PostCardProps {
 
 export default function PostCard({ post, currentUser, onRefresh, isDetail = false, isListItem = true }: PostCardProps) {
   const router = useRouter();
+  const { transitionTo } = useTransitionNav();
 
   const contentRef = useRef<HTMLDivElement>(null);
   const [isOverflowing, setIsOverflowing] = useState(false);
@@ -98,7 +100,7 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
     e.stopPropagation();
     try {
       const token = localStorage.getItem('auth_token');
-      
+
       // 즉각적인 시각 피드백: 바운스 애니메이션 시작
       setIsPopping(true);
       setTimeout(() => setIsPopping(false), 500);
@@ -106,7 +108,7 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
       if (!isLiked) {
         createParticles();
       }
-      
+
       await axios.post('/api/sns/likes', { postId: post.id }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -126,7 +128,7 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
           headers: { Authorization: `Bearer ${token}` }
         });
         if (isDetail) {
-          router.push('/dashboard/sns');
+          transitionTo('/dashboard/sns');
         } else {
           onRefresh();
         }
@@ -139,13 +141,13 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
 
   const goToDetail = () => {
     if (!isDetail) {
-      router.push(`/dashboard/sns/post/${post.id}`);
+      transitionTo(`/dashboard/sns/post/${post.id}`);
     }
   };
 
   const goToProfile = (e: React.MouseEvent) => {
     e.stopPropagation();
-    router.push(`/dashboard/sns/user/${post.authorId}`);
+    transitionTo(`/dashboard/sns/user/${post.authorId}`);
   };
 
   const cardClassName = isListItem

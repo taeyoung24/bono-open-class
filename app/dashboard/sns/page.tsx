@@ -6,16 +6,18 @@ import PostCard from 'app/components/PostCard';
 import TextArea from 'app/components/TextArea';
 import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
+import { useTransitionNav } from 'app/providers/TransitionProvider';
 import axios from 'axios';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
+import { getUserDisplayName } from 'src/userHelpers';
 import { logger } from 'src/utils/log';
 import styles from './sns.module.css';
-import { getUserDisplayName } from 'src/userHelpers';
 
 export default function SNSPage() {
   const router = useRouter();
+  const { transitionTo } = useTransitionNav();
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [newPostContent, setNewPostContent] = useState('');
@@ -86,41 +88,35 @@ export default function SNSPage() {
 
   const menuItems = [
     { label: '전체 피드', onClick: () => fetchPosts() },
-    { label: '내 프로필 수정', onClick: () => router.push('/dashboard/profile') },
+    { label: '내 프로필 수정', onClick: () => transitionTo('/dashboard/profile') },
   ];
-
-  if (isLoading || !user) {
-    return (
-      <main className={layoutStyles.container}>
-        <p>로딩 중...</p>
-      </main>
-    );
-  }
 
   return (
     <main className={layoutStyles.container}>
       <div className={styles.layoutContainer}>
         {/* 왼쪽 사이드바: 프로필 및 메뉴 통합 카드 (메일함 구조 차용) */}
         <aside className={`${layoutStyles.formCard} ${styles.sidebar}`}>
-          <div className={styles.sidebarProfileSection}>
-            <Image
-              src={user.profileImage || '/app/logo-square-256.png'}
-              alt="My Profile"
-              width={100}
-              height={100}
-              className={`${styles.miniProfileImage} ${styles.clickable}`}
-              onClick={() => router.push(`/dashboard/sns/user/${user.userId}`)}
-            />
-            <div className={styles.miniProfileInfo}>
-              <span 
-                className={`${styles.miniNickname} ${styles.clickable}`}
-                onClick={() => router.push(`/dashboard/sns/user/${user.userId}`)}
-              >
-                {getUserDisplayName(user)}
-              </span>
-              <span className={styles.miniBio}>{user.bio || '자기소개가 없습니다.'}</span>
+          {user && (
+            <div className={styles.sidebarProfileSection}>
+              <Image
+                src={user.profileImage || '/app/logo-square-256.png'}
+                alt="My Profile"
+                width={100}
+                height={100}
+                className={`${styles.miniProfileImage} ${styles.clickable}`}
+                onClick={() => transitionTo(`/dashboard/sns/user/${user.userId}`)}
+              />
+              <div className={styles.miniProfileInfo}>
+                <span
+                  className={`${styles.miniNickname} ${styles.clickable}`}
+                  onClick={() => transitionTo(`/dashboard/sns/user/${user.userId}`)}
+                >
+                  {getUserDisplayName(user)}
+                </span>
+                <span className={styles.miniBio}>{user.bio || '자기소개가 없습니다.'}</span>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className={styles.navSection}>
             <ActionList items={menuItems} />
@@ -129,7 +125,7 @@ export default function SNSPage() {
           <div className={styles.sidebarFooter}>
             <DefaultButton
               text="대쉬보드 돌아가기"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => transitionTo('/dashboard')}
               variant="none"
               width="fill"
             />
@@ -140,15 +136,17 @@ export default function SNSPage() {
         <section className={styles.contentArea}>
           {/* 게시글 작성 섹션: 2단 레이아웃(좌: 프로필, 우: 입력필드) 적용 */}
           <div className={styles.postForm}>
-            <div className={styles.postLeft}>
-              <Image
-                src={user.profileImage || '/app/logo-square-256.png'}
-                alt="My Profile"
-                width={48}
-                height={48}
-                className={styles.profileImage}
-              />
-            </div>
+            {user && (
+              <div className={styles.postLeft}>
+                <Image
+                  src={user.profileImage || '/app/logo-square-256.png'}
+                  alt="My Profile"
+                  width={48}
+                  height={48}
+                  className={styles.profileImage}
+                />
+              </div>
+            )}
             <div className={styles.postFormRight}>
               <form onSubmit={handlePostSubmit} className={styles.flexColumnGap}>
                 <TextArea
@@ -160,10 +158,11 @@ export default function SNSPage() {
                 />
                 <div className={styles.flexEnd}>
                   <DefaultButton
-                    text={isSubmitting ? '등록 중...' : '게시하기'}
+                    text="게시하기"
                     type="submit"
                     variant="primary"
                     width="hug"
+                    isLoading={isSubmitting}
                     disabled={isSubmitting || !newPostContent.trim()}
                   />
                 </div>
@@ -174,7 +173,11 @@ export default function SNSPage() {
           {/* 피드 리스트 영역: 순수 리스트형 카드 구조 */}
           <div className={styles.feedContainer}>
             <div className={styles.feedScrollArea}>
-              {posts.length === 0 ? (
+              {isLoading ? (
+                <div className={styles.emptyFeedCard}>
+                  <p>로딩 중...</p>
+                </div>
+              ) : posts.length === 0 ? (
                 <div className={styles.emptyFeedCard}>
                   <p>아직 게시글이 없습니다. 첫 글을 남겨보세요!</p>
                 </div>
