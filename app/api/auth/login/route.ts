@@ -53,7 +53,7 @@ export async function POST(request: Request) {
     // 응답 구성 (보안을 위해 비밀번호 제외)
     const { password: _, ...userWithoutPassword } = user;
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         message: '로그인 성공',
         token,
@@ -61,6 +61,16 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     );
+
+    response.cookies.set('auth_token', token, {
+      path: '/',
+      httpOnly: false, // 클라이언트 측(로그아웃)에서 지울 수 있도록 허용
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 // 1일
+    });
+
+    return response;
   } catch (error) {
     logger.e(`Login error: ${error}`);
     return NextResponse.json(
