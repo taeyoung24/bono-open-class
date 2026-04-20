@@ -45,6 +45,8 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
   });
 
   const [particles, setParticles] = useState<{ id: number; left: number; delay: number }[]>([]);
+  const [isPopping, setIsPopping] = useState(false);
+
 
   const createParticles = () => {
     const newParticles = Array.from({ length: 12 }).map((_, i) => ({
@@ -96,9 +98,15 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
     e.stopPropagation();
     try {
       const token = localStorage.getItem('auth_token');
+      
+      // 즉각적인 시각 피드백: 바운스 애니메이션 시작
+      setIsPopping(true);
+      setTimeout(() => setIsPopping(false), 500);
+
       if (!isLiked) {
         createParticles();
       }
+      
       await axios.post('/api/sns/likes', { postId: post.id }, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -106,6 +114,7 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
     } catch (error) {
       logger.e(`Like error: ${error}`);
     }
+
   };
 
   const handleDelete = async (e: React.MouseEvent) => {
@@ -195,9 +204,10 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
 
         <div className={styles.postFooter}>
           <button
-            className={`${styles.actionButton} ${styles.likeButton} ${isLiked ? styles.likeButtonActive : ''}`}
+            className={`${styles.actionButton} ${styles.likeButton} ${isLiked ? styles.likeButtonActive : ''} ${isPopping ? styles.likeButtonPopping : ''}`}
             onClick={handleLike}
           >
+
             {isLiked ? <FaHeart /> : <FaRegHeart />}
             <span>{formatCompactNumber(post._count?.likes || 0)}</span>
 

@@ -225,15 +225,24 @@
 
 /* --- Like Button Animation --- */
 .likeButton {
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: color 0.3s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   position: relative;
   overflow: visible;
+  user-select: none;
 }
+
+.likeButton:active {
+  transform: scale(0.85) !important;
+  transition: transform 0.1s ease;
+}
+
 
 .likeButton:hover {
   transform: scale(1.1);
   color: var(--status-failure);
 }
+
+
 
 /* 호버 시 텍스트(좋아요 수) 숨기기 */
 .likeButton > span:not(.heartParticle) {
@@ -251,24 +260,34 @@
 }
 
 .likeButton svg {
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .likeButton:hover svg {
   transform: scale(1.6);
+  color: var(--status-failure);
   filter: drop-shadow(0 0 5px rgba(239, 68, 68, 0.5));
 }
 
+
+
 .likeButtonActive {
   color: var(--status-failure) !important;
-  animation: heartPop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+.likeButtonPopping {
+  animation: heartPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+
+
 @keyframes heartPop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.45); }
+  0% { transform: scale(0.85); }
+  50% { transform: scale(1.4); }
+  75% { transform: scale(0.95); }
   100% { transform: scale(1); }
 }
+
 
 /* Splash explosion effect */
 .likeButton::after {
