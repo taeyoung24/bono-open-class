@@ -67,6 +67,7 @@ export default function DashboardPage() {
 
   const menuItems = [
     { label: '스티커판', onClick: () => transitionTo('/dashboard/stickers') },
+    { label: '보관함', onClick: () => transitionTo('/dashboard/inventory') },
     { label: '메일함', onClick: () => transitionTo('/dashboard/mailbox') },
     { label: '타자연습 기록실', onClick: () => transitionTo('/dashboard/typing-records') },
     { label: '본오스퀘어', onClick: () => transitionTo('/dashboard/sns') },
