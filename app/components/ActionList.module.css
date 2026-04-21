@@ -6,6 +6,12 @@
   /* 상단 구분선 제거 */
 }
 
+@media (max-width: 1100px) {
+  .listContainer {
+    margin: 0 -24px;
+  }
+}
+
 .listItem {
   display: flex;
   align-items: center;
@@ -19,6 +25,12 @@
   transition: all 0.1s ease;
   user-select: none;
   /* 하단 구분선 제거 */
+}
+
+@media (max-width: 1100px) {
+  .listItem {
+    padding: 20px 24px;
+  }
 }
 
 .listItem:hover {

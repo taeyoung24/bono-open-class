@@ -268,6 +268,82 @@
   .sidebar,
   .contentArea {
     width: 100%;
-    max-width: var(--form-width-base);
+    max-width: var(--form-width-base) !important;
+    padding: 24px !important;
+  }
+
+  .contentArea {
+    max-height: none;
+    min-height: auto;
+  }
+
+  /* 툴바 필어 그룹이 넘치는 문제 수정 */
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    height: auto;
+    padding: 12px 0;
+    gap: 12px;
+  }
+
+  .toolbarActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .filterGroup {
+    flex-direction: row; /* 검색과 정렬은 가로로 유지하되 너비 유연하게 */
+    width: 100%;
+    gap: 8px;
+  }
+
+  .filterGroup > div {
+    flex: 1;
+    width: auto !important; /* 고정 너비(120px, 200px) 해제 */
+  }
+
+  .filterGroup > div:last-child {
+    flex: 1.5; /* 검색창에 더 많은 공간 할당 */
+  }
+
+  /* 리스트 컬럼 조정 */
+  .colName {
+    width: 80px;
+    font-size: var(--font-size-xs);
+    padding-right: 8px;
+  }
+
+  .colDate {
+    width: 85px;
+    font-size: var(--font-size-xs);
+  }
+
+  .listMailTitle {
+    font-size: var(--font-size-sm);
+  }
+
+  /* 메일 보기/작성 영역 최적화 */
+  .viewHeader {
+    padding-bottom: 16px;
+    margin-bottom: 16px;
+  }
+
+  .mailInfoGrid {
+    gap: 8px;
+  }
+
+  .infoRow {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .infoLabel {
+    width: auto;
+    font-size: var(--font-size-xs);
+  }
+
+  .mailContentBody {
+    min-height: 200px;
   }
 }
