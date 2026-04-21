@@ -1,0 +1,45 @@
+.stickersContainer {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  justify-content: center;
+  max-width: calc(var(--form-width-base) + var(--form-width-extra) + 24px);
+  width: 100%;
+}
+
+.sidebar {
+  width: var(--form-width-base);
+  max-width: var(--form-width-base);
+  flex-shrink: 0;
+}
+
+.contentArea {
+  width: var(--form-width-extra);
+  max-width: var(--form-width-extra) !important;
+  flex-grow: 1;
+  min-height: 540px;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.mainContent {
+  flex: 1 1 auto;
+  display: flex !important;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1100px) {
+  .stickersContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar,
+  .contentArea {
+    width: 100%;
+    max-width: var(--form-width-base);
+  }
+}
