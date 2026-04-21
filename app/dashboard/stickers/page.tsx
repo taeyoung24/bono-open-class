@@ -6,6 +6,7 @@ import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import styles from './stickers.module.css';
+import Tooltip from 'app/overlays/Tooltip';
 
 interface OwnedSticker {
   inventoryId: number;
@@ -229,23 +230,28 @@ export default function StickersPage() {
                 ownedStickers.map((sticker) => {
                   const isSelected = selectedSticker?.itemId === sticker.itemId;
                   return (
-                    <div
-                      key={sticker.itemId}
-                      className={`${styles.stickerSlot} ${styles.stickerSlotActive} ${isSelected ? styles.stickerSlotSelected : ''}`}
-                      title={sticker.name}
-                      onClick={() => handleStickerClick(sticker)}
+                    <Tooltip 
+                      key={sticker.itemId} 
+                      content={sticker.name} 
+                      position="bottom"
                     >
-                      <img
-                        src={sticker.imageUrl}
-                        alt={sticker.name}
-                        className={styles.stickerImg}
-                      />
-                      {(sticker.quantity > 1) && (
-                        <div className={styles.stickerBadge}>
-                          {sticker.quantity > 99 ? '99+' : sticker.quantity}
-                        </div>
-                      )}
-                    </div>
+                      <div
+                        className={`${styles.stickerSlot} ${styles.stickerSlotActive} ${isSelected ? styles.stickerSlotSelected : ''}`}
+                        onClick={() => handleStickerClick(sticker)}
+                      >
+                        <img
+                          src={sticker.imageUrl}
+                          alt={sticker.name}
+                          className={styles.stickerImg}
+                          draggable={false}
+                        />
+                        {(sticker.quantity > 1) && (
+                          <div className={styles.stickerBadge}>
+                            {sticker.quantity > 99 ? '99+' : sticker.quantity}
+                          </div>
+                        )}
+                      </div>
+                    </Tooltip>
                   );
                 })
               )}
@@ -294,6 +300,7 @@ export default function StickersPage() {
                 alt={ps.sticker.name}
                 className={styles.placedSticker}
                 onClick={(e) => handlePickUpSticker(e, ps)}
+                draggable={false}
                 style={{
                   left: `${ps.x}%`,
                   top: `${ps.y}%`,
@@ -310,6 +317,7 @@ export default function StickersPage() {
                 src={selectedSticker.imageUrl}
                 alt="ghost"
                 className={styles.stickerGhost}
+                draggable={false}
                 style={{
                   left: cursorPos.x - STICKER_GHOST_SIZE / 2,
                   top: cursorPos.y - STICKER_GHOST_SIZE / 2,
