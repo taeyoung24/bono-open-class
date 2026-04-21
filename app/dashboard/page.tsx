@@ -8,11 +8,11 @@ import Tooltip from 'app/overlays/Tooltip';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { logger } from 'src/utils/log';
 import { UserRole } from 'src/types';
+import { logger } from 'src/utils/log';
 import styles from './dashboard.module.css';
 
-import { FaEnvelope, FaUserTag, FaStamp } from 'react-icons/fa6';
+import { FaEnvelope, FaStamp, FaUserTag } from 'react-icons/fa6';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -34,6 +34,18 @@ export default function DashboardPage() {
     transitionTo('/login');
   };
 
+  const fetchStickerCount = async (uid: string) => {
+    try {
+      const response = await fetch(`/api/user/sticker-placements?userId=${uid}`);
+      if (response.ok) {
+        const data = await response.json();
+        setStickerCount(data.placements.length);
+      }
+    } catch (e) {
+      console.error('Failed to fetch sticker count:', e);
+    }
+  };
+
   useEffect(() => {
     // 로컬 스토리지에서 사용자 정보 가져오기
     const storedUser = localStorage.getItem('user_info');
@@ -43,6 +55,10 @@ export default function DashboardPage() {
         setUserName(user.name || user.userId || '사용자');
         setUserEmail(user.email || '');
         setUserRole(user.role || '');
+
+        if (user.userId) {
+          fetchStickerCount(user.userId);
+        }
       } catch (e) {
         logger.e(`Failed to parse user info: ${e}`);
       }
