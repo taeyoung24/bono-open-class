@@ -14,7 +14,7 @@ import styles from './give-sticker.module.css';
 
 export default function GiveStickerPage() {
   const { transitionBack } = useTransitionNav();
-  
+
   // 데이터 공유 상태
   const [users, setUsers] = useState<any[]>([]);
   const [stickers, setStickers] = useState<any[]>([]);
@@ -24,7 +24,7 @@ export default function GiveStickerPage() {
   const [selectedUser, setSelectedUser] = useState<any | null>(null);
   const [selectedSticker, setSelectedSticker] = useState<any | null>(null);
   const [quantity, setQuantity] = useState('1');
-  
+
   // 모달 상태
   const [alert, setAlert] = useState({ isOpen: false, title: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,7 +61,7 @@ export default function GiveStickerPage() {
 
   const handleGiveSticker = async () => {
     if (!selectedUser || !selectedSticker) return;
-    
+
     setIsSubmitting(true);
     try {
       const response = await fetch('/api/teacher/give-sticker', {
@@ -77,7 +77,7 @@ export default function GiveStickerPage() {
         })
       });
       const data = await response.json();
-      
+
       if (response.ok) {
         setAlert({ isOpen: true, title: '지급 완료', message: data.message });
         // 성공 시 폼 초기화 (유저는 유지하거나 변경 가능)
@@ -112,7 +112,7 @@ export default function GiveStickerPage() {
     ),
     selected: selectedUser?.userId === u.userId,
     onClick: () => {
-      setSelectedUser(prev => prev?.userId === u.userId ? null : u);
+      setSelectedUser((prev: any) => prev?.userId === u.userId ? null : u);
       logger.d(`Toggled user selection: ${u.userId}`);
     }
   }));
@@ -125,7 +125,7 @@ export default function GiveStickerPage() {
       </div>
     ),
     selected: selectedSticker?.id === s.id,
-    onClick: () => setSelectedSticker(prev => prev?.id === s.id ? null : s)
+    onClick: () => setSelectedSticker((prev: any) => prev?.id === s.id ? null : s)
   }));
 
   return (
@@ -144,7 +144,7 @@ export default function GiveStickerPage() {
               <SelectionList items={userItems} />
             )}
           </div>
-          
+
           <div className={layoutStyles.footer}>
             <DefaultButton
               text="돌아가기"
