@@ -1,14 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import { logger } from 'src/utils/log';
+import { AuthUser } from 'src/types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key';
-
-export interface AuthUser {
-  id: number;
-  userId: string;
-  role: string;
-}
 
 export async function verifyAuth(request: Request): Promise<AuthUser | null> {
   try {
