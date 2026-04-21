@@ -2,11 +2,12 @@
 
 import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton } from 'app/components/Button';
+import Tooltip from 'app/overlays/Tooltip';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { logger } from 'src/utils/log';
 import styles from './stickers.module.css';
-import Tooltip from 'app/overlays/Tooltip';
 
 interface OwnedSticker {
   inventoryId: number;
@@ -88,7 +89,7 @@ export default function StickersPage() {
         setPlacedStickers(loaded);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      logger.e(`Failed to fetch data: ${error}`);
     } finally {
       setIsLoading(false);
       setPageReady(true);
@@ -156,7 +157,7 @@ export default function StickersPage() {
             body: JSON.stringify({ x, y }),
           });
         } catch (error) {
-          console.error('Failed to update placement:', error);
+          logger.e(`Failed to update placement: ${error}`);
         }
       }
     } else {
@@ -199,7 +200,7 @@ export default function StickersPage() {
           ));
         }
       } catch (error) {
-        console.error('Failed to save placement:', error);
+        logger.e(`Failed to save placement: ${error}`);
       }
     }
 
@@ -230,9 +231,9 @@ export default function StickersPage() {
                 ownedStickers.map((sticker) => {
                   const isSelected = selectedSticker?.itemId === sticker.itemId;
                   return (
-                    <Tooltip 
-                      key={sticker.itemId} 
-                      content={sticker.name} 
+                    <Tooltip
+                      key={sticker.itemId}
+                      content={sticker.name}
                       position="bottom"
                     >
                       <div

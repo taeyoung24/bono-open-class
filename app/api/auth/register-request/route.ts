@@ -36,13 +36,13 @@ export async function POST(request: Request) {
       create: { target: userId, type: 'REGISTER', code, expiresAt },
     });
 
-    // 관리자 알림
+    // 선생님 알림
     await logger.reportAsync(
       `**[신규 가입 요청]**\n\`아이디\`: \`${userId}\`\n\`인증코드\`: **${code}** (${expiryMinutes}분 유효)\n\n학생에게 이 코드를 알려주세요.`,
       true
     );
 
-    return NextResponse.json({ message: '가입 인증코드가 관리자에게 요청되었습니다.' }, { status: 200 });
+    return NextResponse.json({ message: '가입 인증코드가 선생님에게 요청되었습니다.' }, { status: 200 });
   } catch (error) {
     logger.e(`Register code request error: ${error}`);
     return NextResponse.json({ message: '서버 오류가 발생했습니다.' }, { status: 500 });

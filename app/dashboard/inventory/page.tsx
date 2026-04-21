@@ -2,15 +2,16 @@
 
 import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton } from 'app/components/Button';
+import Tooltip from 'app/overlays/Tooltip';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useEffect, useState } from 'react';
 import { FaBoxOpen } from 'react-icons/fa6';
+import { logger } from 'src/utils/log';
 import styles from './inventory.module.css';
-import Tooltip from 'app/overlays/Tooltip';
 
 export default function InventoryPage() {
   const { transitionTo, setPageReady } = useTransitionNav();
-  const [items, setItems] = useState<any[]>([]); 
+  const [items, setItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -23,7 +24,7 @@ export default function InventoryPage() {
         setItems(data.items);
       }
     } catch (error) {
-      console.error('Failed to fetch inventory:', error);
+      logger.e(`Failed to fetch inventory: ${error}`);
     } finally {
       setIsLoading(false);
       setHasFetched(true);
@@ -43,7 +44,7 @@ export default function InventoryPage() {
         const user = JSON.parse(storedUser);
         setUserId(user.userId);
       } catch (e) {
-        console.error('Failed to parse user info', e);
+        logger.e(`Failed to parse user info: ${e}`);
       }
     } else {
       transitionTo('/login');
@@ -91,13 +92,13 @@ export default function InventoryPage() {
 
           <div className={styles.gridContainer}>
             {slots.map((item, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className={`${styles.gridSlot} ${item ? styles.hasItem : ''}`}
               >
                 {item ? (
-                  <Tooltip 
-                    content={`${item.name}${item.description ? ` - ${item.description}` : ''}`} 
+                  <Tooltip
+                    content={`${item.name}${item.description ? ` - ${item.description}` : ''}`}
                     position="bottom"
                   >
                     <div className={styles.itemContainer}>
@@ -120,14 +121,14 @@ export default function InventoryPage() {
           <div className={styles.pagination}>
             <DefaultButton
               text="이전"
-              onClick={() => {}} // 추후 페이지 전환 로직 연동
+              onClick={() => { }} // 추후 페이지 전환 로직 연동
               variant="none"
               width="hug"
             />
             <span className={styles.pageIndicator}>1 / 1</span>
             <DefaultButton
               text="다음"
-              onClick={() => {}} // 추후 페이지 전환 로직 연동
+              onClick={() => { }} // 추후 페이지 전환 로직 연동
               variant="none"
               width="hug"
             />

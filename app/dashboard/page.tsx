@@ -42,7 +42,7 @@ export default function DashboardPage() {
         setStickerCount(data.placements.length);
       }
     } catch (e) {
-      console.error('Failed to fetch sticker count:', e);
+      logger.e(`Failed to fetch sticker count: ${e}`);
     }
   };
 
@@ -74,51 +74,69 @@ export default function DashboardPage() {
     { label: '내 정보 수정', onClick: () => transitionTo('/dashboard/profile') },
   ];
 
+  const teacherMenuItems = [
+    { label: '스티커 지급', onClick: () => transitionTo('/dashboard/teacher/give-sticker') },
+    { label: '타자 연습 기록 추가', onClick: () => { } },
+  ];
+
   const ROLE_NAME_MAP: Record<string, string> = {
-    'ADMIN': '관리자',
     'STUDENT': '학생',
     'TEACHER': '선생님'
   };
 
   return (
     <main className={layoutStyles.container}>
-      <div className={layoutStyles.formCard}>
-        <div className={layoutStyles.header}>
-          <h3 className={layoutStyles.title}>대쉬보드 메뉴 ({userName})</h3>
-          <div className={styles.userInfo}>
-            {userRole && (
+      <div className={styles.dashboardLayout}>
+        {/* 왼쪽 카드: 일반 메뉴 */}
+        <div className={layoutStyles.formCard}>
+          <div className={layoutStyles.header}>
+            <h3 className={layoutStyles.title}>대쉬보드 메뉴 ({userName})</h3>
+            <div className={styles.userInfo}>
+              {userRole && (
+                <div className={styles.infoItem}>
+                  <Tooltip content="권한" position="bottom">
+                    <span className={styles.infoIcon}><FaUserTag /></span>
+                  </Tooltip>
+                  <span>{ROLE_NAME_MAP[userRole] || userRole}</span>
+                </div>
+              )}
               <div className={styles.infoItem}>
-                <Tooltip content="권한" position="bottom">
-                  <span className={styles.infoIcon}><FaUserTag /></span>
+                <Tooltip content="이메일" position="bottom">
+                  <span className={styles.infoIcon}><FaEnvelope /></span>
                 </Tooltip>
-                <span>{ROLE_NAME_MAP[userRole] || userRole}</span>
+                <span>{userEmail}</span>
               </div>
-            )}
-            <div className={styles.infoItem}>
-              <Tooltip content="이메일" position="bottom">
-                <span className={styles.infoIcon}><FaEnvelope /></span>
-              </Tooltip>
-              <span>{userEmail}</span>
+              <div className={styles.infoItem}>
+                <Tooltip content="스티커" position="bottom">
+                  <span className={styles.infoIcon}><FaStamp /></span>
+                </Tooltip>
+                <span>모은 스티커 {stickerCount}개</span>
+              </div>
             </div>
-            <div className={styles.infoItem}>
-              <Tooltip content="스티커" position="bottom">
-                <span className={styles.infoIcon}><FaStamp /></span>
-              </Tooltip>
-              <span>모은 스티커 {stickerCount}개</span>
-            </div>
+          </div>
+
+          <ActionList items={menuItems} />
+
+          <div className={styles.logoutSection}>
+            <DefaultButton
+              text="로그아웃"
+              onClick={() => setIsLogoutModalOpen(true)}
+              width='fill'
+              variant="none"
+            />
           </div>
         </div>
 
-        <ActionList items={menuItems} />
+        {/* 오른쪽 카드: 선생님 전용 메뉴 */}
+        {userRole === 'TEACHER' && (
+          <div className={layoutStyles.formCard}>
+            <div className={layoutStyles.header}>
+              <h3 className={layoutStyles.title}>선생님 도구</h3>
+            </div>
 
-        <div className={styles.logoutSection}>
-          <DefaultButton
-            text="로그아웃"
-            onClick={() => setIsLogoutModalOpen(true)}
-            width='fill'
-            variant="none"
-          />
-        </div>
+            <ActionList items={teacherMenuItems} />
+          </div>
+        )}
       </div>
 
       <ConfirmModal

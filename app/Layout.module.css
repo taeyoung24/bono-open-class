@@ -204,3 +204,8 @@
   font-weight: var(--font-weight-r);
   color: var(--text-muted);
 }
+
+/* --- Global Footer Styles --- */
+.footer {
+  margin-top: 24px;
+}

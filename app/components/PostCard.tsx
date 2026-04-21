@@ -84,7 +84,7 @@ export default function PostCard({ post, currentUser, onRefresh, isDetail = fals
   };
 
   const isLiked = post.likes?.some((like: any) => like.userId === currentUser.userId);
-  const isOwner = post.authorId === currentUser.userId || currentUser.role === 'ADMIN';
+  const isOwner = post.authorId === currentUser.userId || currentUser.role === 'TEACHER';
 
   const postDate = new Date(post.createdAt);
   const relativeTime = formatRelativeTime(postDate);

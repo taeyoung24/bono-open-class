@@ -20,7 +20,7 @@ model User {
   // 기본 프로필 정보
   nickname     String?  // SNS용 닉네임
   name         String?  // 사용자 이름
-  role         String   @default("STUDENT") // ADMIN | STUDENT | TEACHER
+  role         String   @default("STUDENT") // STUDENT | TEACHER
   profileImage String?  // 프로필 이미지 URL
   bio          String?  // 한 줄 소개
   points       Int      @default(0) // 사용자 보유 포인트 (재화)
@@ -127,7 +127,7 @@ model Like {
 }
 
 // ─────────────────────────────────────────────
-// 범용 관리자 승인 인증코드 (회원가입, 비밀번호 재설정 등)
+// 범용 선생님 승인 인증코드 (회원가입, 비밀번호 재설정 등)
 // ─────────────────────────────────────────────
 model VerificationCode {
   id        Int      @id @default(autoincrement())

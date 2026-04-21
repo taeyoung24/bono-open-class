@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     if (!record || record.code !== verificationCode || new Date() > record.expiresAt) {
       return NextResponse.json(
-        { field: 'verificationCode', message: '인증코드가 유효하지 않거나 만료되었습니다. 관리자에게 다시 요청해주세요.' },
+        { field: 'verificationCode', message: '인증코드가 유효하지 않거나 만료되었습니다. 선생님에게 다시 요청해주세요.' },
         { status: 401 }
       );
     }

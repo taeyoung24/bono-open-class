@@ -1,0 +1,59 @@
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.1s ease;
+  user-select: none;
+  border-radius: var(--radius-sm);
+  margin-bottom: 2px;
+}
+
+.listItem:hover {
+  background-color: var(--bg-input-hover);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.listItem.selected {
+  background-color: rgba(79, 70, 229, 0.08);
+}
+
+.listItem.selected .itemLabel {
+  color: var(--accent-primary);
+}
+
+.listItem:active {
+  transform: translateY(2px);
+}
+
+.itemLabel {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-sb);
+  color: var(--text-main);
+  text-align: left;
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-h5);
+}
+
+.unselectedIcon {
+  color: var(--text-muted);
+}
+
+.selectedIcon {
+  color: var(--accent-primary);
+}

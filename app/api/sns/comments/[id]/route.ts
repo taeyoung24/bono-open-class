@@ -24,7 +24,7 @@ export async function DELETE(
       );
     }
 
-    if (comment.authorId !== user.userId && user.role !== 'ADMIN') {
+    if (comment.authorId !== user.userId && user.role !== 'TEACHER') {
       return NextResponse.json(
         { message: '삭제 권한이 없습니다.' },
         { status: 403 }

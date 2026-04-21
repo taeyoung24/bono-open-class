@@ -1,7 +1,7 @@
 /**
  * User Roles
  */
-export type UserRole = 'ADMIN' | 'STUDENT' | 'TEACHER';
+export type UserRole = 'STUDENT' | 'TEACHER';
 
 /**
  * Typing Practice Types

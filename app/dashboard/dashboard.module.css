@@ -30,3 +30,20 @@
   /* 아이콘이 살짝 위로 치우쳐 보일 경우를 대비한 미세 조정 */
   transform: translateY(1px); 
 }
+
+.dashboardLayout {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  max-width: calc(var(--form-width-base) * 2 + 24px);
+}
+
+@media (max-width: 1100px) {
+  .dashboardLayout {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+}
