@@ -6,6 +6,7 @@ import CircleLoader from 'app/components/loaders/circle';
 import SelectInput from 'app/components/SelectInput';
 import TextArea from 'app/components/TextArea';
 import TextInput from 'app/components/TextInput';
+import FileInput from 'app/components/FileInput';
 import layoutStyles from 'app/Layout.module.css';
 import AlertModal from 'app/modals/AlertModal';
 import ConfirmModal from 'app/modals/ConfirmModal';
@@ -33,6 +34,7 @@ export default function MailboxPage() {
   const [content, setContent] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isSentSuccess, setIsSentSuccess] = useState(false);
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // 알림 모달 상태
@@ -189,10 +191,20 @@ export default function MailboxPage() {
 
     setIsSending(true);
     try {
+      const formData = new FormData();
+      formData.append('senderId', userId);
+      formData.append('receiverEmail', receiverEmail);
+      formData.append('title', title);
+      formData.append('content', content);
+      
+      attachedFiles.forEach(file => {
+        formData.append('files', file);
+      });
+
       const response = await fetch('/api/mailbox/send', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ senderId: userId, receiverEmail, title, content }),
+        // 브라우저가 multipart/form-data와 boundary를 자동 설정하도록 headers에서 Content-Type 생략
+        body: formData,
       });
 
       if (response.ok) {
@@ -200,6 +212,7 @@ export default function MailboxPage() {
         setReceiverEmail('');
         setTitle('');
         setContent('');
+        setAttachedFiles([]);
         setErrorStatus(null);
       } else {
         const data = await response.json();
@@ -226,6 +239,7 @@ export default function MailboxPage() {
         setSelectedMail(null);
         setSelectedIds([]);
         setSearchQuery('');
+        setAttachedFiles([]);
         setErrorStatus(null);
       }
     },
@@ -241,6 +255,7 @@ export default function MailboxPage() {
         setSelectedMail(null);
         setSelectedIds([]);
         setSearchQuery('');
+        setAttachedFiles([]);
         setErrorStatus(null);
       }
     }
@@ -329,6 +344,7 @@ export default function MailboxPage() {
               onClick={() => {
                 setCurrentView('compose');
                 setIsSentSuccess(false);
+                setAttachedFiles([]);
                 setErrorStatus(null);
               }}
               variant="primary"
@@ -469,6 +485,33 @@ export default function MailboxPage() {
                     </div>
                   </div>
                 </div>
+
+                {/* 첨부파일 표시 영역 */}
+                {selectedMail.attachments && selectedMail.attachments.length > 0 && (
+                  <div className={styles.attachmentsView}>
+                    <div className={styles.attachmentsLabel}>
+                      첨부파일 <span className={styles.attachmentsCount}>{selectedMail.attachments.length}</span>
+                    </div>
+                    <div className={styles.attachmentsList}>
+                      {selectedMail.attachments.map((file: any) => (
+                        <a 
+                          key={file.id} 
+                          href={file.savedPath} 
+                          download={file.originalName}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={styles.attachmentLink}
+                        >
+                          <span className={styles.attachmentName}>{file.originalName}</span>
+                          <span className={styles.attachmentSize}>
+                            {Math.round(file.size / 1024)}KB
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className={styles.mailContentBody}>
                   {selectedMail.content}
                 </div>
@@ -575,6 +618,19 @@ export default function MailboxPage() {
                         {errorStatus.message}
                       </span>
                     )}
+                  </div>
+
+                  <div className={layoutStyles.fieldGroup}>
+                    <div className={layoutStyles.labelRow}>
+                      <label className={layoutStyles.label}>
+                        파일 첨부
+                      </label>
+                    </div>
+                    <FileInput
+                      files={attachedFiles}
+                      onChange={setAttachedFiles}
+                      disabled={isSending}
+                    />
                   </div>
                 </form>
 

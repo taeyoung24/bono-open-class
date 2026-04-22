@@ -70,7 +70,7 @@ export default function DashboardPage() {
     { label: '보관함', onClick: () => transitionTo('/dashboard/inventory') },
     { label: '메일함', onClick: () => transitionTo('/dashboard/mailbox') },
     { label: '타자연습 기록실', onClick: () => transitionTo('/dashboard/typing-records') },
-    { label: '본오스퀘어', onClick: () => transitionTo('/dashboard/sns') },
+    { label: '본오스퀘어', onClick: () => transitionTo('/dashboard/sns'), disabled: true },
     { label: '내 정보 수정', onClick: () => transitionTo('/dashboard/profile') },
   ];
 

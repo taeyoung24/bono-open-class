@@ -1,10 +1,11 @@
 import React from 'react';
 import styles from './ActionList.module.css';
-import { FaArrowRight } from 'react-icons/fa6';
+import { FaArrowRight, FaLock } from 'react-icons/fa6';
 
 export interface ActionListItem {
   label: React.ReactNode;
   onClick: () => void;
+  disabled?: boolean;
 }
 
 interface ActionListProps {
@@ -17,11 +18,16 @@ export default function ActionList({ items }: ActionListProps) {
       {items.map((item, index) => (
         <button
           key={index}
-          className={styles.listItem}
-          onClick={item.onClick}
+          className={`${styles.listItem} ${item.disabled ? styles.disabled : ''}`}
+          onClick={!item.disabled ? item.onClick : undefined}
+          disabled={item.disabled}
         >
           <span className={styles.itemLabel}>{item.label}</span>
-          <FaArrowRight className={styles.itemIcon} />
+          {item.disabled ? (
+            <FaLock className={styles.itemIcon} />
+          ) : (
+            <FaArrowRight className={styles.itemIcon} />
+          )}
         </button>
       ))}
     </nav>

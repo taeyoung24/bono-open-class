@@ -11,34 +11,34 @@ datasource db {
 // 사용자 계정 (인증 및 권한 관리)
 // ─────────────────────────────────────────────
 model User {
-  id           Int      @id @default(autoincrement())
-  userId       String   @unique // 로그인 시 사용하는 아이디
-  email        String   @unique // 사용자 이메일 (아이디@도메인)
-  password     String   // 해싱된 비밀번호
-  refreshToken String?  // JWT Refresh Token 보관용 (선택 사항)
-  
+  id           Int     @id @default(autoincrement())
+  userId       String  @unique // 로그인 시 사용하는 아이디
+  email        String  @unique // 사용자 이메일 (아이디@도메인)
+  password     String // 해싱된 비밀번호
+  refreshToken String? // JWT Refresh Token 보관용 (선택 사항)
+
   // 기본 프로필 정보
-  nickname     String?  // SNS용 닉네임
-  name         String?  // 사용자 이름
-  role         String   @default("STUDENT") // STUDENT | TEACHER
-  profileImage String?  // 프로필 이미지 URL
-  bio          String?  // 한 줄 소개
-  points       Int      @default(0) // 사용자 보유 포인트 (재화)
-  
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  nickname     String? // SNS용 닉네임
+  name         String? // 사용자 이름
+  role         String  @default("STUDENT") // STUDENT | TEACHER
+  profileImage String? // 프로필 이미지 URL
+  bio          String? // 한 줄 소개
+  points       Int     @default(0) // 사용자 보유 포인트 (재화)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // 관계 설정
-  sentMails     Mail[] @relation("SentMails")
-  receivedMails Mail[] @relation("ReceivedMails")
+  sentMails     Mail[]         @relation("SentMails")
+  receivedMails Mail[]         @relation("ReceivedMails")
   typingRecords TypingRecord[]
   posts         Post[]
   comments      Comment[]
   likes         Like[]
-  
+
   // 아이템 및 스티커 시스템
-  inventories      UserInventory[]
-  stickerPages     StickerPage[]
+  inventories  UserInventory[]
+  stickerPages StickerPage[]
 
   @@map("users") // 테이블 이름을 명확하게 지정
 }
@@ -47,43 +47,66 @@ model User {
 // 메일(쪽지) 시스템
 // ─────────────────────────────────────────────
 model Mail {
-  id          Int      @id @default(autoincrement())
-  
+  id Int @id @default(autoincrement())
+
   // 발신자 정보
-  sender      User     @relation("SentMails", fields: [senderId], references: [userId])
-  senderId    String
-  
+  sender   User   @relation("SentMails", fields: [senderId], references: [userId])
+  senderId String
+
   // 수신자 정보
-  receiver    User     @relation("ReceivedMails", fields: [receiverId], references: [userId])
-  receiverId  String
-  
-  title       String   // 제목
-  content     String   // 내용
-  
-  isRead      Boolean  @default(false) // 읽음 여부
-  
+  receiver   User   @relation("ReceivedMails", fields: [receiverId], references: [userId])
+  receiverId String
+
+  title   String // 제목
+  content String // 내용
+
+  isRead Boolean @default(false) // 읽음 여부
+
   // 삭제 여부 플래그
-  deletedBySender   Boolean  @default(false)
-  deletedByReceiver Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())   // 보낸 시간
+  deletedBySender   Boolean @default(false)
+  deletedByReceiver Boolean @default(false)
+
+  createdAt DateTime @default(now()) // 보낸 시간
+
+  // 첨부 파일 관계
+  attachments MailAttachment[]
 
   @@map("mails")
+}
+
+// ─────────────────────────────────────────────
+// 메일 첨부 파일
+// ─────────────────────────────────────────────
+model MailAttachment {
+  id           Int      @id @default(autoincrement())
+  
+  mail         Mail     @relation(fields: [mailId], references: [id], onDelete: Cascade)
+  mailId       Int
+
+  originalName String   // 사용자가 올린 원본 파일명
+  savedPath    String   // 서버에 저장된 실제 경로 (또는 URL)
+  size         Int      // 파일 크기(Byte)
+  mimeType     String   // 파일 형식
+
+  createdAt    DateTime @default(now())
+
+  @@index([mailId])
+  @@map("mail_attachments")
 }
 
 // ─────────────────────────────────────────────
 // SNS 시스템 (Bono Square)
 // ─────────────────────────────────────────────
 model Post {
-  id        Int      @id @default(autoincrement())
-  content   String   // 게시글 내용
-  
-  author    User     @relation(fields: [authorId], references: [userId])
-  authorId  String
-  
-  comments  Comment[]
-  likes     Like[]
-  
+  id      Int    @id @default(autoincrement())
+  content String // 게시글 내용
+
+  author   User   @relation(fields: [authorId], references: [userId])
+  authorId String
+
+  comments Comment[]
+  likes    Like[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -91,20 +114,20 @@ model Post {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String   // 댓글 내용
-  
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    Int
-  
-  author    User     @relation(fields: [authorId], references: [userId])
-  authorId  String
-  
+  id      Int    @id @default(autoincrement())
+  content String // 댓글 내용
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId Int
+
+  author   User   @relation(fields: [authorId], references: [userId])
+  authorId String
+
   // 대댓글(답글)을 위한 셀프 참조
-  parent    Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  parent          Comment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
   parentCommentId Int?
-  replies   Comment[] @relation("CommentReplies")
-  
+  replies         Comment[] @relation("CommentReplies")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -112,14 +135,14 @@ model Comment {
 }
 
 model Like {
-  id        Int      @id @default(autoincrement())
-  
-  user      User     @relation(fields: [userId], references: [userId])
-  userId    String
-  
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    Int
-  
+  id Int @id @default(autoincrement())
+
+  user   User   @relation(fields: [userId], references: [userId])
+  userId String
+
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId Int
+
   createdAt DateTime @default(now())
 
   @@unique([userId, postId]) // 한 사용자가 한 게시글에 한 번만 좋아요 가능
@@ -131,9 +154,9 @@ model Like {
 // ─────────────────────────────────────────────
 model VerificationCode {
   id        Int      @id @default(autoincrement())
-  target    String   // 식별자 (userId, email, phone 등)
-  type      String   // 용도 (REGISTER, PASSWORD_RESET, REWARD_CLAIM 등)
-  code      String   // 발급된 인증코드
+  target    String // 식별자 (userId, email, phone 등)
+  type      String // 용도 (REGISTER, PASSWORD_RESET, REWARD_CLAIM 등)
+  code      String // 발급된 인증코드
   expiresAt DateTime // 만료 시각
   createdAt DateTime @default(now())
 
@@ -145,17 +168,17 @@ model VerificationCode {
 // 타자 연습 기록 시스템
 // ─────────────────────────────────────────────
 model TypingRecord {
-  id        Int      @id @default(autoincrement())
-  
+  id Int @id @default(autoincrement())
+
   // 사용자 정보 (User 테이블의 userId와 매핑)
-  user      User     @relation(fields: [userId], references: [userId])
-  userId    String
-  
-  cpm       Int?     // 타수 (Characters Per Minute, 선택)
-  accuracy  Float?   // 정확도 (0~1 사이, 선택)
-  duration  Int?     // 소요 시간 (초 단위, 선택)
-  type      String   // 타자 연습 종류 (POSITION | WORD | NORMAL)
-  
+  user   User   @relation(fields: [userId], references: [userId])
+  userId String
+
+  cpm      Int? // 타수 (Characters Per Minute, 선택)
+  accuracy Float? // 정확도 (0~1 사이, 선택)
+  duration Int? // 소요 시간 (초 단위, 선택)
+  type     String // 타자 연습 종류 (POSITION | WORD | NORMAL)
+
   createdAt DateTime @default(now()) // 기록 날짜 (필수)
 
   @@index([userId]) // 사용자별 기록 조회를 위한 인덱스
@@ -171,24 +194,45 @@ model Item {
   name        String   // 아이템 이름
   description String?  // 아이템 설명
   imageUrl    String   // 아이템 이미지 URL
-  type        String   @default("STICKER") // STICKER | THEME | BACKGROUND 등
-  
+  type        String   @default("STICKER") // STICKER | PACK 등
+
   createdAt   DateTime @default(now())
 
   inventories  UserInventory[]
   placements   UserStickerPlacement[]
 
+  // [꾸러미 역할] 이 아이템이 '상자'일 때: 이 상자를 열면 얻을 수 있는 아이템 목록
+  packContents PackContent[] @relation("PackToContent")
+  // [보상 역할] 이 아이템이 '내용물'일 때: 이 아이템이 포함되어 있는 상자 목록
+  includedIn   PackContent[] @relation("ContentToPack")
+
   @@map("items")
 }
 
+// 꾸러미(상자)의 구성품 정의
+model PackContent {
+  id             Int    @id @default(autoincrement())
+
+  // 어떤 상자에 들어있는가
+  packItem       Item   @relation("PackToContent", fields: [packItemId], references: [id], onDelete: Cascade)
+  packItemId     Int
+
+  // 무엇이 나오는가
+  rewardItem     Item   @relation("ContentToPack", fields: [rewardItemId], references: [id], onDelete: Cascade)
+  rewardItemId   Int
+
+  @@index([packItemId])
+  @@map("pack_contents")
+}
+
 model UserInventory {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  userId    String
-  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  itemId    Int
-  quantity  Int      @default(1)
-  
+  id       Int    @id @default(autoincrement())
+  user     User   @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId   String
+  item     Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId   Int
+  quantity Int    @default(1)
+
   createdAt DateTime @default(now())
 
   @@unique([userId, itemId])
@@ -196,17 +240,17 @@ model UserInventory {
 }
 
 model StickerPage {
-  id              Int      @id @default(autoincrement())
-  user            User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  id              Int     @id @default(autoincrement())
+  user            User    @relation(fields: [userId], references: [userId], onDelete: Cascade)
   userId          String
-  pageNumber      Int      @default(1) // 페이지 순서
-  title           String?  @default("새 페이지")
-  backgroundColor String?  @default("#ffffff")
-  
-  placements      UserStickerPlacement[]
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  pageNumber      Int     @default(1) // 페이지 순서
+  title           String? @default("새 페이지")
+  backgroundColor String? @default("#ffffff")
+
+  placements UserStickerPlacement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([userId, pageNumber])
   @@index([userId])
@@ -214,20 +258,20 @@ model StickerPage {
 }
 
 model UserStickerPlacement {
-  id        Int      @id @default(autoincrement())
-  
-  page      StickerPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  pageId    Int
-  
-  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  itemId    Int
+  id Int @id @default(autoincrement())
+
+  page   StickerPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  pageId Int
+
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId Int
 
   // 배치를 위한 좌표 및 회전값
-  x         Float
-  y         Float
-  rotation  Float    @default(0)
+  x        Float
+  y        Float
+  rotation Float @default(0)
 
-  placedAt  DateTime @default(now())
+  placedAt DateTime @default(now())
 
   @@index([pageId])
   @@map("user_sticker_placements")

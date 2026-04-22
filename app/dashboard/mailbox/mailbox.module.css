@@ -229,12 +229,74 @@
   word-break: break-all;
 }
 
+.attachmentsView {
+  margin-bottom: 24px;
+  padding: 8px;
+  background-color: var(--bg-input-hover);
+  border-radius: var(--radius-sm);
+  /* FileInput과 동일한 두꺼운 점선 테두리 적용 */
+  border: var(--border-width) dashed var(--text-muted);
+}
+
+.attachmentsLabel {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-sb);
+  color: var(--text-main);
+  margin-bottom: 12px;
+  padding-left: 4px;
+  padding-top: 4px;
+}
+
+.attachmentsCount {
+  color: var(--accent-primary);
+  margin-left: 4px;
+}
+
+.attachmentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.attachmentLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: transparent;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: none;
+  box-shadow: none;
+}
+
+.attachmentLink:hover {
+  background-color: var(--bg-input);
+}
+
+.attachmentName {
+  font-size: var(--font-size-sm);
+  color: var(--text-sub);
+  font-weight: var(--font-weight-sb);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 16px;
+}
+
+.attachmentSize {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
 .mailContentBody {
   font-size: var(--font-size-sm);
   line-height: 1.8;
   color: var(--text-main);
   white-space: pre-wrap;
-  min-height: 300px;
+  min-height: 240px;
 }
 
 .viewActions {
@@ -293,18 +355,21 @@
   }
 
   .filterGroup {
-    flex-direction: row; /* 검색과 정렬은 가로로 유지하되 너비 유연하게 */
+    flex-direction: row;
+    /* 검색과 정렬은 가로로 유지하되 너비 유연하게 */
     width: 100%;
     gap: 8px;
   }
 
-  .filterGroup > div {
+  .filterGroup>div {
     flex: 1;
-    width: auto !important; /* 고정 너비(120px, 200px) 해제 */
+    width: auto !important;
+    /* 고정 너비(120px, 200px) 해제 */
   }
 
-  .filterGroup > div:last-child {
-    flex: 1.5; /* 검색창에 더 많은 공간 할당 */
+  .filterGroup>div:last-child {
+    flex: 1.5;
+    /* 검색창에 더 많은 공간 할당 */
   }
 
   /* 리스트 컬럼 조정 */

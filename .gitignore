@@ -46,3 +46,6 @@ next-env.d.ts
 
 /app/generated/prisma
 /docs/reports
+
+# uploads
+/public/uploads/

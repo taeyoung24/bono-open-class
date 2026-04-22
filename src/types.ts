@@ -16,7 +16,7 @@ export type VerificationType = 'REGISTER' | 'PASSWORD_RESET' | 'REWARD_CLAIM';
 /**
  * Item Types
  */
-export type ItemType = 'STICKER';
+export type ItemType = 'STICKER' | 'PACK';
 
 /**
  * Authentication User Payload

@@ -55,3 +55,17 @@
   color: var(--text-sub);
   font-size: var(--font-size-base);
 }
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.disabled:hover {
+  background-color: var(--bg-card);
+}
+
+.disabled:active {
+  transform: none;
+  box-shadow: none;
+}
