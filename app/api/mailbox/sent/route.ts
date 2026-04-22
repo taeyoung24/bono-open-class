@@ -33,6 +33,7 @@ export async function GET(request: Request) {
             email: true,
           },
         },
+        attachments: true,
       },
       orderBy: {
         createdAt: 'desc',

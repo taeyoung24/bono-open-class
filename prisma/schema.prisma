@@ -68,7 +68,30 @@ model Mail {
 
   createdAt DateTime @default(now()) // 보낸 시간
 
+  // 첨부 파일 관계
+  attachments MailAttachment[]
+
   @@map("mails")
+}
+
+// ─────────────────────────────────────────────
+// 메일 첨부 파일
+// ─────────────────────────────────────────────
+model MailAttachment {
+  id           Int      @id @default(autoincrement())
+  
+  mail         Mail     @relation(fields: [mailId], references: [id], onDelete: Cascade)
+  mailId       Int
+
+  originalName String   // 사용자가 올린 원본 파일명
+  savedPath    String   // 서버에 저장된 실제 경로 (또는 URL)
+  size         Int      // 파일 크기(Byte)
+  mimeType     String   // 파일 형식
+
+  createdAt    DateTime @default(now())
+
+  @@index([mailId])
+  @@map("mail_attachments")
 }
 
 // ─────────────────────────────────────────────

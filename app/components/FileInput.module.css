@@ -1,0 +1,130 @@
+.fileInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.fileList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  height: 140px;
+  overflow-y: auto;
+  padding: 8px;
+  background-color: var(--bg-input-hover);
+  border-radius: var(--radius-sm);
+  /* 글로벌 보더 두께 적용 및 색상 조정 */
+  border: var(--border-width) dashed var(--text-muted);
+}
+
+/* 스크롤바 스타일 */
+.fileList::-webkit-scrollbar {
+  width: 4px;
+}
+
+.fileList::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fileList::-webkit-scrollbar-thumb {
+  background: var(--border-main);
+  border-radius: 4px;
+}
+
+.emptyList {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.fileItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-sub);
+  flex-shrink: 0;
+}
+
+.fileItem:hover {
+  background-color: var(--bg-input);
+}
+
+.fileName {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 12px;
+}
+
+.fileSize {
+  color: var(--text-muted);
+  margin-right: 12px;
+  font-size: var(--font-size-xs);
+}
+
+.removeButton {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.removeButton:hover {
+  color: var(--status-failure);
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.actionRow {
+  display: flex;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.addFileButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  background-color: var(--bg-input-hover);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-sub);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-sb);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.addFileButton:hover {
+  background-color: var(--bg-input);
+}
+
+.addFileButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.clipIcon {
+  font-size: 1.1rem;
+}
