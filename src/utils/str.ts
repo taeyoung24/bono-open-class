@@ -39,3 +39,36 @@ export function formatCompactNumber(num: number): string {
   
   return sign + result + units[unitIndex];
 }
+
+/**
+ * 파일 크기를 3자리 유효 숫자로 제한하여 축약된 문자열로 변환합니다. (1024 기준)
+ * 단위: B, KB, MB, GB, TB, PB
+ */
+export function formatCompactFileSize(bytes: number): string {
+  if (bytes === 0) return '0 B';
+  if (isNaN(bytes)) return '0 B';
+
+  const k = 1024;
+  const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+  const absBytes = Math.abs(bytes);
+  const sign = bytes < 0 ? '-' : '';
+
+  let i = Math.floor(Math.log(absBytes) / Math.log(k));
+  
+  // PB 단위를 초과하는 경우 PB로 고정
+  if (i >= units.length) {
+    i = units.length - 1;
+  }
+
+  // 1024보다 작은 경우 (B 단위)
+  if (i <= 0) {
+    return sign + absBytes.toString() + ' ' + units[0];
+  }
+
+  const scaled = absBytes / Math.pow(k, i);
+  
+  // 3자리 유효 숫자로 변환 후 불필요한 소수점 제거
+  const result = parseFloat(scaled.toPrecision(3)).toString();
+  
+  return sign + result + ' ' + units[i];
+}
