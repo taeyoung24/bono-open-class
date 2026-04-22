@@ -37,7 +37,7 @@
   width: fit-content !important;
 }
 
-.wide:active {
+.wide:not(:disabled):active {
   transform: translateY(2px);
   box-shadow: inset 0 calc(var(--shadow-depth-md) * -0.5) 0 var(--shadow-inset);
 }
@@ -48,7 +48,7 @@
   color: white;
 }
 
-.primary:hover {
+.primary:not(:disabled):hover {
   background-color: var(--accent-primary-hover);
 }
 
@@ -57,7 +57,7 @@
   color: white;
 }
 
-.danger:hover {
+.danger:not(:disabled):hover {
   background-color: var(--status-failure-hover);
 }
 
@@ -66,7 +66,7 @@
   color: white;
 }
 
-.correct:hover {
+.correct:not(:disabled):hover {
   background-color: var(--status-success-hover);
 }
 
@@ -75,7 +75,7 @@
   color: var(--text-main);
 }
 
-.none:hover {
+.none:not(:disabled):hover {
   background-color: var(--text-muted);
   /* none의 경우 클릭 가능한 상태임을 알리기 위해 좀 더 확실히 어둡게 함 */
 }

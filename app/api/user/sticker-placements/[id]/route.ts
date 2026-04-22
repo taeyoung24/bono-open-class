@@ -5,10 +5,11 @@ import { logger } from 'src/utils/log';
 // 스티커 위치 이동
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id: rawId } = await params;
+    const id = parseInt(rawId);
     const body = await request.json();
     const { x, y, rotation } = body;
 
@@ -35,10 +36,11 @@ export async function PATCH(
 // 스티커 제거
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = parseInt(params.id);
+    const { id: rawId } = await params;
+    const id = parseInt(rawId);
     if (isNaN(id)) {
       return NextResponse.json({ message: '올바르지 않은 요청입니다.' }, { status: 400 });
     }

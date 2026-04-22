@@ -38,7 +38,7 @@ model User {
   
   // 아이템 및 스티커 시스템
   inventories      UserInventory[]
-  stickerPlacements UserStickerPlacement[]
+  stickerPages     StickerPage[]
 
   @@map("users") // 테이블 이름을 명확하게 지정
 }
@@ -195,22 +195,40 @@ model UserInventory {
   @@map("user_inventories")
 }
 
+model StickerPage {
+  id              Int      @id @default(autoincrement())
+  user            User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  userId          String
+  pageNumber      Int      @default(1) // 페이지 순서
+  title           String?  @default("새 페이지")
+  backgroundColor String?  @default("#ffffff")
+  
+  placements      UserStickerPlacement[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, pageNumber])
+  @@index([userId])
+  @@map("sticker_pages")
+}
+
 model UserStickerPlacement {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
-  userId    String
+  
+  page      StickerPage @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  pageId    Int
+  
   item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
   itemId    Int
 
-  // 자유 배치를 위한 좌표 및 회전값
-  x         Float    // 0~100 사이의 % 값 추천
-  y         Float    // 0~100 사이의 % 값 추천
-  rotation  Float    @default(0) // 회전 각도 (0~360)
+  // 배치를 위한 좌표 및 회전값
+  x         Float
+  y         Float
+  rotation  Float    @default(0)
 
   placedAt  DateTime @default(now())
 
-  @@index([userId])
+  @@index([pageId])
   @@map("user_sticker_placements")
 }
-
-

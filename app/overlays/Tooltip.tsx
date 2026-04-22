@@ -8,6 +8,7 @@ interface TooltipProps {
   position?: 'top' | 'bottom' | 'left' | 'right';
   delay?: number;
   show?: boolean;
+  className?: string;
 }
 
 export default function Tooltip({ 
@@ -15,7 +16,8 @@ export default function Tooltip({
   content, 
   position = 'top',
   delay = 0,
-  show
+  show,
+  className = ''
 }: TooltipProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
@@ -102,7 +104,7 @@ export default function Tooltip({
     <>
       <div 
         ref={triggerRef}
-        className={styles.tooltipWrapper}
+        className={`${styles.tooltipWrapper} ${className}`}
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}
       >

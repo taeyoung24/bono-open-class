@@ -23,6 +23,19 @@
 
 .controlForm {
   padding: 40px !important;
+  display: flex !important;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pageNavRow {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.navTooltip {
+  flex: 1;
 }
 
 /* 미니멀 통계 섹션 */
@@ -107,7 +120,7 @@
   align-items: center;
   justify-content: center;
   height: 48px;
-  color: var(--bg-card);
+  color: var(--accent-primary-hover);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-sb);
 }
@@ -186,12 +199,11 @@
   width: var(--form-width-extra);
   max-width: var(--form-width-extra) !important;
   flex-grow: 1;
-  min-height: 540px;
+  min-height: 600px;
   display: flex !important;
   flex-direction: column !important;
   position: relative;
   overflow: hidden;
-  padding: 40px !important;
 }
 
 .boardSelectionMode {
@@ -205,10 +217,52 @@
   justify-content: flex-start;
   min-height: 0;
   position: relative;
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
-  background-size: 20px 20px;
+}
+
+.backgroundGrid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 80px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gridCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dotCircle {
+  width: 60px;
+  height: 60px;
+  border: var(--border-width-thin) dashed var(--border-main);
+  border-radius: 50%;
+  opacity: 0.1;
+}
+
+.boardLabel {
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-sb);
+  opacity: 0.1;
+  user-select: none;
+  pointer-events: none;
+  z-index: 0;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
 }
 
 .stickerGhost {
@@ -228,6 +282,31 @@
   z-index: 5;
   user-select: none;
   -webkit-user-drag: none;
+}
+
+/* 컬러 피커 스타일 */
+.colorPickerGrid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 12px 0;
+}
+
+.colorOption {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.colorOption:hover {
+  opacity: 0.8;
+}
+
+.colorOptionSelected {
+  outline: var(--border-width) solid var(--accent-primary);
 }
 
 /* Mobile Responsive */
