@@ -245,10 +245,35 @@
 }
 
 .colDate {
-  width: 160px;
+  width: 120px;
   text-align: right;
   justify-content: flex-end;
   color: var(--text-muted);
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.deleteButton:hover {
+  background: var(--bg-input-hover);
+  color: var(--status-failure);
+}
+
+.deleteButton svg {
+  width: var(--font-size-sm);
+  height: var(--font-size-sm);
 }
 
 /* Mobile Responsive */
@@ -266,8 +291,8 @@
   }
 
   .contentArea {
-    max-height: none;
-    min-height: auto;
+    max-height: 600px;
+    min-height: 500px;
   }
 
   .colStats {

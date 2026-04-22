@@ -76,7 +76,7 @@ export default function DashboardPage() {
 
   const teacherMenuItems = [
     { label: '스티커 지급', onClick: () => transitionTo('/dashboard/teacher/give-sticker') },
-    { label: '타자 연습 기록 추가', onClick: () => { } },
+    { label: '타자 연습 기록 추가', onClick: () => transitionTo('/dashboard/teacher/add-typing-record') },
     { label: '시스템 정보', onClick: () => transitionTo('/dashboard/teacher/system-info') },
   ];
 

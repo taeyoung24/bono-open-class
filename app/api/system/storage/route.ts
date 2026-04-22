@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import fs from 'fs';
+import { NextResponse } from 'next/server';
 import path from 'path';
 import { logger } from 'src/utils/log';
 import { formatCompactFileSize } from 'src/utils/str';
@@ -28,9 +28,9 @@ export async function GET() {
   try {
     const uploadDir = path.join(process.cwd(), 'public', 'uploads');
     const usedBytes = getDirSize(uploadDir);
-    
+
     // 전체 할당량 (1GB)
-    const totalQuota = 1024 * 1024 * 1024; 
+    const totalQuota = 1024 * 1024 * 1024;
     const remainingBytes = Math.max(0, totalQuota - usedBytes);
 
     return NextResponse.json({

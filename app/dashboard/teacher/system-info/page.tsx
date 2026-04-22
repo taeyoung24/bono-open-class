@@ -4,6 +4,7 @@ import layoutStyles from 'app/Layout.module.css';
 import { DefaultButton } from 'app/components/Button';
 import { useTransitionNav } from 'app/providers/TransitionProvider';
 import { useEffect, useState } from 'react';
+import { logger } from 'src/utils/log';
 
 export default function SystemInfoPage() {
   const { transitionBack } = useTransitionNav();
@@ -18,7 +19,7 @@ export default function SystemInfoPage() {
           setStorageInfo(data);
         }
       } catch (e) {
-        console.error('Failed to fetch storage info', e);
+        logger.e(`Failed to fetch storage info: ${e}`);
       }
     };
     fetchStorage();
@@ -37,8 +38,8 @@ export default function SystemInfoPage() {
             <label className={layoutStyles.label}>
               메일 저장소 사용 현황
             </label>
-            <div style={{ 
-              padding: '12px 4px', 
+            <div style={{
+              padding: '12px 4px',
               fontSize: 'var(--font-size-base)',
               fontWeight: 'var(--font-weight-sb)',
               color: 'var(--text-main)',
