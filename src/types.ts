@@ -11,7 +11,7 @@ export type TypingType = 'POSITION' | 'WORD' | 'NORMAL';
 /**
  * Verification Code Types
  */
-export type VerificationType = 'REGISTER' | 'PASSWORD_RESET' | 'REWARD_CLAIM';
+export type VerificationType = 'REGISTER' | 'PASSWORD_RESET' | 'REWARD_CLAIM' | 'RECORD_DELETE';
 
 /**
  * Item Types

@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // 1. 허용되는 공개 라우트 (비로그인 상태 접근 가능)
   const publicPaths = ['/login', '/register', '/reset-password', '/about'];
 
-  // 루트 경로(/\)나 공개 경로, 혹은 API 라우트인 경우 통과
+  // 루트 경로(/)나 공개 경로, 혹은 API 라우트인 경우 통과
   if (
     pathname === '/' ||
     publicPaths.some((path) => pathname.startsWith(path)) ||
@@ -23,14 +23,14 @@ export function middleware(request: NextRequest) {
     // 토큰이 없으면 로그인 페이지로 리다이렉트
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    
+
     const response = NextResponse.redirect(url);
-    
+
     // 브라우저 캐시 방지 헤더 추가
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
-    
+
     return response;
   }
 
@@ -72,7 +72,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * 아래 경로들을 제외한 모든 경로에 미들웨어 적용:
+     * 아래 경로들을 제외한 모든 경로에 프록시 적용:
      * - api (API 라우트)
      * - _next/static (정적 파일)
      * - _next/image (이미지 최적화 파일)

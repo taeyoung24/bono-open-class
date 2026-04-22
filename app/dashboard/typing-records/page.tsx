@@ -12,6 +12,10 @@ import { logger } from 'src/utils/log';
 import ProficiencyGauge from './ProficiencyGauge';
 import styles from './typing-records.module.css';
 import TypingHistoryChart from './TypingHistoryChart';
+import { FaTrash } from 'react-icons/fa6';
+import RecordDeleteModal from 'app/modals/RecordDeleteModal';
+import AlertModal from 'app/modals/AlertModal';
+import axios from 'axios';
 
 interface Stats {
   totalCount: number;
@@ -35,12 +39,24 @@ const TYPE_SHORT_MAP: Record<string, string> = {
 export default function TypingRecordsPage() {
   const router = useRouter();
   const { transitionTo, setPageReady } = useTransitionNav();
+  const [userId, setUserId] = useState<string | null>(null);
   const [allRecords, setAllRecords] = useState<TypingRecord[]>([]);
   const [stats, setStats] = useState<Stats>({ totalCount: 0, avgCpm: 0, avgAccuracy: 0 });
   const [filter, setFilter] = useState<TypingType | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'analytics' | null>('analytics');
   const [isLoading, setIsLoading] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
+
+  // 모달 및 진행 상태
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedRecordId, setSelectedRecordId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isRequestingCode, setIsRequestingCode] = useState(false);
+  const [alertModal, setAlertModal] = useState({ isOpen: false, title: '알림', message: '' });
+
+  const showAlert = (message: string, title: string = '알림') => {
+    setAlertModal({ isOpen: true, title, message });
+  };
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user_info');
@@ -49,8 +65,9 @@ export default function TypingRecordsPage() {
       return;
     }
 
-    const { userId } = JSON.parse(storedUser);
-    fetchRecords(userId);
+    const { userId: uid } = JSON.parse(storedUser);
+    setUserId(uid);
+    fetchRecords(uid);
   }, [router]);
 
   // 데이터 무결성 검증: 타자 기록 데이터가 모두 준비되었을 때만 연필 로더 해제
@@ -109,6 +126,45 @@ export default function TypingRecordsPage() {
     { label: `낱말 연습 (${getCount('WORD')})`, onClick: () => { setFilter('WORD'); setViewMode('list'); } },
     { label: `일반 연습 (${getCount('NORMAL')})`, onClick: () => { setFilter('NORMAL'); setViewMode('list'); } },
   ];
+
+  // 삭제 코드 요청
+  const handleRequestDeleteCode = async () => {
+    if (!userId || !selectedRecordId) return;
+    setIsRequestingCode(true);
+    try {
+      await axios.post('/api/typing-records/delete-request', { userId, recordId: selectedRecordId });
+      showAlert('삭제 승인 코드가 선생님에게 전송되었습니다.');
+    } catch (error: any) {
+      logger.e(`Delete request error: ${error}`);
+      showAlert(error.response?.data?.message || '코드 요청 중 오류가 발생했습니다.');
+    } finally {
+      setIsRequestingCode(false);
+    }
+  };
+
+  // 삭제 실행
+  const handleConfirmDelete = async (code: string) => {
+    if (!userId || !selectedRecordId || !code) return;
+    setIsDeleting(true);
+    try {
+      const response = await axios.post('/api/typing-records/delete-confirm', { 
+        userId, 
+        recordId: selectedRecordId, 
+        code 
+      });
+      setIsDeleteModalOpen(false);
+      showAlert(response.data.message, '삭제 완료');
+      // 기록 새로고침
+      fetchRecords(userId);
+    } catch (error: any) {
+      if (error.response?.status !== 400) {
+        logger.e(`Delete confirm error: ${error}`);
+      }
+      showAlert(error.response?.data?.message || '삭제 처리 중 오류가 발생했습니다.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <main className={layoutStyles.container}>
@@ -234,6 +290,17 @@ export default function TypingRecordsPage() {
                   <div className={`${layoutStyles.dataCol} ${layoutStyles.dataColFixed} ${styles.colDate}`}>
                     {formatDate(record.createdAt)}
                   </div>
+                  <button 
+                    className={styles.deleteButton} 
+                    title="삭제" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedRecordId(record.id);
+                      setIsDeleteModalOpen(true);
+                    }}
+                  >
+                    <FaTrash />
+                  </button>
                 </div>
               ))
             ) : (
@@ -244,6 +311,22 @@ export default function TypingRecordsPage() {
           </div>
         </section>
       </div>
+
+      <RecordDeleteModal
+        isOpen={isDeleteModalOpen}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onRequestCode={handleRequestDeleteCode}
+        isLoading={isDeleting}
+        isRequestingCode={isRequestingCode}
+      />
+
+      <AlertModal
+        isOpen={alertModal.isOpen}
+        title={alertModal.title}
+        message={alertModal.message}
+        onConfirm={() => setAlertModal(prev => ({ ...prev, isOpen: false }))}
+      />
     </main>
   );
 }

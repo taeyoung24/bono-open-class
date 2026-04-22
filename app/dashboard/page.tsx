@@ -71,12 +71,13 @@ export default function DashboardPage() {
     { label: '메일함', onClick: () => transitionTo('/dashboard/mailbox') },
     { label: '타자연습 기록실', onClick: () => transitionTo('/dashboard/typing-records') },
     { label: '본오스퀘어', onClick: () => transitionTo('/dashboard/sns'), disabled: true },
-    { label: '내 정보 수정', onClick: () => transitionTo('/dashboard/profile') },
+    { label: '내 정보 수정', onClick: () => transitionTo('/dashboard/profile'), disabled: true },
   ];
 
   const teacherMenuItems = [
     { label: '스티커 지급', onClick: () => transitionTo('/dashboard/teacher/give-sticker') },
-    { label: '타자 연습 기록 추가', onClick: () => { } },
+    { label: '타자 연습 기록 추가', onClick: () => transitionTo('/dashboard/teacher/add-typing-record') },
+    { label: '시스템 정보', onClick: () => transitionTo('/dashboard/teacher/system-info') },
   ];
 
   const ROLE_NAME_MAP: Record<string, string> = {
