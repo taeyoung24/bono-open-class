@@ -6,6 +6,12 @@
   /* 상단 구분선 제거 */
 }
 
+@media (max-width: 1100px) {
+  .listContainer {
+    margin: 0 -24px;
+  }
+}
+
 .listItem {
   display: flex;
   align-items: center;
@@ -19,6 +25,12 @@
   transition: all 0.1s ease;
   user-select: none;
   /* 하단 구분선 제거 */
+}
+
+@media (max-width: 1100px) {
+  .listItem {
+    padding: 20px 24px;
+  }
 }
 
 .listItem:hover {
@@ -42,4 +54,18 @@
 .itemIcon {
   color: var(--text-sub);
   font-size: var(--font-size-base);
+}
+
+.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.disabled:hover {
+  background-color: var(--bg-card);
+}
+
+.disabled:active {
+  transform: none;
+  box-shadow: none;
 }

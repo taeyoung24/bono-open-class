@@ -4,9 +4,9 @@
   /* 전체 앱의 가장 밑단 배경색 */
   --bg-card: #ffffff;
   /* 컨텐츠를 담는 카드나 모달의 배경색 (흰색으로 변경) */
-  --bg-input: #e9e9e9;
+  --bg-input: #eeeeee;
   /* 입력창의 배경색 (밝은 톤) */
-  --bg-input-hover: #f1f5f9;
+  --bg-input-hover: #fcfcfc;
   /* 입력창 호버 시 배경색 */
 
   /* 텍스트 글로벌 색상 (검정색 계열로 변경) */
@@ -78,6 +78,7 @@
   /* 16px */
   --font-size-sm: 0.875rem;
   /* 14px */
+  --font-size-xs: 0.75rem;
 
   /* Typography - Weights */
   --font-weight-eb: 800;

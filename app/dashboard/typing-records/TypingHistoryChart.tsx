@@ -1,20 +1,20 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
   CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
   Tooltip,
-  ResponsiveContainer
+  XAxis,
+  YAxis
 } from 'recharts';
-import { 
-  TypingRecord, 
-  calculateAdjustedCpmSeries, 
-  calculateDurationSeries, // 새로 생성됨
-  sampleData 
+import { TypingRecord } from 'src/types';
+import {
+  calculateAdjustedCpmSeries,
+  calculateDurationSeries,
+  sampleData
 } from './chart-utils';
 
 interface TypingHistoryChartProps {
@@ -34,7 +34,7 @@ export default function TypingHistoryChart({ records, mode = 'cpm' }: TypingHist
     if (!records || records.length === 0) return [];
 
     // 모드에 따라 계산 로직 선택
-    const fullSeries = mode === 'cpm' 
+    const fullSeries = mode === 'cpm'
       ? calculateAdjustedCpmSeries(records)
       : calculateDurationSeries(records);
 

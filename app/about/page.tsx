@@ -41,7 +41,7 @@ export default function AboutPage() {
             </p>
             <section className={`${styles.section} ${styles.warningSection}`}>
               <p className={styles.sectionText}>
-                이 앱은 안산열린교실 지역아동센터 컴퓨터 교육용으로 제작·운영 중으로 <strong>외부인 가입이 제한</strong>됩니다. (별도의 관리자 문의-승인 절차 필요)
+                이 앱은 안산열린교실 지역아동센터 컴퓨터 교육용으로 제작·운영 중으로 <strong>외부인 가입이 제한</strong>됩니다. (별도의 선생님 문의-승인 절차 필요)
               </p>
             </section>
           </section>

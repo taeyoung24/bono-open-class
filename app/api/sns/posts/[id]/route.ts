@@ -102,8 +102,8 @@ export async function DELETE(
       );
     }
 
-    // 작성자 본인 확인 (또는 관리자 권한 확인 로직 추가 가능)
-    if (post.authorId !== user.userId && user.role !== 'ADMIN') {
+    // 작성자 본인 확인 (또는 선생님 권한 확인)
+    if (post.authorId !== user.userId && user.role !== 'TEACHER') {
       return NextResponse.json(
         { message: '삭제 권한이 없습니다.' },
         { status: 403 }

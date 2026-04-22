@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       true
     );
 
-    return NextResponse.json({ message: '인증코드가 관리자에게 전송되었습니다.' }, { status: 200 });
+    return NextResponse.json({ message: '인증코드가 선생님에게 전송되었습니다.' }, { status: 200 });
   } catch (error) {
     logger.e(`Reset request error: ${error}`);
     return NextResponse.json({ message: '서버 오류가 발생했습니다.' }, { status: 500 });

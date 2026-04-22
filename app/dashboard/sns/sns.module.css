@@ -497,3 +497,75 @@
 .clickable {
   cursor: pointer;
 }
+
+/* Mobile Responsive */
+@media (max-width: 1100px) {
+  .layoutContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar,
+  .contentArea {
+    width: 100%;
+    max-width: var(--form-width-base) !important;
+  }
+
+  /* 카드 및 섹션 패딩 축소 */
+  .postCard,
+  .postListItem,
+  .postForm,
+  .commentAreaCard,
+  .sidebar,
+  .contentCard {
+    padding: 24px !important;
+  }
+
+  /* 프로필 섹션 가로 배치로 전환 (수직 공간 절약) */
+  .sidebarProfileSection {
+    flex-direction: row;
+    text-align: left;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .miniProfileImage {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+  }
+
+  .miniNickname {
+    font-size: var(--font-size-base);
+  }
+
+  .miniBio {
+    font-size: var(--font-size-xs);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* 피드 영역 스크롤 방식 변경 (페이지 전체 스크롤이 더 자연스러움) */
+  .feedContainer,
+  .feedScrollArea {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* 게시글 내부 간격 미세 조정 */
+  .postCard, .postListItem, .postForm {
+    gap: 1rem;
+  }
+
+  .postLeft {
+    gap: 0.5rem;
+  }
+
+  .profileImage {
+    width: 40px;
+    height: 40px;
+  }
+}
